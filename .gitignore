@@ -1,0 +1,12 @@
+node_modules/
+dist/
+server/
+coverage/
+*.tsbuildinfo
+.DS_Store
+
+.env*
+!.env.example
+
+CLAUDE.local.md
+.claude/settings.local.json

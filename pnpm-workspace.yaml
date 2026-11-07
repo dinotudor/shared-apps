@@ -1,0 +1,21 @@
+packages:
+  - "apps/*"
+  - "modules/*"
+  - "packages/*"
+
+# 7 days, in minutes. Setting this explicitly makes installs fail rather than
+# fall back to a newer version.
+minimumReleaseAge: 10080
+
+# Urgent security fixes only, as exact versions. See guidelines/tooling.md.
+# Example: pkg@1.2.3 # https://github.com/advisories/GHSA-xxxx (remove once 7 days old)
+minimumReleaseAgeExclude: []
+
+# Packages allowed to run install scripts. Review with `pnpm approve-builds`.
+allowBuilds:
+  # Required by Qwik. Both ship prebuilt binaries.
+  sharp: false
+  "@parcel/watcher": false
+
+# Versions shared by more than one package. Reference them with "catalog:".
+catalog: {}
