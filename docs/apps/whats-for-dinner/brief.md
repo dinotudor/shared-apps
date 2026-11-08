@@ -1,11 +1,10 @@
 # Brief — What's for dinner
 
 > Status: approved by Dino (2026-11-08). Source of truth for planning and implementation in `shared-apps`.
-> Wireframes: https://claude.ai/artifact/JP2uAC19XkAGNYkF96ZyLr
-> Visual design (final, clickable prototype + guide): https://claude.ai/artifact/KHJ7ACQG7n5WvGSdjeXseP
-> Logo: https://claude.ai/artifact/11kppMZ4oSqcbLJAXKxY49 · Brand identity (SkiroLiro): https://claude.ai/artifact/2c3D7D5MFcyGiPpaDnTCCF
+> Wireframes (all 6 screens plus states): [light](design/screenshots/wireframes-claro.png) · [dark](design/screenshots/wireframes-escuro.png) · [icons](design/screenshots/icones.png)
+> Visual design (final, clickable prototype + guide, works offline): [`design/wireframes-finais.html`](design/wireframes-finais.html)
+> Logo: [`design/brand/`](design/brand/) · Brand identity (SkiroLiro): [`dinotudor/design-system`](https://github.com/dinotudor/design-system)
 > Design files (tokens-wfd.css, icons/, brand/, PLANO.md, GUIA.md): see section 11.
-> Background (Portuguese): https://app.notion.com/p/411e6413a786818f8018f0922623781b
 
 ## 1. Goal
 
@@ -66,7 +65,7 @@ It is also the first app in `shared-apps`. It must prove the shared stack end to
 - Text messages between users.
 - Statistics and rankings.
 - Shopping list.
-- External notifications (WhatsApp, push, e-mail). Earlier research proposed a `MessagingChannel` interface; see the Notion archive.
+- External notifications (WhatsApp, push, e-mail). Earlier research proposed a `MessagingChannel` interface.
 - Phase 2: emoji stickers on dish photos, stored as a non-destructive layer (`DishPhotoSticker`: dishId, userId, emoji, x, y, scale, rotation).
 
 ## 5. Domain model (draft)

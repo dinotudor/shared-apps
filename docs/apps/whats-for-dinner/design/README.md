@@ -10,5 +10,5 @@ Para registrar no repositório do app (sugestão: `docs/design/` ou `apps/<app>/
 - `brand/`: logo v0 (marca, marca com nome, ícone do app) e README.
 - `screenshots/`: imagens dos wireframes e ícones.
 
-Base visual: design system SkiroLiro (`dinotudor/design-system`). Páginas publicadas como artefato: https://claude.ai/artifact/KHJ7ACQG7n5WvGSdjeXseP (privada).
+Base visual: design system SkiroLiro (`dinotudor/design-system`). Referência visual: [`screenshots/wireframes-claro.png`](screenshots/wireframes-claro.png), [`screenshots/wireframes-escuro.png`](screenshots/wireframes-escuro.png), [`screenshots/icones.png`](screenshots/icones.png) e o protótipo offline [`wireframes-finais.html`](wireframes-finais.html).
 Decisões: reações com qualquer emoji; respostas do dia em inglês (versão soft por família, depois); Enjoei por pessoa; ícones só de uso do app, emojis para respostas, notas e reações.

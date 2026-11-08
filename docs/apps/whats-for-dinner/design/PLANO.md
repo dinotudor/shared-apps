@@ -1,6 +1,6 @@
 # What's for dinner? com a identidade SkiroLiro
 
-Base: handoff do brainstorm e página do Notion (PRD, modelo de dados). O canvas original dos wireframes não pôde ser aberto.
+Base: handoff do brainstorm e pesquisa anterior (PRD, modelo de dados). O canvas original dos wireframes não pôde ser aberto.
 
 Regra: "let's order" e "going out" geram um aviso no dia, sem mudar o plano.
 
@@ -41,11 +41,11 @@ Mês (mesmo cartão de dia, menor), mensagens (3ª aba), estatísticas, lista de
 - Reações: lista fixa ou qualquer emoji?
 
 ## Logo e ícone do app (v0 aprovado)
-Aprovado por Dino em 2026-11-08, a refinar depois. Carinha pensativa desenhada (rosto menta, olhos brancos grandes, uma sobrancelha levantada, boca reta) com o nome em Figtree Bold. Arquivos em `brand/v0/` (lockups claro e escuro, marca, ícone de app 1024 px). Explorações descartadas em `brand/explorations/`.
+Aprovado por Dino em 2026-11-08, a refinar depois. Carinha pensativa desenhada (rosto menta, olhos brancos grandes, uma sobrancelha levantada, boca reta) com o nome em Figtree Bold. Arquivos em `brand/` (lockups claro e escuro, marca, ícone de app 1024 px). Explorações descartadas em `brand/explorations/`.
 
 ## Identidade final (2026-11-08)
 - Paleta B, Verde de feira: ação em verde (#0F7A5C claro / #4FE0B0 escuro), texto azul-marinho, fundos com leve tom verde, âmbar para atenção.
-- Logo v0 (carinha pensativa) no cabeçalho e nos estados vazio/carregando; arquivos em `brand/v0/`.
+- Logo v0 (carinha pensativa) no cabeçalho e nos estados vazio/carregando; arquivos em `brand/`.
 - Ícones: 33 só de uso do app (`icons/`). Emojis para respostas, notas, reações e Enjoei.
 - Wireframes finais, Play (protótipo clicável) e Guia de uso: `wireframes-finais.html` (e PNGs claro/escuro).
 - Reações: qualquer emoji. Versão soft das respostas: por família, depois.

@@ -7,7 +7,7 @@ A versão completa, com tabelas e exemplos de fluxos, está na aba **Guia** de `
 - `PLANO.md`: escopo, regras de produto, decisões.
 - `tokens-wfd.css`: variáveis `--wfd-*` da paleta B, claro e escuro.
 - `icons/`: 33 ícones SVG (grade 24, traço 1.5, `currentColor`) e `sprite.svg`.
-- `brand/v0/`: logo v0.
+- `brand/`: logo v0.
 
 ## Regras
 - Use papéis semânticos de cor, não hex.
