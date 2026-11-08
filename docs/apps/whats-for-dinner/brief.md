@@ -1,11 +1,10 @@
 # Brief — What's for dinner
 
 > Status: approved by Dino (2026-11-08). Source of truth for planning and implementation in `shared-apps`.
-> Wireframes: https://claude.ai/artifact/JP2uAC19XkAGNYkF96ZyLr
-> Visual design (final, clickable prototype + guide): https://claude.ai/artifact/KHJ7ACQG7n5WvGSdjeXseP
-> Logo: https://claude.ai/artifact/11kppMZ4oSqcbLJAXKxY49 · Brand identity (SkiroLiro): https://claude.ai/artifact/2c3D7D5MFcyGiPpaDnTCCF
-> Design files (tokens-wfd.css, icons/, brand/, PLANO.md, GUIA.md): see section 11.
-> Background (Portuguese): https://app.notion.com/p/411e6413a786818f8018f0922623781b
+> Wireframes (all 6 screens plus states): [light](design/screenshots/wireframes-light.png) · [dark](design/screenshots/wireframes-dark.png) · [icons](design/screenshots/icons.png)
+> Visual design (final, clickable prototype + guide, works offline): [`design/wireframes-final.html`](design/wireframes-final.html)
+> Logo: [`design/brand/`](design/brand/) · Brand identity (SkiroLiro): [`dinotudor/design-system`](https://github.com/dinotudor/design-system)
+> Design files (tokens-wfd.css, icons/, brand/, PLAN.md, GUIDE.md): see section 11.
 
 ## 1. Goal
 
@@ -66,7 +65,7 @@ It is also the first app in `shared-apps`. It must prove the shared stack end to
 - Text messages between users.
 - Statistics and rankings.
 - Shopping list.
-- External notifications (WhatsApp, push, e-mail). Earlier research proposed a `MessagingChannel` interface; see the Notion archive.
+- External notifications (WhatsApp, push, e-mail). Earlier research proposed a `MessagingChannel` interface.
 - Phase 2: emoji stickers on dish photos, stored as a non-destructive layer (`DishPhotoSticker`: dishId, userId, emoji, x, y, scale, rotation).
 
 ## 5. Domain model (draft)
@@ -133,16 +132,16 @@ Expected new packages: `modules/dishes`, `modules/meals` (names to confirm), `pa
 - Tone: humour in responses, the missing-ingredient alert, empty states and *Enjoei*; never in errors, offline or delete.
 - Touch targets ≥ 44 px; state is never shown by colour alone; contrast ≥ 4.5:1 (checked in the guide).
 - Deleting a dish asks for confirmation: "Excluir [prato]? As notas da família também somem. Não dá para desfazer."
-- UI copy (pt-BR) is listed in the guide's "Textos do app" table; response labels stay in English for now. A "soft" version of the responses, per family, is a later idea.
+- UI copy (pt-BR) is listed in the guide's "App copy" table; response labels stay in English for now. A "soft" version of the responses, per family, is a later idea.
 
 ## 11. Design files
 
-The design package lives in this repo at `docs/apps/whats-for-dinner/design/` (texts in Portuguese). Issue 7 turns it into `packages/design-system`:
+The design package lives in this repo at `docs/apps/whats-for-dinner/design/` (docs in English; UI copy in pt-BR). Issue 7 turns it into `packages/design-system`:
 
 - `tokens-wfd.css` — `--wfd-*` colour, font and radius tokens, light and dark.
 - `icons/*.svg` and `icons/sprite.svg` — 33 app icons (24 px grid, 1.5 stroke, `currentColor`; 5 are for Phase 2).
 - `brand/` — logo v0: mark, lockup and app icon, light and dark (see `brand/README.md`).
-- `PLANO.md` (product rules), `GUIA.md` (usage guide, UI copy, accessibility), `wireframes-finais.html` (offline prototype), `screenshots/`.
+- `PLAN.md` (product rules), `GUIDE.md` (usage guide, UI copy, accessibility), `wireframes-final.html` (offline prototype), `screenshots/`.
 - Visual base: the SkiroLiro design system (`dinotudor/design-system`).
 
 ## 12. Dependencies on Dino

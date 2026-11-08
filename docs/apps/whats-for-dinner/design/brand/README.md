@@ -1,11 +1,11 @@
-# What's for dinner? logo, v0 aprovado
+# What's for dinner? logo, v0 approved
 
-Aprovado por Dino em 2026-11-08. Direção G1: carinha pensativa desenhada (rosto menta, olhos brancos grandes, uma sobrancelha levantada, boca reta). É uma v0, a ser refinada depois.
+Approved by Dino on 2026-11-08. Direction G1: a hand-drawn thinking face (mint face, big white eyes, one raised eyebrow, straight mouth). It is a v0, to be refined later.
 
-| Arquivo | Uso |
+| File | Use |
 |---|---|
-| `wfd-lockup-light.svg` / `wfd-lockup-dark.svg` | Marca com o nome, em fundo claro e escuro |
-| `wfd-mark-light.svg` / `wfd-mark-dark.svg` | Só a carinha, para avatar e favicon |
-| `wfd-app-icon.svg` | Ícone do app (1024 px, fundo azul-marinho) |
+| `wfd-lockup-light.svg` / `wfd-lockup-dark.svg` | Mark with the name, on light and dark backgrounds |
+| `wfd-mark-light.svg` / `wfd-mark-dark.svg` | The face only, for avatar and favicon |
+| `wfd-app-icon.svg` | App icon (1024 px, navy background) |
 
-O nome está em Figtree Bold convertido em curvas. Cores da SkiroLiro (menta `#2DB88C` / `#4FE0B0`, azul-marinho `#16335E`). Desenho próprio, sem licença de terceiros. As outras direções ficam em `../explorations/`.
+The name is set in Figtree Bold, converted to outlines. SkiroLiro colours (mint `#2DB88C` / `#4FE0B0`, navy `#16335E`). Original drawing, no third-party licence. The other directions live in `../explorations/`.

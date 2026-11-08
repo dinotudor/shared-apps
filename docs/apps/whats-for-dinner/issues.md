@@ -2,7 +2,7 @@
 
 > For `engineering-playbook/processes/plan-project.md`, steps 3–7. Status: approved by Dino (2026-11-08).
 > Repository: `dinotudor/shared-apps`. GitHub Project: "What's for dinner". Every issue gets the label `app:whats-for-dinner`.
-> The brief (`brief.md`) becomes the issue labelled `brief`. Visual reference for every screen issue: the prototype https://claude.ai/artifact/KHJ7ACQG7n5WvGSdjeXseP and brief section 10. Decision references (D1–D8) point to its section 8.
+> The brief (`brief.md`) becomes the issue labelled `brief`. Visual reference for every screen issue: the wireframe screenshots ([light](design/screenshots/wireframes-light.png), [dark](design/screenshots/wireframes-dark.png), [icons](design/screenshots/icons.png)), the offline prototype [`design/wireframes-final.html`](design/wireframes-final.html) and brief section 10. Decision references (D1–D8) point to its section 8.
 > Each issue fits in one PR and follows `processes/implement-issue.md`.
 
 Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has the infrastructure.
