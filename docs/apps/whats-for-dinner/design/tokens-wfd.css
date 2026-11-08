@@ -1,0 +1,22 @@
+/* What's for dinner? Paleta B "Verde de feira". Papéis semânticos; valores por modo. */
+:root{
+  --wfd-bg:#F4F6F1;--wfd-surface:#FFFFFF;--wfd-sunken:#E8EDE4;--wfd-border:#D6DDD0;--wfd-border-strong:#7C8A78;
+  --wfd-text:#12263A;--wfd-text-muted:#55665F;
+  --wfd-action:#0F7A5C;--wfd-on-action:#FFFFFF;--wfd-confirm:#0F7A5C;
+  --wfd-selected:#D9F0E4;--wfd-warning:#8A5200;--wfd-warning-bg:#FFEFD0;--wfd-warning-border:#E8C27A;
+  --wfd-info:#1E3A5F;--wfd-info-bg:#E6EEF8;--wfd-info-border:#A9C0E0;--wfd-danger:#B92D3A;
+  --wfd-font-ui:Figtree,system-ui,sans-serif;--wfd-font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --wfd-radius-md:12px;--wfd-radius-lg:14px;--wfd-radius-xl:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --wfd-bg:#0C1512;--wfd-surface:#15211C;--wfd-sunken:#09100D;--wfd-border:#243229;--wfd-border-strong:#627A6C;
+  --wfd-text:#E8F1EC;--wfd-text-muted:#9BB0A4;
+  --wfd-action:#4FE0B0;--wfd-on-action:#07140F;--wfd-confirm:#4FE0B0;
+  --wfd-selected:#153A2D;--wfd-warning:#F2B84B;--wfd-warning-bg:#3A2C10;--wfd-warning-border:#6B5220;
+  --wfd-info:#B5CCF2;--wfd-info-bg:#16294A;--wfd-info-border:#2E4A7A;--wfd-danger:#FF8A93}}
+:root[data-theme="dark"]{
+  --wfd-bg:#0C1512;--wfd-surface:#15211C;--wfd-sunken:#09100D;--wfd-border:#243229;--wfd-border-strong:#627A6C;
+  --wfd-text:#E8F1EC;--wfd-text-muted:#9BB0A4;
+  --wfd-action:#4FE0B0;--wfd-on-action:#07140F;--wfd-confirm:#4FE0B0;
+  --wfd-selected:#153A2D;--wfd-warning:#F2B84B;--wfd-warning-bg:#3A2C10;--wfd-warning-border:#6B5220;
+  --wfd-info:#B5CCF2;--wfd-info-bg:#16294A;--wfd-info-border:#2E4A7A;--wfd-danger:#FF8A93}

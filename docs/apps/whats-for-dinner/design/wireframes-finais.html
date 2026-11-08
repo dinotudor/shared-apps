@@ -1,0 +1,701 @@
+<title>What's for dinner? Protótipo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+
+/* Layout: abas Cores (3 opções, 2 telas, claro e escuro) e Ícones. Chrome da página usa tokens SkiroLiro. */
+:root{--bg:#F6F8FA;--surface:#FFFFFF;--border:#D5DCE6;--text:#0E1B2E;--muted:#586A82;--primary:#16335E;--on-primary:#FFFFFF;--accent:#17795C;--sans:Figtree,system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A101C;--surface:#111B2E;--border:#223048;--text:#E9EEF7;--muted:#93A3BA;--primary:#7E9FE0;--on-primary:#0A101C;--accent:#4FE0B0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A101C;--surface:#111B2E;--border:#223048;--text:#E9EEF7;--muted:#93A3BA;--primary:#7E9FE0;--on-primary:#0A101C;--accent:#4FE0B0;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 16px/24px var(--sans);padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+h1,h2,h3,h4,p{margin:0}h1,h2,h3{letter-spacing:-.02em;text-wrap:balance}
+.wrap{max-width:1180px;margin-inline:auto;padding-block:24px 64px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.dots{display:inline-flex;flex-direction:column;gap:3px}.dots i{width:9px;height:9px;border-radius:50%;display:block}.dots i:first-child{background:var(--primary)}.dots i:last-child{background:#2DB88C}
+.btn{font:600 14px/20px var(--sans);min-height:44px;padding:0 16px;border-radius:8px;border:1.5px solid var(--muted);background:transparent;color:var(--text);cursor:pointer}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto}
+.tab{font:600 15px/20px var(--sans);padding:12px 16px;min-height:44px;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--primary);border-bottom-color:var(--primary)}
+.lead{font-size:18px;line-height:28px;max-width:68ch}
+.mut{color:var(--muted)}
+.eyebrow{font:600 12px/16px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.opt{margin-top:48px;display:flex;flex-direction:column;gap:16px}
+.opt h2{font-size:26px;line-height:32px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.opt h2 .l{font:600 13px/20px var(--mono);color:var(--muted);border:1.5px solid var(--border);border-radius:9999px;padding:0 10px}
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;max-width:760px}
+.sw div{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);font-size:11px;line-height:14px}
+.sw i{display:block;height:36px}.sw span{display:block;padding:6px 8px}.sw code{display:block;font:500 11px/14px var(--mono);color:var(--muted)}
+.row2{display:flex;flex-wrap:wrap;gap:20px}
+.pw{width:276px;height:598px;flex:none;border-radius:26px;overflow:hidden;border:1px solid var(--border)}
+.pi{width:360px;height:780px;transform:scale(.7667);transform-origin:0 0}
+/* tokens do app por opção e modo */
+.ol{--bg:#F5F3EE;--sf:#FFFFFF;--sk:#ECE9E2;--bd:#DDD9D0;--bs:#8A8579;--tx:#14233A;--mu:#5C6676;--pr:#16335E;--onp:#FFFFFF;--ac:#17795C;--acs:#DDF2E9;--prs:#DCE6F6;--wn:#8A5200;--wns:#FFF0D2;--wnb:#E8C27A;--ifs:#E6EEF8;--ifb:#A9C0E0;--ift:#1E3A5F;--dg:#B92D3A}
+.od{--bg:#0E1420;--sf:#172033;--sk:#0B101A;--bd:#26324A;--bs:#6C7A94;--tx:#EDF0F6;--mu:#9AA7BC;--pr:#8FB0EE;--onp:#0B1220;--ac:#5CE0B4;--acs:#12382F;--prs:#1D2D4F;--wn:#F2B84B;--wns:#3A2C10;--wnb:#6B5220;--ifs:#16294A;--ifb:#2E4A7A;--ift:#B5CCF2;--dg:#FF8A93}
+.bl{--bg:#F4F6F1;--sf:#FFFFFF;--sk:#E8EDE4;--bd:#D6DDD0;--bs:#7C8A78;--tx:#12263A;--mu:#55665F;--pr:#0F7A5C;--onp:#FFFFFF;--ac:#0F7A5C;--acs:#D9F0E4;--prs:#D9F0E4;--wn:#8A5200;--wns:#FFEFD0;--wnb:#E8C27A;--ifs:#E6EEF8;--ifb:#A9C0E0;--ift:#1E3A5F;--dg:#B92D3A}
+.bd2{--bg:#0C1512;--sf:#15211C;--sk:#09100D;--bd:#243229;--bs:#627A6C;--tx:#E8F1EC;--mu:#9BB0A4;--pr:#4FE0B0;--onp:#07140F;--ac:#4FE0B0;--acs:#153A2D;--prs:#153A2D;--wn:#F2B84B;--wns:#3A2C10;--wnb:#6B5220;--ifs:#16294A;--ifb:#2E4A7A;--ift:#B5CCF2;--dg:#FF8A93}
+.cl{--bg:#F6F4EF;--sf:#FFFFFF;--sk:#ECE8E0;--bd:#DDD8CE;--bs:#8C8576;--tx:#16233A;--mu:#5E6573;--pr:#B4471A;--onp:#FFFFFF;--ac:#17795C;--acs:#DDF2E9;--prs:#FBE3D6;--wn:#8A5200;--wns:#FFF1D6;--wnb:#E8C27A;--ifs:#E6EEF8;--ifb:#A9C0E0;--ift:#1E3A5F;--dg:#B92D3A}
+.cd{--bg:#111623;--sf:#1B2132;--sk:#0C101B;--bd:#2B3350;--bs:#767E99;--tx:#F1EDE8;--mu:#A9A39A;--pr:#F0905F;--onp:#1A0E08;--ac:#5CE0B4;--acs:#12382F;--prs:#3A2218;--wn:#F2B84B;--wns:#3A2C10;--wnb:#6B5220;--ifs:#16294A;--ifb:#2E4A7A;--ift:#B5CCF2;--dg:#FF8A93}
+.s{background:var(--bg);color:var(--tx);font:400 14px/20px var(--sans);display:flex;flex-direction:column;overflow:hidden}
+.s svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.s .sm{width:18px;height:18px}
+.s .hd{padding:18px 18px 10px;display:flex;flex-direction:column;gap:12px}
+.s .l1{display:flex;justify-content:space-between;align-items:center}
+.s .app{font:600 12px/16px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--mu)}
+.s .av{width:32px;height:32px;border-radius:50%;background:var(--prs);color:var(--pr);display:grid;place-items:center;font-weight:700;font-size:13px}
+.s .wk{display:flex;justify-content:space-between;align-items:center}
+.s .wk h3{font-size:20px;line-height:26px;font-weight:700}
+.s .ib{width:44px;height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);display:grid;place-items:center;color:var(--tx)}
+.s .main{flex:1;padding:0 16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.s .day{display:flex;align-items:center;gap:12px;padding:8px 12px;min-height:60px;border-radius:14px;background:var(--sf);border:1px solid var(--bd)}
+.s .day.td{border:2px solid var(--pr)}
+.s .day.em{background:transparent;border:1.5px dashed var(--bs);color:var(--pr)}
+.s .dn{width:40px;text-align:center;font-size:11px;line-height:14px;font-weight:600;color:var(--mu);text-transform:uppercase}
+.s .dn b{display:block;font-size:20px;line-height:24px;color:var(--tx)}
+.s .dt{flex:1;min-width:0}.s .dt b{display:block;font-size:15px;line-height:20px}.s .dt span{font-size:12px;line-height:16px;color:var(--mu)}
+.s .em .dt b{color:var(--pr)}
+.s .bg{display:flex;align-items:center;gap:6px;font-size:13px}
+.s .ty{width:34px;height:34px;border-radius:10px;background:var(--sk);color:var(--mu);display:grid;place-items:center;flex:none}
+.s .now{font:600 10px/12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--onp);background:var(--pr);border-radius:9999px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+.s .nav{height:68px;border-top:1px solid var(--bd);background:var(--sf);display:grid;grid-template-columns:1fr 1fr}
+.s .nav div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--mu)}
+.s .nav .on{color:var(--pr)}
+.s .pg{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.s .bk{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:14px;color:var(--pr)}
+.s .bk span{display:flex;align-items:center;gap:4px}
+.s .ey{font:600 11px/14px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--mu)}
+.s h2{font-size:24px;line-height:30px;font-weight:700;letter-spacing:-.02em;margin:0}
+.s .ph{height:110px;border-radius:16px;background:var(--sk);border:1px solid var(--bd);display:grid;place-items:center;color:var(--mu)}
+.s .al{padding:10px 12px;border-radius:14px;background:var(--wns);border:1px solid var(--wnb);display:flex;gap:10px;align-items:flex-start;color:var(--tx)}
+.s .al svg{color:var(--wn);margin-top:1px}.s .al b{display:block;font-size:14px;line-height:20px}.s .al span{font-size:12px;line-height:16px;color:var(--mu)}
+.s .nt{padding:10px 12px;border-radius:14px;background:var(--ifs);border:1px solid var(--ifb);font-size:13px;color:var(--ift);display:flex;gap:10px;align-items:center}
+.s .crd{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.s .crd h4{font-size:15px;line-height:20px;margin:0}
+.s .op{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);font-weight:600;font-size:14px}
+.s .op.on{background:var(--prs);border:2px solid var(--pr)}
+.s .op .e{font-size:18px}.s .op span:nth-child(2){flex:1}.s .op small{font-size:12px;color:var(--mu);font-weight:500}
+.s .ck{display:flex;align-items:center;gap:10px;min-height:36px;font-size:14px}
+.s .bx{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bs);display:grid;place-items:center;flex:none}
+.s .bx.on{background:var(--ac);border-color:var(--ac);color:var(--bg)}.s .bx svg{width:14px;height:14px;stroke-width:2.5}
+.s .ck small{margin-left:auto;color:var(--mu);font-size:12px}
+.s .em2{display:flex;gap:8px;flex-wrap:wrap}
+.s .em2 div{min-height:40px;padding:0 12px;border-radius:9999px;border:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:4px;font-size:14px}
+.s .em2 .on{background:var(--prs);border:2px solid var(--pr)}
+.s .em2 .ad{border:1.5px dashed var(--bs);background:transparent;color:var(--mu)}
+.s .tag{display:inline-flex;align-items:center;gap:4px;font:600 11px/14px var(--sans);padding:2px 8px;border-radius:9999px;background:var(--wns);color:var(--wn)}
+/* ícones */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:12px}
+.ic{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;font-size:13px;line-height:16px}
+.ic svg{width:32px;height:32px;fill:none;stroke:var(--primary);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ic code{font:500 11px/14px var(--mono);color:var(--muted)}
+.ig,.big svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.big{display:flex;gap:28px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.gb{width:240px;height:240px;border-radius:12px;border:1px solid var(--border);background-color:var(--surface);background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:10px 10px;position:relative}
+.gb svg{width:240px;height:240px;stroke:var(--primary);stroke-width:1.5}
+.gb .live{position:absolute;inset:30px;border:1px dashed var(--accent);border-radius:4px;pointer-events:none}
+.szs{display:flex;gap:22px;align-items:flex-end;color:var(--primary)}
+.groupe{margin-top:28px}
+
+.seg2{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:9999px;padding:4px;gap:4px}
+.seg2 button{font:600 14px/20px var(--sans);min-height:40px;padding:0 16px;border-radius:9999px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.seg2 button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.wfg{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start;margin-top:24px}
+.fig{margin:0;display:flex;flex-direction:column;gap:12px;width:300px}
+.fig figcaption{font-size:14px;line-height:20px;color:var(--muted)}.fig figcaption b{display:block;color:var(--text);font-size:15px}
+.s .lg{height:28px;width:auto;display:block}
+.s .lgd{display:none}.od .lgl,.bd2 .lgl,.cd .lgl{display:none}.od .lgd,.bd2 .lgd,.cd .lgd{display:block}
+.s .brandrow{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:-.02em}
+.s .brandrow img{width:30px;height:30px}
+.s .rw{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;background:var(--sf);border:1px solid var(--bd);min-height:56px}
+.s .tb{width:44px;height:44px;border-radius:10px;background:var(--sk);color:var(--mu);display:grid;place-items:center;flex:none}
+.s .tb.lg2{width:56px;height:56px}
+.s .rw .dt b{font-size:15px}
+.s .fl{height:44px;border-radius:12px;background:var(--sf);border:1px solid var(--bs);display:flex;align-items:center;gap:10px;padding:0 12px;color:var(--mu);font-size:14px}
+.s .fl.v{color:var(--tx)}
+.s .chp{display:flex;gap:8px;flex-wrap:wrap}
+.s .chp div{min-height:36px;padding:0 14px;border-radius:9999px;border:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.s .chp .on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.s .bp{min-height:48px;border-radius:12px;background:var(--pr);color:var(--onp);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:15px}
+.s .bs2{min-height:48px;border-radius:12px;border:1.5px solid var(--bs);color:var(--tx);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px}
+.s .bt{min-height:44px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:var(--pr)}
+.s .bt.dgr{color:var(--dg)}
+.s .tpt{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.s .pill{min-height:40px;padding:0 16px;border-radius:9999px;background:var(--pr);color:var(--onp);display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px}
+.s .scl{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+.s .scl span{height:36px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);display:grid;place-items:center;font:500 12px/1 var(--mono);color:var(--mu)}
+.s .scl span.on{background:var(--pr);border-color:var(--pr);color:var(--onp);font-weight:700}
+.s .bands{display:grid;grid-template-columns:5fr 3fr 3fr;text-align:center;font-size:12px;color:var(--mu);font-weight:600;margin-top:4px}
+.s .bands .on{color:var(--ac)}
+.s .hint{font-size:12px;line-height:16px;color:var(--mu)}
+.s .tg2{display:inline-flex;align-items:center;gap:4px;font:600 11px/14px var(--sans);padding:2px 8px;border-radius:9999px;border:1px solid var(--bd);color:var(--mu);background:var(--sk)}
+.s .tg2.w{background:var(--wns);border-color:var(--wnb);color:var(--wn)}
+.s .tg2.g{background:var(--acs);border-color:transparent;color:var(--ac)}
+.s .sk{background:var(--sk);border-radius:10px;height:44px}
+.s .ctr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:10px}
+.s .box{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.s .ing2{display:grid;grid-template-columns:1fr 80px 36px;gap:8px;align-items:center}
+.s .ta2{min-height:76px;border-radius:12px;background:var(--sf);border:1px solid var(--bs);padding:10px 12px;font-size:14px;line-height:20px;color:var(--tx)}
+.s .lbl{font:600 11px/14px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--mu)}
+.logos{display:flex;gap:24px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.logos .tile{border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;align-items:center;justify-content:center;background:#F4F6F1}
+.logos .tile.dk{background:#0C1512}
+.s button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.s button.w{width:100%}
+.s button:focus-visible,.s input:focus-visible,.s textarea:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+.s .nav .nv{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--mu);text-align:center}.s .nav .nv.on{color:var(--pr)}
+.s .chp .c{min-height:40px;padding:0 14px;border-radius:9999px;border:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.s .chp .c.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.s .em2 .e2{min-height:40px;padding:0 12px;border-radius:9999px;border:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:4px;font-size:14px}.s .em2 .e2.on{background:var(--prs);border:2px solid var(--pr)}.s .em2 .e2.ad{border:1.5px dashed var(--bs);background:transparent;color:var(--mu)}
+.s .scl .n{height:40px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);display:grid;place-items:center;font:500 12px/1 var(--mono);color:var(--mu);text-align:center}.s .scl .n.on{background:var(--pr);border-color:var(--pr);color:var(--onp);font-weight:700}
+.s input.f,.s textarea.f{font:inherit;font-size:14px;color:var(--tx);background:var(--sf);border:1px solid var(--bs);border-radius:12px;min-height:44px;padding:0 12px;width:100%;min-width:0}
+.s textarea.f{padding:10px 12px;line-height:20px;resize:none}
+.s .fl input.f{border:0;background:transparent;padding:0;min-height:40px;border-radius:0}
+.s .ing2 .f{padding:0 10px}
+.s.pf-in{width:100%;height:100%;position:relative;background:var(--bg)}
+.s .pg{flex:1;min-height:0;overflow:auto}.s .main{flex:1;min-height:0}
+.s .off{background:var(--wns);color:var(--wn);border-bottom:1px solid var(--wnb);padding:8px 14px;font-size:12px;line-height:16px;display:flex;gap:8px;align-items:center}.s .off b{color:var(--tx)}
+.s .ov{position:absolute;inset:0;pointer-events:none}.s .ov>*{pointer-events:auto}
+.s .scrim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.s .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--sf);border-radius:20px 20px 0 0;padding:16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--bd)}
+.s .qg{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}.s .qg button{font-size:22px;min-height:44px;border-radius:10px;text-align:center}.s .qg button:hover{background:var(--sk)}
+.s .dlg{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-50%);background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.s .toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--tx);color:var(--bg);border-radius:12px;padding:10px 14px;font-size:13px;line-height:18px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;text-align:center;z-index:5}.s .toast.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.s .toast{transition:none}}
+.play .pf{width:min(100%,360px);height:760px;border-radius:30px;overflow:hidden;border:1px solid var(--border);box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.playrow{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-top:20px}
+.pcol{flex:1;min-width:260px;max-width:460px;display:flex;flex-direction:column;gap:16px}
+.pcol ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;color:var(--muted)}
+.pcol ol b{color:var(--text)}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.doc h2{font-size:24px;line-height:32px;margin-top:40px}.doc h3{font-size:18px;margin-top:20px}
+.doc p,.doc li{color:var(--muted);max-width:72ch}.doc ul,.doc ol{margin:8px 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.doc pre{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;overflow-x:auto;font:400 12px/18px var(--mono);color:var(--text)}
+.doc table{border-collapse:collapse;width:100%;font-size:14px}.doc td,.doc th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}.doc th{font:600 12px/16px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.doc .sc{overflow-x:auto}
+
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo4M2NlMjk0Yi1hZDFmLTRlODktOTgwMi01OTNmZWJkYmQwN2QAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaC7+SxteSJt8OH3lyY63yJEAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo3MjVmMGUzOS03YjM0LTQ3ZjMtYWE1Ny1jM2I3Y2NiNGE0ODZscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNo2P/GdiQRd3Bq4X2HQvC16AAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggmUP1/xOTYLaLgAgmqoQwExH41hcFGzWUDVnf5Ygs7IWkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaPPMi5WL0oBOI4g1jSxBthcAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCClH0095yEZ2WBKr95F2jrr8jOsnHQJTdl/cRwitBnmv2RuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBh8Zmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjgzY2UyOTRiLWFkMWYtNGU4OS05ODAyLTU5M2ZlYmRiZDA3ZC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmY0MTAyNzA1LTlkZTAtNDQzNi1iYzljLTcyMzQ0YzYyMDU4MnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCZQ/X/E5NgtouACCaqhDATEfjWFwUbNZQNWd/liCzshaJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggJIHsyVx0w/XyEmmaBLMJDV4OvdcTn36JmjwNY0lXM8uiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg2nXJOuR92xirPzk88aqNuuGyqcyL6628rl7VBNFExWx0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQMLBgaQ+foSgvLChoMpXvmhgEDWJmKny0rIm+kxKDhLWaHryypEuk2R+R95FBSqCIv05p8vTA/7OnMLZbCbmZCY=</c2pa:manifest></metadata>
+<symbol id="i-semana" viewBox="0 0 24 24"><title>Semana</title><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M4 10h16M8.5 3.5v3M15.5 3.5v3"/></symbol>
+<symbol id="i-pratos" viewBox="0 0 24 24"><title>Pratos</title><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></symbol>
+<symbol id="i-voltar" viewBox="0 0 24 24"><title>Voltar</title><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-avancar" viewBox="0 0 24 24"><title>Avançar</title><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-mais" viewBox="0 0 24 24"><title>Adicionar</title><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-busca" viewBox="0 0 24 24"><title>Buscar</title><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+<symbol id="i-ordenar" viewBox="0 0 24 24"><title>Ordenar</title><path d="M8 5v14M4.5 15.5 8 19l3.5-3.5M16 19V5M12.5 8.5 16 5l3.5 3.5"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><title>Foto</title><rect x="3.5" y="7" width="17" height="12.5" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8.5 7l1-2h5l1 2"/></symbol>
+<symbol id="i-imagem" viewBox="0 0 24 24"><title>Imagem</title><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m4 17 4.5-4.5 3.5 3.5 3-3 5 5"/></symbol>
+<symbol id="i-editar" viewBox="0 0 24 24"><title>Editar</title><path d="m4.5 19.5.8-4L16 4.8a2.1 2.1 0 0 1 3 3L8.3 18.7z"/><path d="m14.5 6.3 3 3"/></symbol>
+<symbol id="i-lixeira" viewBox="0 0 24 24"><title>Excluir</title><path d="M5 7h14M9.5 7V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2M6.5 7l.8 12a1.5 1.5 0 0 0 1.5 1.4h6.4a1.5 1.5 0 0 0 1.5-1.4L17.5 7M10 11v6M14 11v6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><title>Marcar</title><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-fechar" viewBox="0 0 24 24"><title>Fechar</title><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="i-desfazer" viewBox="0 0 24 24"><title>Desfazer</title><path d="M8.5 6.5 4 11l4.5 4.5M5 11h9a4.5 4.5 0 0 1 0 9h-3.5"/></symbol>
+<symbol id="i-compartilhar" viewBox="0 0 24 24"><title>Compartilhar</title><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.9 7.6-3.8M8.2 13.1l7.6 3.8"/></symbol>
+<symbol id="i-pessoa" viewBox="0 0 24 24"><title>Pessoa</title><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6"/></symbol>
+<symbol id="i-familia" viewBox="0 0 24 24"><title>Família</title><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16 14.2c2.6 0 4.5 1.6 4.5 4.3"/></symbol>
+<symbol id="i-skip" viewBox="0 0 24 24"><title>Skip dinner</title><circle cx="12" cy="12" r="8.5"/><path d="m6 18 12-12"/></symbol>
+<symbol id="i-freestyle" viewBox="0 0 24 24"><title>Free-style (geladeira)</title><rect x="6.5" y="3" width="11" height="18" rx="3"/><path d="M6.5 10.5h11M9.5 6.5V8M9.5 13v3"/></symbol>
+<symbol id="i-prato-salvo" viewBox="0 0 24 24"><title>Prato salvo</title><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-3.5L6 20V5a1 1 0 0 1 1-1z"/></symbol>
+<symbol id="i-falta" viewBox="0 0 24 24"><title>Ingrediente faltando</title><path d="M4 9.5h16l-1.6 8.6a2 2 0 0 1-2 1.6H7.6a2 2 0 0 1-2-1.6z"/><path d="m8.5 9.5 2.5-5M15.5 9.5 13 4.5M12 12.5v2.5"/><circle cx="12" cy="17.2" r=".75" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-alerta" viewBox="0 0 24 24"><title>Aviso</title><path d="M12 4.5 20.5 19h-17z"/><path d="M12 10v4"/><circle cx="12" cy="16.4" r=".75" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><title>Informação</title><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".75" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-sem-rede" viewBox="0 0 24 24"><title>Sem rede</title><path d="M3 9a14 14 0 0 1 18 0M6 12.5a9 9 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0"/><path d="m4 4 16 16"/></symbol>
+<symbol id="i-panela" viewBox="0 0 24 24"><title>Preparo</title><path d="M4.5 10.5h15V15a5 5 0 0 1-5 5h-5a5 5 0 0 1-5-5z"/><path d="M2.5 10.5h2M19.5 10.5h2M9 7h6"/></symbol>
+<symbol id="i-ingrediente" viewBox="0 0 24 24"><title>Ingrediente</title><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="m5 19 8-8"/></symbol>
+<symbol id="i-relogio" viewBox="0 0 24 24"><title>Tempo</title><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+<symbol id="i-estrela" viewBox="0 0 24 24"><title>Nota média</title><path d="m12 4 2.4 5 5.4.7-4 3.7 1 5.4L12 16.2 7.2 18.8l1-5.4-4-3.7 5.4-.7z"/></symbol>
+<symbol id="i-mes" viewBox="0 0 24 24"><title>Visão de mês</title><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M4 10h16M8.5 3.5v3M15.5 3.5v3"/><circle cx="8.5" cy="14" r=".8" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r=".8" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r=".8" fill="currentColor" stroke="none"/><circle cx="8.5" cy="17" r=".8" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-mensagem" viewBox="0 0 24 24"><title>Mensagens</title><path d="M6 5h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6.5L7.5 19.5V17H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></symbol>
+<symbol id="i-stats" viewBox="0 0 24 24"><title>Estatísticas</title><rect x="5.5" y="11" width="3.5" height="9" rx="1"/><rect x="10.25" y="4" width="3.5" height="16" rx="1"/><rect x="15" y="8" width="3.5" height="12" rx="1"/></symbol>
+<symbol id="i-lista" viewBox="0 0 24 24"><title>Lista de compras</title><rect x="5" y="3.5" width="14" height="17" rx="3"/><path d="M9 8.5h6M9 12h6M9 15.5h3"/></symbol>
+<symbol id="i-sticker" viewBox="0 0 24 24"><title>Sticker na foto</title><path d="M6 4h12a2 2 0 0 1 2 2v8l-6 6H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M20 14h-4.5a1.5 1.5 0 0 0-1.5 1.5V20"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiMyREI4OEMiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMTYzMzVFIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzMzVFIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==" width="32" height="32" alt="" id="hl"> What's for dinner? <span class="mut" style="font-weight:500">· SkiroLiro</span></div>
+    <button class="btn" id="theme" type="button">Tema da página</button>
+  </header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-play" aria-selected="true" aria-controls="p-play">Play</button>
+    <button class="tab" role="tab" id="t-wf" aria-selected="false" aria-controls="p-wf">Wireframes</button>
+    <button class="tab" role="tab" id="t-plano" aria-selected="false" aria-controls="p-plano">Plano</button>
+    <button class="tab" role="tab" id="t-guia" aria-selected="false" aria-controls="p-guia">Guia</button>
+    <button class="tab" role="tab" id="t-marca" aria-selected="false" aria-controls="p-marca">Logo e cores</button>
+    <button class="tab" role="tab" id="t-icones" aria-selected="false" aria-controls="p-icones">Ícones</button>
+  </div>
+
+  <main id="p-play" role="tabpanel" aria-labelledby="t-play">
+    <h1 style="font-size:34px;line-height:42px">Modo play</h1>
+    <p class="lead" style="margin-top:10px">O wireframe final clicável. Nada é salvo: é um protótipo para sentir o fluxo antes de implementar.</p>
+    <div class="playrow">
+      <div class="pcol">
+        <div class="ctl"><div class="seg2" role="group" aria-label="Modo"><button type="button" id="pm-l" aria-pressed="true">Claro</button><button type="button" id="pm-d" aria-pressed="false">Escuro</button></div><button class="btn" id="p-off" type="button" aria-pressed="false">Simular sem rede</button><button class="btn" id="p-reset" type="button">Reiniciar</button></div>
+        <ol>
+          <li><b>Semana:</b> toque em quinta (12) para abrir o Dia, ou em um dia vazio para planejar.</li>
+          <li><b>Dia:</b> responda, desmarque a Ricota e toque em “Eu vou”, reaja com qualquer emoji no “+”.</li>
+          <li><b>Planejar:</b> troque o plano, busque “ricota” e escolha um prato ou Skip e Free-style.</li>
+          <li><b>Pratos:</b> mude a ordem, abra um prato, dê uma nota de 0 a 10 e marque Enjoei.</li>
+          <li><b>Novo prato:</b> adicione ingredientes, salve e veja na lista. Edite e exclua para ver a confirmação.</li>
+          <li><b>Estados:</b> “Simular sem rede” mostra o aviso de conexão.</li>
+        </ol>
+      </div>
+      <div id="play" class="play bl"><div class="pf" id="pf"></div></div>
+    </div>
+  </main>
+
+  <main id="p-wf" role="tabpanel" aria-labelledby="t-wf" hidden>
+    <h1 style="font-size:34px;line-height:42px">Wireframes</h1>
+    <p class="lead" style="margin-top:10px">As 6 telas do handoff mais um quadro de estados, com a paleta B (Verde de feira), o seu logo e os novos ícones. Para testar, use a aba Play.</p>
+    <div style="margin-top:16px" class="seg2" role="group" aria-label="Modo do wireframe"><button type="button" id="m-l" aria-pressed="true">Claro</button><button type="button" id="m-d" aria-pressed="false">Escuro</button></div>
+    <div class="wfg bl" id="wfs"></div>
+  </main>
+
+  <main id="p-plano" role="tabpanel" aria-labelledby="t-plano" hidden>
+    <h1 style="font-size:34px;line-height:42px">What's for dinner? no contexto SkiroLiro</h1>
+    <p class="lead" style="margin-top:10px">App web, mobile-first, para a família planejar os jantares: cada dia tem um prato, um Skip dinner ou um Free-style, e todo mundo responde, reage e avisa o que falta. Útil primeiro, com humor leve e muitos emojis.</p>
+    <p class="mut" style="margin-top:8px;max-width:68ch">Base: handoff do brainstorm e página do Notion (PRD e modelo de dados). Não consegui abrir o canvas original dos wireframes.</p>
+
+    <section class="opt"><h2>Ideia central</h2>
+      <p class="lead">O brilho do app vem da família, não da interface: emojis, reações e as respostas de cada dia. A interface fica calma, em fundo claro quente, e o logo (a carinha pensativa) dá a personalidade. Ela aparece no cabeçalho, nos estados vazios e carregando.</p></section>
+
+    <section class="opt"><h2>As 6 telas</h2>
+      <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:14px">
+        <tbody>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>1. Semana</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">7 dias (prato, Skip, Free-style), reações e selo de ingrediente faltando. Dia vazio: “+ Planejar”.</td></tr>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>2. Dia</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">Foto, quem planejou, quem enjoou, alerta de ingrediente, aviso do dia, 4 respostas, checklist, reações.</td></tr>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>3. Planejar o dia</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">Skip dinner, Free-style ou prato salvo, com busca, média, vezes feito e quem enjoou.</td></tr>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>4. Pratos</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">Busca, ordem (mais feitos, melhor nota, recentes), média, minha nota e Enjoei.</td></tr>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>5. Prato</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">Nota 0 a 10 com emoji por faixa, Enjoei (3 semanas), notas da família, ingredientes e preparo.</td></tr>
+          <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)"><b>6. Novo / editar</b></td><td style="padding:10px 12px;border-bottom:1px solid var(--border)">Foto, nome, ingredientes, preparo. Salvar principal. Excluir com confirmação.</td></tr>
+        </tbody></table></div></section>
+
+    <section class="opt"><h2>Regras de produto que o desenho segue</h2>
+      <ul class="mut" style="max-width:70ch;margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        <li>“Pedir comida” e “sair” geram um aviso no dia, sem mudar o plano.</li>
+        <li>Cada pessoa marca “Enjoei” na tela do prato. O aviso aparece por 3 semanas em Planejar, Pratos e no dia.</li>
+        <li>Respostas mantêm o texto original em inglês. Uma versão “soft” vem depois.</li>
+        <li>“Not home tonight” segue como “a confirmar”.</li>
+        <li>Checklist de ingredientes começa todo marcado. Desmarcar mostra o alerta.</li>
+      </ul></section>
+
+    <section class="opt"><h2>Fase 2 prevista</h2>
+      <p class="mut" style="max-width:70ch">Mês (mesmo cartão de dia, menor), mensagens (3ª aba), estatísticas, lista de compras (nasce dos ingredientes faltando) e stickers sobre a foto do prato. Ícones já desenhados.</p></section>
+
+    <section class="opt"><h2>Em aberto</h2>
+      <ul class="mut" style="max-width:70ch;margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        <li>Versão “soft” das respostas: por família ou por pessoa?</li>
+        <li>Reações: lista fixa de emojis ou qualquer emoji?</li>
+        <li>Fotos de pratos: onde guardar (levantado no Notion).</li>
+      </ul></section>
+  </main>
+
+  <main id="p-guia" role="tabpanel" aria-labelledby="t-guia" hidden class="doc">
+    <h1 style="font-size:34px;line-height:42px">Guia de uso</h1>
+    <p class="lead" style="margin-top:10px">Tudo o que existe para quem for desenhar, revisar ou implementar o What's for dinner?, e como usar cada peça.</p>
+
+    <h2>O que existe e onde está</h2>
+    <div class="sc"><table><thead><tr><th>Peça</th><th>Onde</th><th>Para quê</th></tr></thead><tbody>
+      <tr><td>Wireframes finais, play e guia</td><td>esta página (<code>wireframes-finais.html</code>)</td><td>Ver e testar as telas, claro e escuro</td></tr>
+      <tr><td>Plano</td><td>aba Plano e <code>PLANO.md</code></td><td>Escopo, regras de produto, decisões</td></tr>
+      <tr><td>Tokens de cor e forma</td><td><code>tokens-wfd.css</code></td><td>Variáveis <code>--wfd-*</code> da paleta B, claro e escuro</td></tr>
+      <tr><td>Ícones</td><td><code>icons/*.svg</code> e <code>icons/sprite.svg</code></td><td>33 ícones só de uso do app</td></tr>
+      <tr><td>Logo v0</td><td><code>brand/v0/</code></td><td>Marca, marca com nome e ícone do app</td></tr>
+      <tr><td>Identidade base</td><td><code>/skiroliro/DESIGN.md</code></td><td>Tipografia, espaçamento e regras gerais da SkiroLiro</td></tr>
+    </tbody></table></div>
+
+    <h2>Como ler, em ordem</h2>
+    <ol><li><b>Plano:</b> o que o app faz e as regras que o desenho segue.</li><li><b>Wireframes:</b> as 7 telas lado a lado.</li><li><b>Play:</b> o mesmo desenho clicável, para sentir o fluxo.</li><li><b>Logo e cores</b> e <b>Ícones:</b> consulta durante a implementação.</li></ol>
+
+    <h2>Paleta B em código</h2>
+    <p>Use os papéis semânticos, nunca o hex direto. O modo escuro troca os valores sozinho pela preferência do sistema, ou por <code>data-theme="dark"</code>.</p>
+<pre>/* tokens-wfd.css */
+.card   { background: var(--wfd-surface); border: 1px solid var(--wfd-border); border-radius: var(--wfd-radius-xl) }
+.button { background: var(--wfd-action); color: var(--wfd-on-action); border-radius: var(--wfd-radius-md); min-height: 48px }
+.alert  { background: var(--wfd-warning-bg); border: 1px solid var(--wfd-warning-border); color: var(--wfd-text) }</pre>
+    <div class="sc"><table><thead><tr><th>Papel</th><th>Claro</th><th>Escuro</th><th>Uso</th></tr></thead><tbody>
+      <tr><td><code>bg</code></td><td>#F4F6F1</td><td>#0C1512</td><td>Fundo da tela</td></tr>
+      <tr><td><code>surface</code></td><td>#FFFFFF</td><td>#15211C</td><td>Cartões, linhas, campos</td></tr>
+      <tr><td><code>text</code> / <code>text-muted</code></td><td>#12263A / #55665F</td><td>#E8F1EC / #9BB0A4</td><td>Texto e apoio</td></tr>
+      <tr><td><code>action</code></td><td>#0F7A5C</td><td>#4FE0B0</td><td>Botão principal, hoje, selecionado, confirmado</td></tr>
+      <tr><td><code>selected</code></td><td>#D9F0E4</td><td>#153A2D</td><td>Fundo de resposta ou reação escolhida</td></tr>
+      <tr><td><code>warning</code></td><td>#8A5200 sobre #FFEFD0</td><td>#F2B84B sobre #3A2C10</td><td>Ingrediente faltando, Enjoei</td></tr>
+      <tr><td><code>info</code></td><td>#1E3A5F sobre #E6EEF8</td><td>#B5CCF2 sobre #16294A</td><td>Aviso do dia</td></tr>
+      <tr><td><code>danger</code></td><td>#B92D3A</td><td>#FF8A93</td><td>Excluir</td></tr>
+    </tbody></table></div>
+    <p>Contraste calculado: texto sobre fundo 14.1:1 (claro) e 16.1:1 (escuro). Texto de apoio 5.6:1 e 7.2:1. Ação sobre cartão 5.3:1 (claro) e 11.2:1 (escuro). Aviso âmbar 5.6:1 e 7.6:1. Todos acima de 4.5:1.</p>
+
+    <h2>Ícones</h2>
+    <ul><li>Cada arquivo em <code>icons/</code> é um SVG de 24 px com <code>stroke="currentColor"</code>: a cor vem do texto ao redor.</li>
+    <li>Para web, use o sprite: <code>&lt;svg viewBox="0 0 24 24"&gt;&lt;use href="#i-semana"/&gt;&lt;/svg&gt;</code> (inclua <code>sprite.svg</code> uma vez na página).</li>
+    <li>Tamanhos: 16 (dentro de chips), 20 (botões) e 24 (navegação e linhas). Traço sempre 1.5 px.</li>
+    <li>Ícone sozinho precisa de <code>aria-label</code>. Na navegação, sempre com texto.</li>
+    <li>Emojis: respostas do dia, notas (🤢 😐 😍), reações e Enjoei. Sempre com texto ao lado quando significam algo (por exemplo, “🤢 0 a 4”).</li></ul>
+    <h3>Onde cada ícone aparece</h3>
+    <div class="sc"><table><thead><tr><th>Ícone</th><th>Tela</th></tr></thead><tbody>
+      <tr><td><code>semana</code>, <code>pratos</code></td><td>Navegação inferior e tipo de jantar “prato”</td></tr>
+      <tr><td><code>skip</code>, <code>freestyle</code></td><td>Semana, Dia, Planejar</td></tr>
+      <tr><td><code>falta</code></td><td>Selo na Semana, alerta no Dia</td></tr>
+      <tr><td><code>info</code></td><td>Aviso do dia</td></tr>
+      <tr><td><code>busca</code>, <code>ordenar</code>, <code>mais</code></td><td>Pratos, Planejar</td></tr>
+      <tr><td><code>editar</code>, <code>lixeira</code>, <code>camera</code>, <code>imagem</code>, <code>fechar</code></td><td>Prato, Novo/editar</td></tr>
+      <tr><td><code>sem-rede</code></td><td>Estado sem conexão</td></tr>
+      <tr><td>Fase 2: <code>mes</code>, <code>mensagem</code>, <code>stats</code>, <code>lista</code>, <code>sticker</code></td><td>Ainda não usados</td></tr>
+    </tbody></table></div>
+
+    <h2>Logo</h2>
+    <ul><li>Marca com o rosto no cabeçalho (30 px), em estados vazio e carregando (40 a 64 px) e como ícone do app.</li>
+    <li>Tamanho mínimo da marca: 24 px. Área livre: metade da largura do rosto.</li>
+    <li>No modo escuro, use <code>wfd-mark-dark.svg</code> (menta mais claro). Não aplique sombra, giro ou outra cor.</li>
+    <li>É uma v0, a ser refinada. Troque os arquivos de <code>brand/</code> e o resto continua valendo.</li></ul>
+
+    <h2>Exemplos de fluxos</h2>
+    <h3>1. Planejar um dia</h3>
+    <ol><li>Semana: tocar em um dia “+ Planejar”.</li><li>Planejar: escolher Skip dinner, Free-style ou buscar um prato.</li><li>De volta à Semana com aviso “Planejado: Lasanha de berinjela”.</li></ol>
+    <h3>2. Responder ao jantar</h3>
+    <ol><li>Semana: tocar no dia. Dia: tocar em uma das quatro respostas (tocar de novo desfaz).</li><li>Se a resposta for pedir ou sair, o aviso do dia aparece para todos e o plano continua.</li></ol>
+    <h3>3. Ingrediente faltando</h3>
+    <ol><li>Dia: desmarcar um ingrediente.</li><li>O alerta âmbar “Ingrediente faltando! Quem vai? 😄” aparece com o botão “Eu vou”.</li><li>Ao tocar, o alerta vira confirmação verde com “Desfazer”.</li></ol>
+    <h3>4. Dar nota e marcar Enjoei</h3>
+    <ol><li>Prato: tocar em um número de 0 a 10. A faixa (🤢 😐 😍) se acende.</li><li>Tocar em “🤢 Enjoei”. O prato some das suas sugestões por 3 semanas e o aviso aparece em Planejar, Pratos e no dia. Dá para desfazer.</li></ol>
+    <h3>5. Criar ou editar um prato</h3>
+    <ol><li>Pratos: “Novo prato” (ou lápis em Prato). Preencher nome, ingredientes (nome e quantidade) e preparo.</li><li>“Salvar prato”. Excluir pede confirmação dizendo o que será perdido.</li></ol>
+
+    <h2>Textos do app</h2>
+    <div class="sc"><table><thead><tr><th>Onde</th><th>Texto</th></tr></thead><tbody>
+      <tr><td>Respostas do dia</td><td>MMMM can't wait! · F*#% it, let's order! · I'm in the mood for going out tonight ;) · Not home tonight (a confirmar). Versão “soft”, por família, vem depois.</td></tr>
+      <tr><td>Ingrediente faltando</td><td>Ingrediente faltando! Quem vai? 😄</td></tr>
+      <tr><td>Aviso do dia</td><td>1 pessoa quer pedir delivery 🛵 · 1 pessoa quer sair 🍸</td></tr>
+      <tr><td>Dia vazio</td><td>+ Planejar · Escolher prato, skip ou free-style</td></tr>
+      <tr><td>Enjoei</td><td>Some das sugestões por 3 semanas. Você pode desfazer.</td></tr>
+      <tr><td>Semana vazia</td><td>Ninguém decidiu ainda. Quer ser o primeiro a planejar um jantar?</td></tr>
+      <tr><td>Sem rede</td><td>Sem conexão. O que você já viu continua aqui.</td></tr>
+      <tr><td>Excluir</td><td>Excluir [prato]? As notas da família também somem. Não dá para desfazer.</td></tr>
+    </tbody></table></div>
+    <p>Regra de tom: humor nas respostas, no alerta de ingrediente, no vazio e em Enjoei. Nunca em erro, sem rede e exclusão.</p>
+
+    <h2>Reações</h2>
+    <p>Qualquer emoji. A lista mostra os mais usados, e o campo de texto aceita qualquer emoji do teclado do celular. O ícone da linha mostra a reação mais popular do dia.</p>
+
+    <h2>Estados e acessibilidade</h2>
+    <ul><li>Cada tela de dados tem vazio, carregando e erro/sem rede (quadro Estados nos wireframes).</li>
+    <li>Alvos de toque de pelo menos 44 px. Estado nunca só por cor: sempre texto, ícone ou emoji junto.</li>
+    <li>Todos os botões do Play são botões reais, com foco visível e rótulos; funciona por teclado (Tab, Enter, Esc fecha folhas e diálogos).</li>
+    <li>Modo claro e escuro seguem o sistema; o Play permite trocar manualmente.</li></ul>
+
+    <h2>Limites desta versão</h2>
+    <ul><li>O Play é um protótipo: nada é salvo, e recarregar a página reinicia os dados de exemplo.</li><li>Só existe a semana de 9 a 15 de novembro. Fotos são áreas tracejadas. Upload de foto, login e fuso horário ficam para a implementação.</li><li>Fase 2 (mês, mensagens, estatísticas, lista de compras, stickers) tem ícones, mas não telas.</li></ul>
+  </main>
+
+  <main id="p-marca" role="tabpanel" aria-labelledby="t-marca" hidden>
+    <h1 style="font-size:34px;line-height:42px">Logo e cores</h1>
+    <section class="opt"><h2>Logo v0</h2>
+      <p class="mut" style="max-width:68ch">Carinha pensativa em menta, olhos brancos e uma sobrancelha levantada. No app: marca no cabeçalho (30 px), em estados vazios e de carregamento (maior), e como ícone do app. A variação escura usa o menta claro.</p>
+      <div class="logos">
+        <div class="tile"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiMyREI4OEMiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMTYzMzVFIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzMzVFIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==" width="120" alt="Logo, claro"></div>
+        <div class="tile dk"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiM0RkUwQjAiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzBBMTAxQyIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMEExMDFDIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMEExMDFDIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==" width="120" alt="Logo, escuro"></div>
+        <div class="tile"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iV2hhdCdzIGZvciBkaW5uZXI/Ij48cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiByeD0iMjI0IiBmaWxsPSIjMTYzMzVFIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIyLjU2LDMyMi41Nikgc2NhbGUoMC43NCkiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjE0IiBmaWxsPSIjNEZFMEIwIi8+PGNpcmNsZSBjeD0iMTc0IiBjeT0iMjU0IiByPSI1OCIgZmlsbD0iI0ZGRkZGRiIvPjxjaXJjbGUgY3g9IjE4OCIgY3k9IjIzOCIgcj0iMjkiIGZpbGw9IiMxNjMzNUUiLz48Y2lyY2xlIGN4PSIzMzgiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMzUyIiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxwYXRoIGQ9Ik0xMjYgMTY4IFExNzQgMTU2IDIyNCAxNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTI5MCAxMzIgUTMzOCA5OCAzOTAgMTM0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjMzNUUiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yMDQgMzc0IEwzMDggMzc0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjMzNUUiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4K" width="120" alt="Ícone do app"></div>
+        <div class="tile"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAwIDE3MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJXaGF0J3MgZm9yIGRpbm5lcj8iPjxnIHRyYW5zZm9ybT0ic2NhbGUoMC4zMzIwMzEyNSkiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjE0IiBmaWxsPSIjMkRCODhDIi8+PGNpcmNsZSBjeD0iMTc0IiBjeT0iMjU0IiByPSI1OCIgZmlsbD0iI0ZGRkZGRiIvPjxjaXJjbGUgY3g9IjE4OCIgY3k9IjIzOCIgcj0iMjkiIGZpbGw9IiMxNjMzNUUiLz48Y2lyY2xlIGN4PSIzMzgiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMzUyIiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxwYXRoIGQ9Ik0xMjYgMTY4IFExNzQgMTU2IDIyNCAxNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTI5MCAxMzIgUTMzOCA5OCAzOTAgMTM0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjMzNUUiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yMDQgMzc0IEwzMDggMzc0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjMzNUUiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48cGF0aCBkPSJNMjUyLjI1IDEzNy41IDIyMS4yIDMyLjVIMjQyLjA1TDI2My4zNSAxMDYuMEwyODMuNiAzMi41SDMwNC4wTDMyNC40IDEwNC45NUwzNDUuNyAzMi41SDM2Ni41NDk5OTk5OTk5OTk5NUwzMzUuMiAxMzcuNUgzMTMuNkwyOTMuOCA2NC42MDAwMDAwMDAwMDAwMUwyNzMuNyAxMzcuNVogTTM3Ni40NSAxMzcuNVYzMi41SDM5Ni4yNVY3Mi4xMDAwMDAwMDAwMDAwMVE0MDAuMCA2Ni41NSA0MDUuNTUgNjMuNjI1UTQxMS4xIDYwLjcgNDE4LjAgNjAuN1E0MjcuMCA2MC43IDQzMy4yMjUgNjQuMzAwMDAwMDAwMDAwMDFRNDM5LjQ1IDY3LjkgNDQyLjc1IDc1LjQ3NTAwMDAwMDAwMDAxUTQ0Ni4wNSA4My4wNTAwMDAwMDAwMDAwMSA0NDYuMDUgOTUuMDUwMDAwMDAwMDAwMDFWMTM3LjVINDI2LjI1Vjk5LjFRNDI2LjI1IDkxLjQ1IDQyNC40NSA4Ny4yNVE0MjIuNjUgODMuMDUwMDAwMDAwMDAwMDEgNDE5LjUgODEuMTc1MDAwMDAwMDAwMDFRNDE2LjM1IDc5LjMwMDAwMDAwMDAwMDAxIDQxMi4xNSA3OS4zMDAwMDAwMDAwMDAwMVE0MDQuNSA3OS4xNSA0MDAuMzc1IDgzLjk1UTM5Ni4yNSA4OC43NSAzOTYuMjUgOTguMlYxMzcuNVogTTQ4Ni4xIDEzOS4zUTQ3Mi42IDEzOS4zIDQ2NS4xNzUgMTMzLjNRNDU3Ljc1IDEyNy4zIDQ1Ny43NSAxMTYuMzVRNDU3Ljc1IDEwNC4zNSA0NjUuNzc1IDk4LjI3NVE0NzMuOCA5Mi4yIDQ4OC4zNSA5Mi4ySDUwNi4wNVE1MDUuMCA4NS4zMDAwMDAwMDAwMDAwMSA1MDEuNyA4MS42MjVRNDk4LjQgNzcuOTUgNDkyLjI1IDc3Ljk1UTQ4Ny40NSA3Ny45NSA0ODMuNTQ5OTk5OTk5OTk5OTUgODAuMDUwMDAwMDAwMDAwMDFRNDc5LjY1IDgyLjE1IDQ3Ni45NSA4Ni41TDQ1OS41NSA4MC41UTQ2MS42NSA3NS43IDQ2NS43IDcxLjEyNVE0NjkuNzUgNjYuNTUgNDc2LjI3NSA2My42MjVRNDgyLjggNjAuNyA0OTIuMjUgNjAuN1E1MDMuNjUgNjAuNyA1MTEuMjI0OTk5OTk5OTk5OTcgNjUuMDUwMDAwMDAwMDAwMDFRNTE4LjggNjkuNCA1MjIuNDc0OTk5OTk5OTk5OSA3Ny4yNzVRNTI2LjE1IDg1LjE1IDUyNi4wIDk1Ljk1TDUyNS41NSAxMzcuNUg1MDcuMUw1MDYuOCAxMjguOFE1MDMuOTUgMTMzLjkgNDk4Ljc3NSAxMzYuNjAwMDAwMDAwMDAwMDJRNDkzLjYgMTM5LjMgNDg2LjEgMTM5LjNaTTQ4OS40IDEyMi44UTQ5NC4yIDEyMi44IDQ5OC4xIDEyMC41NVE1MDIuMCAxMTguMyA1MDQuMjUgMTE0LjY5OTk5OTk5OTk5OTk5UTUwNi41IDExMS4xIDUwNi41IDEwNy4yVjEwNi45SDQ5NS4yNVE0ODUuNSAxMDYuOSA0ODEuNzUgMTA5LjIyNVE0NzguMCAxMTEuNTUgNDc4LjAgMTE1Ljc1UTQ3OC4wIDExOS4wNSA0ODEuMCAxMjAuOTI1UTQ4NC4wIDEyMi44IDQ4OS40IDEyMi44WiBNNTcyLjY1MDAwMDAwMDAwMDEgMTM5LjNRNTYwLjIgMTM5LjMgNTUzLjgyNSAxMzMuMTVRNTQ3LjQ1IDEyNy4wIDU0Ny40NSAxMTUuNlY3OS4zMDAwMDAwMDAwMDAwMUg1MzUuMzAwMDAwMDAwMDAwMVY2Mi41SDU0Ny40NVYzOS4xMDAwMDAwMDAwMDAwMUg1NjcuMjVWNjIuNUg1ODYuMFY3OS4zMDAwMDAwMDAwMDAwMUg1NjcuMjVWMTExLjI1UTU2Ny4yNSAxMTYuMDUgNTY5LjM1IDExOC41MjVRNTcxLjQ1IDEyMS4wIDU3NS41IDEyMS4wUTU3Ny4wIDEyMS4wIDU3OC44IDEyMC4zMjVRNTgwLjYgMTE5LjY1IDU4Mi41NTAwMDAwMDAwMDAxIDExOC4zTDU4OS40NSAxMzMuMTVRNTg1Ljg1IDEzNS44NSA1ODEuNDI1IDEzNy41NzVRNTc3LjAgMTM5LjMgNTcyLjY1MDAwMDAwMDAwMDEgMTM5LjNaIE02MDQuNiA2OC41IDYwMi41IDMwLjEwMDAwMDAwMDAwMDAxSDYyMS4yNUw2MTkuMTUgNjguNVogTTY2Ni44NSAxMzkuM1E2NTkuNjUgMTM5LjMgNjUzLjM0OTk5OTk5OTk5OTkgMTM3LjEyNVE2NDcuMDUgMTM0Ljk1IDY0Mi4yNSAxMzAuODI1UTYzNy40NSAxMjYuNyA2MzQuNzUgMTIwLjdMNjUxLjcgMTEyLjlRNjUzLjk1IDExNi41IDY1Ny44NSAxMTkuMTI1UTY2MS43NSAxMjEuNzUgNjY2Ljg1IDEyMS43NVE2NzEuOCAxMjEuNzUgNjc0LjUgMTIwLjMyNVE2NzcuMiAxMTguOSA2NzcuMiAxMTYuMlE2NzcuMiAxMTMuNSA2NzUuMDI1MDAwMDAwMDAwMSAxMTIuMjI1UTY3Mi44NSAxMTAuOTUgNjY5LjEgMTEwLjA1TDY2Mi4yIDEwOC4yNVE2NTEuNCAxMDUuNCA2NDUuMTc1IDk5LjE3NTAwMDAwMDAwMDAxUTYzOC45NSA5Mi45NSA2MzguOTUgODQuODVRNjM4Ljk1IDczLjMgNjQ2LjM3NSA2Ny4wUTY1My44IDYwLjcgNjY3LjQ1IDYwLjdRNjc0LjUgNjAuNyA2ODAuNTc1IDYyLjgwMDAwMDAwMDAwMDAwNFE2ODYuNjUgNjQuOSA2OTEuMCA2OC42NVE2OTUuMzUgNzIuNCA2OTcuMCA3Ny4zNUw2ODAuNjUgODQuODVRNjc5LjYgODEuODUgNjc1LjU1IDc5Ljk3NVE2NzEuNSA3OC4xIDY2Ny40NSA3OC4xUTY2My40IDc4LjEgNjYxLjIyNDk5OTk5OTk5OTkgNzkuODI1UTY1OS4wNSA4MS41NTAwMDAwMDAwMDAwMSA2NTkuMDUgODQuNTUwMDAwMDAwMDAwMDFRNjU5LjA1IDg2LjUgNjYxLjE1IDg3Ljc3NVE2NjMuMjUgODkuMDUwMDAwMDAwMDAwMDEgNjY3LjE1IDg5Ljk1TDY3Ni45IDkyLjM1UTY4NC4yNSA5NC4xNSA2ODguNjc1IDk4LjEyNVE2OTMuMSAxMDIuMSA2OTUuMTI1IDEwNi45NzVRNjk3LjE1IDExMS44NSA2OTcuMTUgMTE2LjVRNjk3LjE1IDEyMy4yNSA2OTMuMTc1IDEyOC40MjVRNjg5LjIgMTMzLjYgNjgyLjM3NSAxMzYuNDVRNjc1LjU1IDEzOS4zIDY2Ni44NSAxMzkuM1ogIE03NTEuOSAxMzcuNVY3OC40SDczOS40NVY2Mi41SDc1MS45VjU1LjBRNzUxLjkgNDMuMCA3NTguMDUgMzYuMzI1UTc2NC4yIDI5LjY1MDAwMDAwMDAwMDAwNiA3NzYuODAwMDAwMDAwMDAwMSAyOS42NTAwMDAwMDAwMDAwMDZRNzgxLjE1IDI5LjY1MDAwMDAwMDAwMDAwNiA3ODYuMDI1IDMxLjE1MDAwMDAwMDAwMDAwNlE3OTAuOSAzMi42NTAwMDAwMDAwMDAwMDYgNzk0Ljk1IDM0Ljc1TDc4Ny42IDQ5LjBRNzg1LjIgNDcuOCA3ODMuMjUgNDcuMlE3ODEuMzAwMDAwMDAwMDAwMSA0Ni42MDAwMDAwMDAwMDAwMSA3NzkuNjUgNDYuNjAwMDAwMDAwMDAwMDFRNzc1LjYgNDYuNjAwMDAwMDAwMDAwMDEgNzczLjY1MDAwMDAwMDAwMDEgNDkuMzc1MDAwMDAwMDAwMDFRNzcxLjcgNTIuMTUwMDAwMDAwMDAwMDA2IDc3MS43IDU4LjNWNjIuNUg3OTAuMTVWNzguNEg3NzEuN1YxMzcuNVogTTgzOC42IDEzOS4zUTgyNy4yIDEzOS4zIDgxOC4yNzUwMDAwMDAwMDAxIDEzNC4yNzVRODA5LjM1IDEyOS4yNSA4MDQuMzI1IDEyMC40UTc5OS4zMDAwMDAwMDAwMDAxIDExMS41NSA3OTkuMzAwMDAwMDAwMDAwMSAxMDAuMFE3OTkuMzAwMDAwMDAwMDAwMSA4OC40NSA4MDQuMjUgNzkuNlE4MDkuMiA3MC43NSA4MTguMDUwMDAwMDAwMDAwMSA2NS43MjVRODI2LjkwMDAwMDAwMDAwMDEgNjAuNyA4MzguMzAwMDAwMDAwMDAwMSA2MC43UTg0OS44NSA2MC43IDg1OC43IDY1LjcyNVE4NjcuNTUwMDAwMDAwMDAwMSA3MC43NSA4NzIuNSA3OS42UTg3Ny40NSA4OC40NSA4NzcuNDUgMTAwLjBRODc3LjQ1IDExMS41NSA4NzIuNSAxMjAuNFE4NjcuNTUwMDAwMDAwMDAwMSAxMjkuMjUgODU4Ljc3NTAwMDAwMDAwMDEgMTM0LjI3NVE4NTAuMDAwMDAwMDAwMDAwMSAxMzkuMyA4MzguNiAxMzkuM1pNODM4LjYgMTIxLjBRODQ0LjE1MDAwMDAwMDAwMDEgMTIxLjAgODQ4LjM1MDAwMDAwMDAwMDEgMTE4LjNRODUyLjU1MDAwMDAwMDAwMDEgMTE1LjYgODU0Ljg3NSAxMTAuODc1UTg1Ny4yIDEwNi4xNSA4NTcuMiAxMDAuMFE4NTcuMiA5My44NSA4NTQuODAwMDAwMDAwMDAwMSA4OS4xMjVRODUyLjQwMDAwMDAwMDAwMDEgODQuNCA4NDguMTI1IDgxLjdRODQzLjg1IDc5LjAgODM4LjMwMDAwMDAwMDAwMDEgNzkuMFE4MzIuOTAwMDAwMDAwMDAwMSA3OS4wIDgyOC42MjUgODEuN1E4MjQuMzUgODQuNCA4MjEuOTUgODkuMTI1UTgxOS41NTAwMDAwMDAwMDAxIDkzLjg1IDgxOS41NTAwMDAwMDAwMDAxIDEwMC4wUTgxOS41NTAwMDAwMDAwMDAxIDEwNi4xNSA4MjEuOTUgMTEwLjg3NVE4MjQuMzUgMTE1LjYgODI4LjcgMTE4LjNRODMzLjA1MDAwMDAwMDAwMDEgMTIxLjAgODM4LjYgMTIxLjBaIE04OTAuNSAxMzcuNVY2Mi41SDkxMC4zMDAwMDAwMDAwMDAxVjc2LjMwMDAwMDAwMDAwMDAxUTkxNC45NSA2OS4yNSA5MjIuMDc1IDY1LjcyNVE5MjkuMiA2Mi4yIDkzNi44NSA2Mi4yVjgxLjRROTI5Ljk1IDgxLjQgOTIzLjg3NSA4My4wNTAwMDAwMDAwMDAwMVE5MTcuODAwMDAwMDAwMDAwMSA4NC43IDkxNC4wNTAwMDAwMDAwMDAxIDg4LjQ1UTkxMC4zMDAwMDAwMDAwMDAxIDkyLjIgOTEwLjMwMDAwMDAwMDAwMDEgOTguMDUwMDAwMDAwMDAwMDFWMTM3LjVaICBNMTAxMi45MDAwMDAwMDAwMDAxIDEzOS4zUTEwMDIuNTUwMDAwMDAwMDAwMSAxMzkuMyA5OTQuOTc1MDAwMDAwMDAwMSAxMzQuNVE5ODcuNDAwMDAwMDAwMDAwMSAxMjkuNyA5ODMuMiAxMjAuODVROTc5LjAwMDAwMDAwMDAwMDEgMTEyLjAgOTc5LjAwMDAwMDAwMDAwMDEgMTAwLjBROTc5LjAwMDAwMDAwMDAwMDEgODcuODUgOTgzLjIgNzkuMDc0OTk5OTk5OTk5OTlROTg3LjQwMDAwMDAwMDAwMDEgNzAuMyA5OTQuOTc1MDAwMDAwMDAwMSA2NS41UTEwMDIuNTUwMDAwMDAwMDAwMSA2MC43IDEwMTIuOTAwMDAwMDAwMDAwMSA2MC43UTEwMjAuMjUwMDAwMDAwMDAwMSA2MC43IDEwMjYuMDI1IDYzLjc3NTAwMDAwMDAwMDAwNlExMDMxLjgwMDAwMDAwMDAwMDIgNjYuODUwMDAwMDAwMDAwMDEgMTAzNS40IDcyLjU1VjMyLjVIMTA1NS4yVjEzNy41SDEwMzYuNDVMMTAzNS44NTAwMDAwMDAwMDAxIDEyNy4wUTEwMzIuMTAwMDAwMDAwMDAwMSAxMzIuODUgMTAyNi4yNSAxMzYuMDc1UTEwMjAuNDAwMDAwMDAwMDAwMSAxMzkuMyAxMDEyLjkwMDAwMDAwMDAwMDEgMTM5LjNaTTEwMTguMDAwMDAwMDAwMDAwMSAxMjEuMTVRMTAyMi45NTAwMDAwMDAwMDAyIDEyMS4xNSAxMDI2Ljc3NSAxMTguNjc1MDAwMDAwMDAwMDFRMTAzMC42MDAwMDAwMDAwMDAxIDExNi4yIDEwMzIuODUwMDAwMDAwMDAwMSAxMTEuN1ExMDM1LjEwMDAwMDAwMDAwMDEgMTA3LjIgMTAzNS40IDEwMS41Vjk4LjVRMTAzNS4xMDAwMDAwMDAwMDAxIDkyLjgwMDAwMDAwMDAwMDAxIDEwMzIuODUwMDAwMDAwMDAwMSA4OC4zNzVRMTAzMC42MDAwMDAwMDAwMDAxIDgzLjk1IDEwMjYuNyA4MS40NzVRMTAyMi44MDAwMDAwMDAwMDAxIDc5LjAgMTAxNy44NTAwMDAwMDAwMDAxIDc5LjBRMTAxMi40NTAwMDAwMDAwMDAyIDc5LjAgMTAwOC4zMjUwMDAwMDAwMDAyIDgxLjYyNVExMDA0LjIwMDAwMDAwMDAwMDIgODQuMjUgMTAwMS44NzUwMDAwMDAwMDAxIDg5LjA1UTk5OS41NTAwMDAwMDAwMDAxIDkzLjg1IDk5OS41NTAwMDAwMDAwMDAxIDEwMC4wUTk5OS41NTAwMDAwMDAwMDAxIDEwNi4xNSAxMDAxLjk1IDExMC45NVExMDA0LjM1MDAwMDAwMDAwMDEgMTE1Ljc1IDEwMDguNDc1MDAwMDAwMDAwMSAxMTguNDVRMTAxMi42MDAwMDAwMDAwMDAxIDEyMS4xNSAxMDE4LjAwMDAwMDAwMDAwMDEgMTIxLjE1WiBNMTA3My41IDEzNy41VjYyLjVIMTA5My4zVjEzNy41Wk0xMDgzLjQgNTAuMzUwMDAwMDAwMDAwMDFRMTA3OC45IDUwLjM1MDAwMDAwMDAwMDAxIDEwNzUuNDUgNDYuOTc1MDAwMDAwMDAwMDFRMTA3Mi4wIDQzLjYwMDAwMDAwMDAwMDAxIDEwNzIuMCAzOC45NVExMDcyLjAgMzQuMyAxMDc1LjQ1IDMwLjkyNDk5OTk5OTk5OTk5N1ExMDc4LjkgMjcuNTQ5OTk5OTk5OTk5OTk3IDEwODMuNCAyNy41NDk5OTk5OTk5OTk5OTdRMTA4OC4wNSAyNy41NDk5OTk5OTk5OTk5OTcgMTA5MS40MjUgMzAuOTI0OTk5OTk5OTk5OTk3UTEwOTQuOCAzNC4zIDEwOTQuOCAzOC45NVExMDk0LjggNDMuNjAwMDAwMDAwMDAwMDEgMTA5MS40MjUgNDYuOTc1MDAwMDAwMDAwMDFRMTA4OC4wNSA1MC4zNTAwMDAwMDAwMDAwMSAxMDgzLjQgNTAuMzUwMDAwMDAwMDAwMDFaIE0xMTExLjYgMTM3LjVWNjIuNUgxMTMwLjJMMTEzMS4xIDcyLjdRMTEzNC43IDY2Ljg1MDAwMDAwMDAwMDAxIDExNDAuMzI1IDYzLjc3NTAwMDAwMDAwMDAwNlExMTQ1Ljk1IDYwLjcgMTE1My4xNDk5OTk5OTk5OTk5IDYwLjdRMTE2Mi4wIDYwLjcgMTE2OC4zIDY0LjMwMDAwMDAwMDAwMDAxUTExNzQuNiA2Ny45IDExNzcuOSA3NS40NzUwMDAwMDAwMDAwMVExMTgxLjIgODMuMDUwMDAwMDAwMDAwMDEgMTE4MS4wNSA5NS4wNTAwMDAwMDAwMDAwMVYxMzcuNUgxMTYxLjI1Vjk5LjFRMTE2MS4yNSA5MS40NSAxMTU5LjUyNSA4Ny4yNVExMTU3LjggODMuMDUwMDAwMDAwMDAwMDEgMTE1NC42NSA4MS4xNzUwMDAwMDAwMDAwMVExMTUxLjUgNzkuMzAwMDAwMDAwMDAwMDEgMTE0Ny4zIDc5LjMwMDAwMDAwMDAwMDAxUTExMzkuNjQ5OTk5OTk5OTk5OSA3OS4xNSAxMTM1LjUyNDk5OTk5OTk5OTkgODMuOTVRMTEzMS4zOTk5OTk5OTk5OTk5IDg4Ljc1IDExMzEuMzk5OTk5OTk5OTk5OSA5OC4yVjEzNy41WiBNMTE5Ni44IDEzNy41VjYyLjVIMTIxNS40TDEyMTYuMyA3Mi43UTEyMTkuOSA2Ni44NTAwMDAwMDAwMDAwMSAxMjI1LjUyNSA2My43NzUwMDAwMDAwMDAwMDZRMTIzMS4xNSA2MC43IDEyMzguMzUgNjAuN1ExMjQ3LjIgNjAuNyAxMjUzLjUgNjQuMzAwMDAwMDAwMDAwMDFRMTI1OS44IDY3LjkgMTI2My4xIDc1LjQ3NTAwMDAwMDAwMDAxUTEyNjYuNCA4My4wNTAwMDAwMDAwMDAwMSAxMjY2LjI1IDk1LjA1MDAwMDAwMDAwMDAxVjEzNy41SDEyNDYuNDVWOTkuMVExMjQ2LjQ1IDkxLjQ1IDEyNDQuNzI1IDg3LjI1UTEyNDMuMCA4My4wNTAwMDAwMDAwMDAwMSAxMjM5Ljg1IDgxLjE3NTAwMDAwMDAwMDAxUTEyMzYuNyA3OS4zMDAwMDAwMDAwMDAwMSAxMjMyLjUgNzkuMzAwMDAwMDAwMDAwMDFRMTIyNC44NSA3OS4xNSAxMjIwLjcyNSA4My45NVExMjE2LjYgODguNzUgMTIxNi42IDk4LjJWMTM3LjVaIE0xMzE1LjkgMTM5LjNRMTMwNC44IDEzOS4zIDEyOTYuMjUgMTM0LjI3NVExMjg3LjcgMTI5LjI1IDEyODIuODI1IDEyMC40UTEyNzcuOTUgMTExLjU1IDEyNzcuOTUgMTAwLjBRMTI3Ny45NSA4OC40NSAxMjgyLjk3NSA3OS42UTEyODguMCA3MC43NSAxMjk2Ljc3NSA2NS43MjVRMTMwNS41NSA2MC43IDEzMTYuOTUgNjAuN1ExMzI2Ljg1MDAwMDAwMDAwMDEgNjAuNyAxMzM1LjE3NTAwMDAwMDAwMDIgNjUuODc1UTEzNDMuNSA3MS4wNSAxMzQ4LjUyNSA4MS4wMjVRMTM1My41NSA5MS4wIDEzNTMuNTUgMTA1LjI1SDEyOTguNjVRMTI5OS40IDExMi43NSAxMzA1LjEgMTE3LjE3NVExMzEwLjggMTIxLjYgMTMxOC4wIDEyMS42UTEzMjQuMTUgMTIxLjYgMTMyOC4wNTAwMDAwMDAwMDAyIDExOC45NzVRMTMzMS45NSAxMTYuMzUgMTMzNC4wNSAxMTIuMTVMMTM1MS43NSAxMTkuMDVRMTM0OC42MDAwMDAwMDAwMDAxIDEyNS4zNSAxMzQzLjU3NSAxMjkuOTI1UTEzMzguNTUgMTM0LjUgMTMzMS42NSAxMzYuOVExMzI0Ljc1IDEzOS4zIDEzMTUuOSAxMzkuM1pNMTI5OS43IDkwLjU1MDAwMDAwMDAwMDAxSDEzMzIuMTAwMDAwMDAwMDAwMVExMzMxLjY1IDg1LjkgMTMyOS4xIDgzLjA1MDAwMDAwMDAwMDAxUTEzMjYuNTUgODAuMiAxMzIzLjEgNzguODVRMTMxOS42NSA3Ny41IDEzMTYuMzUwMDAwMDAwMDAwMSA3Ny41UTEzMTMuMiA3Ny41IDEzMDkuNTI1IDc4Ljc3NVExMzA1Ljg1MDAwMDAwMDAwMDEgODAuMDUwMDAwMDAwMDAwMDEgMTMwMy4wNzUgODIuOVExMzAwLjMgODUuNzUgMTI5OS43IDkwLjU1MDAwMDAwMDAwMDAxWiBNMTM2NS4xIDEzNy41VjYyLjVIMTM4NC44OTk5OTk5OTk5OTk5Vjc2LjMwMDAwMDAwMDAwMDAxUTEzODkuNTUgNjkuMjUgMTM5Ni42NzUgNjUuNzI1UTE0MDMuOCA2Mi4yIDE0MTEuNDUgNjIuMlY4MS40UTE0MDQuNTUgODEuNCAxMzk4LjQ3NSA4My4wNTAwMDAwMDAwMDAwMVExMzkyLjM5OTk5OTk5OTk5OTkgODQuNyAxMzg4LjY0OTk5OTk5OTk5OTkgODguNDVRMTM4NC44OTk5OTk5OTk5OTk5IDkyLjIgMTM4NC44OTk5OTk5OTk5OTk5IDk4LjA1MDAwMDAwMDAwMDAxVjEzNy41WiBNMTQzNy44NSAxMDcuMzUgMTQzNy4xIDgwLjk1IDE0NDguMTk5OTk5OTk5OTk5OCA4MC4yUTE0NTUuOTk5OTk5OTk5OTk5OCA3OS43NSAxNDYxLjAyNDk5OTk5OTk5OTkgNzUuN1ExNDY2LjA1IDcxLjY1IDE0NjYuMDUgNjMuODUwMDAwMDAwMDAwMDFRMTQ2Ni4wNSA1Ny4yNSAxNDYxLjM5OTk5OTk5OTk5OTkgNTIuOVExNDU2Ljc0OTk5OTk5OTk5OTggNDguNTUgMTQ0OS4yNDk5OTk5OTk5OTk4IDQ4LjU1UTE0NDMuOTk5OTk5OTk5OTk5OCA0OC41NSAxNDQwLjE3NDk5OTk5OTk5OTcgNTEuMTc1UTE0MzYuMzUgNTMuOCAxNDM0Ljg1IDU3LjdMMTQxNi44NSA1Mi42MDAwMDAwMDAwMDAwMVExNDE5Ljg1IDQyLjcgMTQyOC4zMjQ5OTk5OTk5OTk4IDM2LjdRMTQzNi44IDMwLjcwMDAwMDAwMDAwMDAwMyAxNDQ5LjI0OTk5OTk5OTk5OTggMzAuNzAwMDAwMDAwMDAwMDAzUTE0NTkuNzQ5OTk5OTk5OTk5OCAzMC43MDAwMDAwMDAwMDAwMDMgMTQ2Ny44NSAzNC45NzVRMTQ3NS45NDk5OTk5OTk5OTk4IDM5LjI1IDE0ODAuNTI0OTk5OTk5OTk5OSA0Ni42NzUwMDAwMDAwMDAwMDRRMTQ4NS4xIDU0LjEwMDAwMDAwMDAwMDAxIDE0ODUuMSA2My44NTAwMDAwMDAwMDAwMVExNDg1LjEgNzEuOCAxNDgxLjY0OTk5OTk5OTk5OTkgNzguMVExNDc4LjE5OTk5OTk5OTk5OTggODQuNCAxNDcxLjgyNDk5OTk5OTk5OTggODguMzAwMDAwMDAwMDAwMDFRMTQ2NS40NDk5OTk5OTk5OTk4IDkyLjIgMTQ1Ny4wNSA5My4yNUwxNDU2Ljc0OTk5OTk5OTk5OTggMTA3LjM1Wk0xNDQ3LjMgMTM5Ljc1UTE0NDIuMzUgMTM5Ljc1IDE0MzguODI0OTk5OTk5OTk5OCAxMzYuMjI1UTE0MzUuMyAxMzIuNyAxNDM1LjMgMTI3LjZRMTQzNS4zIDEyMi42NSAxNDM4LjgyNDk5OTk5OTk5OTggMTE5LjEyNVExNDQyLjM1IDExNS42IDE0NDcuMyAxMTUuNlExNDUyLjI0OTk5OTk5OTk5OTggMTE1LjYgMTQ1NS43NzQ5OTk5OTk5OTk5IDExOS4xMjVRMTQ1OS4zIDEyMi42NSAxNDU5LjMgMTI3LjZRMTQ1OS4zIDEzMi43IDE0NTUuNzc0OTk5OTk5OTk5OSAxMzYuMjI1UTE0NTIuMjQ5OTk5OTk5OTk5OCAxMzkuNzUgMTQ0Ny4zIDEzOS43NVoiIGZpbGw9IiMwRTFCMkUiLz48L3N2Zz4K" width="380" alt="Logo com nome, claro"></div>
+        <div class="tile dk"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAwIDE3MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJXaGF0J3MgZm9yIGRpbm5lcj8iPjxnIHRyYW5zZm9ybT0ic2NhbGUoMC4zMzIwMzEyNSkiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjE0IiBmaWxsPSIjNEZFMEIwIi8+PGNpcmNsZSBjeD0iMTc0IiBjeT0iMjU0IiByPSI1OCIgZmlsbD0iI0ZGRkZGRiIvPjxjaXJjbGUgY3g9IjE4OCIgY3k9IjIzOCIgcj0iMjkiIGZpbGw9IiMwQTEwMUMiLz48Y2lyY2xlIGN4PSIzMzgiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMzUyIiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzBBMTAxQyIvPjxwYXRoIGQ9Ik0xMjYgMTY4IFExNzQgMTU2IDIyNCAxNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTI5MCAxMzIgUTMzOCA5OCAzOTAgMTM0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwQTEwMUMiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yMDQgMzc0IEwzMDggMzc0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwQTEwMUMiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48cGF0aCBkPSJNMjUyLjI1IDEzNy41IDIyMS4yIDMyLjVIMjQyLjA1TDI2My4zNSAxMDYuMEwyODMuNiAzMi41SDMwNC4wTDMyNC40IDEwNC45NUwzNDUuNyAzMi41SDM2Ni41NDk5OTk5OTk5OTk5NUwzMzUuMiAxMzcuNUgzMTMuNkwyOTMuOCA2NC42MDAwMDAwMDAwMDAwMUwyNzMuNyAxMzcuNVogTTM3Ni40NSAxMzcuNVYzMi41SDM5Ni4yNVY3Mi4xMDAwMDAwMDAwMDAwMVE0MDAuMCA2Ni41NSA0MDUuNTUgNjMuNjI1UTQxMS4xIDYwLjcgNDE4LjAgNjAuN1E0MjcuMCA2MC43IDQzMy4yMjUgNjQuMzAwMDAwMDAwMDAwMDFRNDM5LjQ1IDY3LjkgNDQyLjc1IDc1LjQ3NTAwMDAwMDAwMDAxUTQ0Ni4wNSA4My4wNTAwMDAwMDAwMDAwMSA0NDYuMDUgOTUuMDUwMDAwMDAwMDAwMDFWMTM3LjVINDI2LjI1Vjk5LjFRNDI2LjI1IDkxLjQ1IDQyNC40NSA4Ny4yNVE0MjIuNjUgODMuMDUwMDAwMDAwMDAwMDEgNDE5LjUgODEuMTc1MDAwMDAwMDAwMDFRNDE2LjM1IDc5LjMwMDAwMDAwMDAwMDAxIDQxMi4xNSA3OS4zMDAwMDAwMDAwMDAwMVE0MDQuNSA3OS4xNSA0MDAuMzc1IDgzLjk1UTM5Ni4yNSA4OC43NSAzOTYuMjUgOTguMlYxMzcuNVogTTQ4Ni4xIDEzOS4zUTQ3Mi42IDEzOS4zIDQ2NS4xNzUgMTMzLjNRNDU3Ljc1IDEyNy4zIDQ1Ny43NSAxMTYuMzVRNDU3Ljc1IDEwNC4zNSA0NjUuNzc1IDk4LjI3NVE0NzMuOCA5Mi4yIDQ4OC4zNSA5Mi4ySDUwNi4wNVE1MDUuMCA4NS4zMDAwMDAwMDAwMDAwMSA1MDEuNyA4MS42MjVRNDk4LjQgNzcuOTUgNDkyLjI1IDc3Ljk1UTQ4Ny40NSA3Ny45NSA0ODMuNTQ5OTk5OTk5OTk5OTUgODAuMDUwMDAwMDAwMDAwMDFRNDc5LjY1IDgyLjE1IDQ3Ni45NSA4Ni41TDQ1OS41NSA4MC41UTQ2MS42NSA3NS43IDQ2NS43IDcxLjEyNVE0NjkuNzUgNjYuNTUgNDc2LjI3NSA2My42MjVRNDgyLjggNjAuNyA0OTIuMjUgNjAuN1E1MDMuNjUgNjAuNyA1MTEuMjI0OTk5OTk5OTk5OTcgNjUuMDUwMDAwMDAwMDAwMDFRNTE4LjggNjkuNCA1MjIuNDc0OTk5OTk5OTk5OSA3Ny4yNzVRNTI2LjE1IDg1LjE1IDUyNi4wIDk1Ljk1TDUyNS41NSAxMzcuNUg1MDcuMUw1MDYuOCAxMjguOFE1MDMuOTUgMTMzLjkgNDk4Ljc3NSAxMzYuNjAwMDAwMDAwMDAwMDJRNDkzLjYgMTM5LjMgNDg2LjEgMTM5LjNaTTQ4OS40IDEyMi44UTQ5NC4yIDEyMi44IDQ5OC4xIDEyMC41NVE1MDIuMCAxMTguMyA1MDQuMjUgMTE0LjY5OTk5OTk5OTk5OTk5UTUwNi41IDExMS4xIDUwNi41IDEwNy4yVjEwNi45SDQ5NS4yNVE0ODUuNSAxMDYuOSA0ODEuNzUgMTA5LjIyNVE0NzguMCAxMTEuNTUgNDc4LjAgMTE1Ljc1UTQ3OC4wIDExOS4wNSA0ODEuMCAxMjAuOTI1UTQ4NC4wIDEyMi44IDQ4OS40IDEyMi44WiBNNTcyLjY1MDAwMDAwMDAwMDEgMTM5LjNRNTYwLjIgMTM5LjMgNTUzLjgyNSAxMzMuMTVRNTQ3LjQ1IDEyNy4wIDU0Ny40NSAxMTUuNlY3OS4zMDAwMDAwMDAwMDAwMUg1MzUuMzAwMDAwMDAwMDAwMVY2Mi41SDU0Ny40NVYzOS4xMDAwMDAwMDAwMDAwMUg1NjcuMjVWNjIuNUg1ODYuMFY3OS4zMDAwMDAwMDAwMDAwMUg1NjcuMjVWMTExLjI1UTU2Ny4yNSAxMTYuMDUgNTY5LjM1IDExOC41MjVRNTcxLjQ1IDEyMS4wIDU3NS41IDEyMS4wUTU3Ny4wIDEyMS4wIDU3OC44IDEyMC4zMjVRNTgwLjYgMTE5LjY1IDU4Mi41NTAwMDAwMDAwMDAxIDExOC4zTDU4OS40NSAxMzMuMTVRNTg1Ljg1IDEzNS44NSA1ODEuNDI1IDEzNy41NzVRNTc3LjAgMTM5LjMgNTcyLjY1MDAwMDAwMDAwMDEgMTM5LjNaIE02MDQuNiA2OC41IDYwMi41IDMwLjEwMDAwMDAwMDAwMDAxSDYyMS4yNUw2MTkuMTUgNjguNVogTTY2Ni44NSAxMzkuM1E2NTkuNjUgMTM5LjMgNjUzLjM0OTk5OTk5OTk5OTkgMTM3LjEyNVE2NDcuMDUgMTM0Ljk1IDY0Mi4yNSAxMzAuODI1UTYzNy40NSAxMjYuNyA2MzQuNzUgMTIwLjdMNjUxLjcgMTEyLjlRNjUzLjk1IDExNi41IDY1Ny44NSAxMTkuMTI1UTY2MS43NSAxMjEuNzUgNjY2Ljg1IDEyMS43NVE2NzEuOCAxMjEuNzUgNjc0LjUgMTIwLjMyNVE2NzcuMiAxMTguOSA2NzcuMiAxMTYuMlE2NzcuMiAxMTMuNSA2NzUuMDI1MDAwMDAwMDAwMSAxMTIuMjI1UTY3Mi44NSAxMTAuOTUgNjY5LjEgMTEwLjA1TDY2Mi4yIDEwOC4yNVE2NTEuNCAxMDUuNCA2NDUuMTc1IDk5LjE3NTAwMDAwMDAwMDAxUTYzOC45NSA5Mi45NSA2MzguOTUgODQuODVRNjM4Ljk1IDczLjMgNjQ2LjM3NSA2Ny4wUTY1My44IDYwLjcgNjY3LjQ1IDYwLjdRNjc0LjUgNjAuNyA2ODAuNTc1IDYyLjgwMDAwMDAwMDAwMDAwNFE2ODYuNjUgNjQuOSA2OTEuMCA2OC42NVE2OTUuMzUgNzIuNCA2OTcuMCA3Ny4zNUw2ODAuNjUgODQuODVRNjc5LjYgODEuODUgNjc1LjU1IDc5Ljk3NVE2NzEuNSA3OC4xIDY2Ny40NSA3OC4xUTY2My40IDc4LjEgNjYxLjIyNDk5OTk5OTk5OTkgNzkuODI1UTY1OS4wNSA4MS41NTAwMDAwMDAwMDAwMSA2NTkuMDUgODQuNTUwMDAwMDAwMDAwMDFRNjU5LjA1IDg2LjUgNjYxLjE1IDg3Ljc3NVE2NjMuMjUgODkuMDUwMDAwMDAwMDAwMDEgNjY3LjE1IDg5Ljk1TDY3Ni45IDkyLjM1UTY4NC4yNSA5NC4xNSA2ODguNjc1IDk4LjEyNVE2OTMuMSAxMDIuMSA2OTUuMTI1IDEwNi45NzVRNjk3LjE1IDExMS44NSA2OTcuMTUgMTE2LjVRNjk3LjE1IDEyMy4yNSA2OTMuMTc1IDEyOC40MjVRNjg5LjIgMTMzLjYgNjgyLjM3NSAxMzYuNDVRNjc1LjU1IDEzOS4zIDY2Ni44NSAxMzkuM1ogIE03NTEuOSAxMzcuNVY3OC40SDczOS40NVY2Mi41SDc1MS45VjU1LjBRNzUxLjkgNDMuMCA3NTguMDUgMzYuMzI1UTc2NC4yIDI5LjY1MDAwMDAwMDAwMDAwNiA3NzYuODAwMDAwMDAwMDAwMSAyOS42NTAwMDAwMDAwMDAwMDZRNzgxLjE1IDI5LjY1MDAwMDAwMDAwMDAwNiA3ODYuMDI1IDMxLjE1MDAwMDAwMDAwMDAwNlE3OTAuOSAzMi42NTAwMDAwMDAwMDAwMDYgNzk0Ljk1IDM0Ljc1TDc4Ny42IDQ5LjBRNzg1LjIgNDcuOCA3ODMuMjUgNDcuMlE3ODEuMzAwMDAwMDAwMDAwMSA0Ni42MDAwMDAwMDAwMDAwMSA3NzkuNjUgNDYuNjAwMDAwMDAwMDAwMDFRNzc1LjYgNDYuNjAwMDAwMDAwMDAwMDEgNzczLjY1MDAwMDAwMDAwMDEgNDkuMzc1MDAwMDAwMDAwMDFRNzcxLjcgNTIuMTUwMDAwMDAwMDAwMDA2IDc3MS43IDU4LjNWNjIuNUg3OTAuMTVWNzguNEg3NzEuN1YxMzcuNVogTTgzOC42IDEzOS4zUTgyNy4yIDEzOS4zIDgxOC4yNzUwMDAwMDAwMDAxIDEzNC4yNzVRODA5LjM1IDEyOS4yNSA4MDQuMzI1IDEyMC40UTc5OS4zMDAwMDAwMDAwMDAxIDExMS41NSA3OTkuMzAwMDAwMDAwMDAwMSAxMDAuMFE3OTkuMzAwMDAwMDAwMDAwMSA4OC40NSA4MDQuMjUgNzkuNlE4MDkuMiA3MC43NSA4MTguMDUwMDAwMDAwMDAwMSA2NS43MjVRODI2LjkwMDAwMDAwMDAwMDEgNjAuNyA4MzguMzAwMDAwMDAwMDAwMSA2MC43UTg0OS44NSA2MC43IDg1OC43IDY1LjcyNVE4NjcuNTUwMDAwMDAwMDAwMSA3MC43NSA4NzIuNSA3OS42UTg3Ny40NSA4OC40NSA4NzcuNDUgMTAwLjBRODc3LjQ1IDExMS41NSA4NzIuNSAxMjAuNFE4NjcuNTUwMDAwMDAwMDAwMSAxMjkuMjUgODU4Ljc3NTAwMDAwMDAwMDEgMTM0LjI3NVE4NTAuMDAwMDAwMDAwMDAwMSAxMzkuMyA4MzguNiAxMzkuM1pNODM4LjYgMTIxLjBRODQ0LjE1MDAwMDAwMDAwMDEgMTIxLjAgODQ4LjM1MDAwMDAwMDAwMDEgMTE4LjNRODUyLjU1MDAwMDAwMDAwMDEgMTE1LjYgODU0Ljg3NSAxMTAuODc1UTg1Ny4yIDEwNi4xNSA4NTcuMiAxMDAuMFE4NTcuMiA5My44NSA4NTQuODAwMDAwMDAwMDAwMSA4OS4xMjVRODUyLjQwMDAwMDAwMDAwMDEgODQuNCA4NDguMTI1IDgxLjdRODQzLjg1IDc5LjAgODM4LjMwMDAwMDAwMDAwMDEgNzkuMFE4MzIuOTAwMDAwMDAwMDAwMSA3OS4wIDgyOC42MjUgODEuN1E4MjQuMzUgODQuNCA4MjEuOTUgODkuMTI1UTgxOS41NTAwMDAwMDAwMDAxIDkzLjg1IDgxOS41NTAwMDAwMDAwMDAxIDEwMC4wUTgxOS41NTAwMDAwMDAwMDAxIDEwNi4xNSA4MjEuOTUgMTEwLjg3NVE4MjQuMzUgMTE1LjYgODI4LjcgMTE4LjNRODMzLjA1MDAwMDAwMDAwMDEgMTIxLjAgODM4LjYgMTIxLjBaIE04OTAuNSAxMzcuNVY2Mi41SDkxMC4zMDAwMDAwMDAwMDAxVjc2LjMwMDAwMDAwMDAwMDAxUTkxNC45NSA2OS4yNSA5MjIuMDc1IDY1LjcyNVE5MjkuMiA2Mi4yIDkzNi44NSA2Mi4yVjgxLjRROTI5Ljk1IDgxLjQgOTIzLjg3NSA4My4wNTAwMDAwMDAwMDAwMVE5MTcuODAwMDAwMDAwMDAwMSA4NC43IDkxNC4wNTAwMDAwMDAwMDAxIDg4LjQ1UTkxMC4zMDAwMDAwMDAwMDAxIDkyLjIgOTEwLjMwMDAwMDAwMDAwMDEgOTguMDUwMDAwMDAwMDAwMDFWMTM3LjVaICBNMTAxMi45MDAwMDAwMDAwMDAxIDEzOS4zUTEwMDIuNTUwMDAwMDAwMDAwMSAxMzkuMyA5OTQuOTc1MDAwMDAwMDAwMSAxMzQuNVE5ODcuNDAwMDAwMDAwMDAwMSAxMjkuNyA5ODMuMiAxMjAuODVROTc5LjAwMDAwMDAwMDAwMDEgMTEyLjAgOTc5LjAwMDAwMDAwMDAwMDEgMTAwLjBROTc5LjAwMDAwMDAwMDAwMDEgODcuODUgOTgzLjIgNzkuMDc0OTk5OTk5OTk5OTlROTg3LjQwMDAwMDAwMDAwMDEgNzAuMyA5OTQuOTc1MDAwMDAwMDAwMSA2NS41UTEwMDIuNTUwMDAwMDAwMDAwMSA2MC43IDEwMTIuOTAwMDAwMDAwMDAwMSA2MC43UTEwMjAuMjUwMDAwMDAwMDAwMSA2MC43IDEwMjYuMDI1IDYzLjc3NTAwMDAwMDAwMDAwNlExMDMxLjgwMDAwMDAwMDAwMDIgNjYuODUwMDAwMDAwMDAwMDEgMTAzNS40IDcyLjU1VjMyLjVIMTA1NS4yVjEzNy41SDEwMzYuNDVMMTAzNS44NTAwMDAwMDAwMDAxIDEyNy4wUTEwMzIuMTAwMDAwMDAwMDAwMSAxMzIuODUgMTAyNi4yNSAxMzYuMDc1UTEwMjAuNDAwMDAwMDAwMDAwMSAxMzkuMyAxMDEyLjkwMDAwMDAwMDAwMDEgMTM5LjNaTTEwMTguMDAwMDAwMDAwMDAwMSAxMjEuMTVRMTAyMi45NTAwMDAwMDAwMDAyIDEyMS4xNSAxMDI2Ljc3NSAxMTguNjc1MDAwMDAwMDAwMDFRMTAzMC42MDAwMDAwMDAwMDAxIDExNi4yIDEwMzIuODUwMDAwMDAwMDAwMSAxMTEuN1ExMDM1LjEwMDAwMDAwMDAwMDEgMTA3LjIgMTAzNS40IDEwMS41Vjk4LjVRMTAzNS4xMDAwMDAwMDAwMDAxIDkyLjgwMDAwMDAwMDAwMDAxIDEwMzIuODUwMDAwMDAwMDAwMSA4OC4zNzVRMTAzMC42MDAwMDAwMDAwMDAxIDgzLjk1IDEwMjYuNyA4MS40NzVRMTAyMi44MDAwMDAwMDAwMDAxIDc5LjAgMTAxNy44NTAwMDAwMDAwMDAxIDc5LjBRMTAxMi40NTAwMDAwMDAwMDAyIDc5LjAgMTAwOC4zMjUwMDAwMDAwMDAyIDgxLjYyNVExMDA0LjIwMDAwMDAwMDAwMDIgODQuMjUgMTAwMS44NzUwMDAwMDAwMDAxIDg5LjA1UTk5OS41NTAwMDAwMDAwMDAxIDkzLjg1IDk5OS41NTAwMDAwMDAwMDAxIDEwMC4wUTk5OS41NTAwMDAwMDAwMDAxIDEwNi4xNSAxMDAxLjk1IDExMC45NVExMDA0LjM1MDAwMDAwMDAwMDEgMTE1Ljc1IDEwMDguNDc1MDAwMDAwMDAwMSAxMTguNDVRMTAxMi42MDAwMDAwMDAwMDAxIDEyMS4xNSAxMDE4LjAwMDAwMDAwMDAwMDEgMTIxLjE1WiBNMTA3My41IDEzNy41VjYyLjVIMTA5My4zVjEzNy41Wk0xMDgzLjQgNTAuMzUwMDAwMDAwMDAwMDFRMTA3OC45IDUwLjM1MDAwMDAwMDAwMDAxIDEwNzUuNDUgNDYuOTc1MDAwMDAwMDAwMDFRMTA3Mi4wIDQzLjYwMDAwMDAwMDAwMDAxIDEwNzIuMCAzOC45NVExMDcyLjAgMzQuMyAxMDc1LjQ1IDMwLjkyNDk5OTk5OTk5OTk5N1ExMDc4LjkgMjcuNTQ5OTk5OTk5OTk5OTk3IDEwODMuNCAyNy41NDk5OTk5OTk5OTk5OTdRMTA4OC4wNSAyNy41NDk5OTk5OTk5OTk5OTcgMTA5MS40MjUgMzAuOTI0OTk5OTk5OTk5OTk3UTEwOTQuOCAzNC4zIDEwOTQuOCAzOC45NVExMDk0LjggNDMuNjAwMDAwMDAwMDAwMDEgMTA5MS40MjUgNDYuOTc1MDAwMDAwMDAwMDFRMTA4OC4wNSA1MC4zNTAwMDAwMDAwMDAwMSAxMDgzLjQgNTAuMzUwMDAwMDAwMDAwMDFaIE0xMTExLjYgMTM3LjVWNjIuNUgxMTMwLjJMMTEzMS4xIDcyLjdRMTEzNC43IDY2Ljg1MDAwMDAwMDAwMDAxIDExNDAuMzI1IDYzLjc3NTAwMDAwMDAwMDAwNlExMTQ1Ljk1IDYwLjcgMTE1My4xNDk5OTk5OTk5OTk5IDYwLjdRMTE2Mi4wIDYwLjcgMTE2OC4zIDY0LjMwMDAwMDAwMDAwMDAxUTExNzQuNiA2Ny45IDExNzcuOSA3NS40NzUwMDAwMDAwMDAwMVExMTgxLjIgODMuMDUwMDAwMDAwMDAwMDEgMTE4MS4wNSA5NS4wNTAwMDAwMDAwMDAwMVYxMzcuNUgxMTYxLjI1Vjk5LjFRMTE2MS4yNSA5MS40NSAxMTU5LjUyNSA4Ny4yNVExMTU3LjggODMuMDUwMDAwMDAwMDAwMDEgMTE1NC42NSA4MS4xNzUwMDAwMDAwMDAwMVExMTUxLjUgNzkuMzAwMDAwMDAwMDAwMDEgMTE0Ny4zIDc5LjMwMDAwMDAwMDAwMDAxUTExMzkuNjQ5OTk5OTk5OTk5OSA3OS4xNSAxMTM1LjUyNDk5OTk5OTk5OTkgODMuOTVRMTEzMS4zOTk5OTk5OTk5OTk5IDg4Ljc1IDExMzEuMzk5OTk5OTk5OTk5OSA5OC4yVjEzNy41WiBNMTE5Ni44IDEzNy41VjYyLjVIMTIxNS40TDEyMTYuMyA3Mi43UTEyMTkuOSA2Ni44NTAwMDAwMDAwMDAwMSAxMjI1LjUyNSA2My43NzUwMDAwMDAwMDAwMDZRMTIzMS4xNSA2MC43IDEyMzguMzUgNjAuN1ExMjQ3LjIgNjAuNyAxMjUzLjUgNjQuMzAwMDAwMDAwMDAwMDFRMTI1OS44IDY3LjkgMTI2My4xIDc1LjQ3NTAwMDAwMDAwMDAxUTEyNjYuNCA4My4wNTAwMDAwMDAwMDAwMSAxMjY2LjI1IDk1LjA1MDAwMDAwMDAwMDAxVjEzNy41SDEyNDYuNDVWOTkuMVExMjQ2LjQ1IDkxLjQ1IDEyNDQuNzI1IDg3LjI1UTEyNDMuMCA4My4wNTAwMDAwMDAwMDAwMSAxMjM5Ljg1IDgxLjE3NTAwMDAwMDAwMDAxUTEyMzYuNyA3OS4zMDAwMDAwMDAwMDAwMSAxMjMyLjUgNzkuMzAwMDAwMDAwMDAwMDFRMTIyNC44NSA3OS4xNSAxMjIwLjcyNSA4My45NVExMjE2LjYgODguNzUgMTIxNi42IDk4LjJWMTM3LjVaIE0xMzE1LjkgMTM5LjNRMTMwNC44IDEzOS4zIDEyOTYuMjUgMTM0LjI3NVExMjg3LjcgMTI5LjI1IDEyODIuODI1IDEyMC40UTEyNzcuOTUgMTExLjU1IDEyNzcuOTUgMTAwLjBRMTI3Ny45NSA4OC40NSAxMjgyLjk3NSA3OS42UTEyODguMCA3MC43NSAxMjk2Ljc3NSA2NS43MjVRMTMwNS41NSA2MC43IDEzMTYuOTUgNjAuN1ExMzI2Ljg1MDAwMDAwMDAwMDEgNjAuNyAxMzM1LjE3NTAwMDAwMDAwMDIgNjUuODc1UTEzNDMuNSA3MS4wNSAxMzQ4LjUyNSA4MS4wMjVRMTM1My41NSA5MS4wIDEzNTMuNTUgMTA1LjI1SDEyOTguNjVRMTI5OS40IDExMi43NSAxMzA1LjEgMTE3LjE3NVExMzEwLjggMTIxLjYgMTMxOC4wIDEyMS42UTEzMjQuMTUgMTIxLjYgMTMyOC4wNTAwMDAwMDAwMDAyIDExOC45NzVRMTMzMS45NSAxMTYuMzUgMTMzNC4wNSAxMTIuMTVMMTM1MS43NSAxMTkuMDVRMTM0OC42MDAwMDAwMDAwMDAxIDEyNS4zNSAxMzQzLjU3NSAxMjkuOTI1UTEzMzguNTUgMTM0LjUgMTMzMS42NSAxMzYuOVExMzI0Ljc1IDEzOS4zIDEzMTUuOSAxMzkuM1pNMTI5OS43IDkwLjU1MDAwMDAwMDAwMDAxSDEzMzIuMTAwMDAwMDAwMDAwMVExMzMxLjY1IDg1LjkgMTMyOS4xIDgzLjA1MDAwMDAwMDAwMDAxUTEzMjYuNTUgODAuMiAxMzIzLjEgNzguODVRMTMxOS42NSA3Ny41IDEzMTYuMzUwMDAwMDAwMDAwMSA3Ny41UTEzMTMuMiA3Ny41IDEzMDkuNTI1IDc4Ljc3NVExMzA1Ljg1MDAwMDAwMDAwMDEgODAuMDUwMDAwMDAwMDAwMDEgMTMwMy4wNzUgODIuOVExMzAwLjMgODUuNzUgMTI5OS43IDkwLjU1MDAwMDAwMDAwMDAxWiBNMTM2NS4xIDEzNy41VjYyLjVIMTM4NC44OTk5OTk5OTk5OTk5Vjc2LjMwMDAwMDAwMDAwMDAxUTEzODkuNTUgNjkuMjUgMTM5Ni42NzUgNjUuNzI1UTE0MDMuOCA2Mi4yIDE0MTEuNDUgNjIuMlY4MS40UTE0MDQuNTUgODEuNCAxMzk4LjQ3NSA4My4wNTAwMDAwMDAwMDAwMVExMzkyLjM5OTk5OTk5OTk5OTkgODQuNyAxMzg4LjY0OTk5OTk5OTk5OTkgODguNDVRMTM4NC44OTk5OTk5OTk5OTk5IDkyLjIgMTM4NC44OTk5OTk5OTk5OTk5IDk4LjA1MDAwMDAwMDAwMDAxVjEzNy41WiBNMTQzNy44NSAxMDcuMzUgMTQzNy4xIDgwLjk1IDE0NDguMTk5OTk5OTk5OTk5OCA4MC4yUTE0NTUuOTk5OTk5OTk5OTk5OCA3OS43NSAxNDYxLjAyNDk5OTk5OTk5OTkgNzUuN1ExNDY2LjA1IDcxLjY1IDE0NjYuMDUgNjMuODUwMDAwMDAwMDAwMDFRMTQ2Ni4wNSA1Ny4yNSAxNDYxLjM5OTk5OTk5OTk5OTkgNTIuOVExNDU2Ljc0OTk5OTk5OTk5OTggNDguNTUgMTQ0OS4yNDk5OTk5OTk5OTk4IDQ4LjU1UTE0NDMuOTk5OTk5OTk5OTk5OCA0OC41NSAxNDQwLjE3NDk5OTk5OTk5OTcgNTEuMTc1UTE0MzYuMzUgNTMuOCAxNDM0Ljg1IDU3LjdMMTQxNi44NSA1Mi42MDAwMDAwMDAwMDAwMVExNDE5Ljg1IDQyLjcgMTQyOC4zMjQ5OTk5OTk5OTk4IDM2LjdRMTQzNi44IDMwLjcwMDAwMDAwMDAwMDAwMyAxNDQ5LjI0OTk5OTk5OTk5OTggMzAuNzAwMDAwMDAwMDAwMDAzUTE0NTkuNzQ5OTk5OTk5OTk5OCAzMC43MDAwMDAwMDAwMDAwMDMgMTQ2Ny44NSAzNC45NzVRMTQ3NS45NDk5OTk5OTk5OTk4IDM5LjI1IDE0ODAuNTI0OTk5OTk5OTk5OSA0Ni42NzUwMDAwMDAwMDAwMDRRMTQ4NS4xIDU0LjEwMDAwMDAwMDAwMDAxIDE0ODUuMSA2My44NTAwMDAwMDAwMDAwMVExNDg1LjEgNzEuOCAxNDgxLjY0OTk5OTk5OTk5OTkgNzguMVExNDc4LjE5OTk5OTk5OTk5OTggODQuNCAxNDcxLjgyNDk5OTk5OTk5OTggODguMzAwMDAwMDAwMDAwMDFRMTQ2NS40NDk5OTk5OTk5OTk4IDkyLjIgMTQ1Ny4wNSA5My4yNUwxNDU2Ljc0OTk5OTk5OTk5OTggMTA3LjM1Wk0xNDQ3LjMgMTM5Ljc1UTE0NDIuMzUgMTM5Ljc1IDE0MzguODI0OTk5OTk5OTk5OCAxMzYuMjI1UTE0MzUuMyAxMzIuNyAxNDM1LjMgMTI3LjZRMTQzNS4zIDEyMi42NSAxNDM4LjgyNDk5OTk5OTk5OTggMTE5LjEyNVExNDQyLjM1IDExNS42IDE0NDcuMyAxMTUuNlExNDUyLjI0OTk5OTk5OTk5OTggMTE1LjYgMTQ1NS43NzQ5OTk5OTk5OTk5IDExOS4xMjVRMTQ1OS4zIDEyMi42NSAxNDU5LjMgMTI3LjZRMTQ1OS4zIDEzMi43IDE0NTUuNzc0OTk5OTk5OTk5OSAxMzYuMjI1UTE0NTIuMjQ5OTk5OTk5OTk5OCAxMzkuNzUgMTQ0Ny4zIDEzOS43NVoiIGZpbGw9IiNFOUVFRjciLz48L3N2Zz4K" width="380" alt="Logo com nome, escuro"></div>
+      </div></section>
+    <section class="opt"><h2>Paleta B, Verde de feira</h2>
+      <p class="mut" style="max-width:68ch">Verde como cor de ação (lembra ingrediente fresco), azul-marinho como cor de texto, fundos com leve tom de verde. Atenção em âmbar, informação em azul claro.</p>
+      <div class="eyebrow">Claro</div><div class="sw" id="swl"></div>
+      <div class="eyebrow">Escuro</div><div class="sw" id="swd"></div></section>
+  </main>
+
+  <main id="p-icones" role="tabpanel" aria-labelledby="t-icones" hidden>
+    <h1 style="font-size:34px;line-height:42px">Ícones</h1>
+    <p class="lead" style="margin-top:10px">33 ícones só para o uso do app. Notas, reações, respostas e Enjoei usam emojis. Grade de 24 px, traço de 1.5 px, pontas e cantos redondos, cor herdada do texto.</p>
+    <div id="igroups"></div>
+  </main>
+</div>
+
+<script>
+(function(){
+var tabs=document.querySelectorAll('.tab');
+function show(id){tabs.forEach(function(t){var on=t.id===id;t.setAttribute('aria-selected',on?'true':'false');var p=document.getElementById(t.getAttribute('aria-controls'));if(p){if(on){p.removeAttribute('hidden')}else{p.setAttribute('hidden','')}}});try{history.replaceState(null,'','#'+id.slice(2))}catch(e){}}
+tabs.forEach(function(t){t.onclick=function(){show(t.id)}});
+try{var h=(location.hash||'').slice(1);if(h==='icones'||h==='wf'||h==='plano'||h==='marca'||h==='play'||h==='guia')show('t-'+h)}catch(e){}
+var th=document.getElementById('theme');if(th)th.onclick=function(){var r=document.documentElement;var dark=r.getAttribute('data-theme')?r.getAttribute('data-theme')==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.setAttribute('data-theme',dark?'light':'dark')};
+})();
+(function(){
+var ICONS=[["semana", "Semana", "Navegação"], ["pratos", "Pratos", "Navegação"], ["voltar", "Voltar", "Navegação"], ["avancar", "Avançar", "Navegação"], ["mais", "Adicionar", "Ação"], ["busca", "Buscar", "Ação"], ["ordenar", "Ordenar", "Ação"], ["camera", "Foto", "Ação"], ["imagem", "Imagem", "Ação"], ["editar", "Editar", "Ação"], ["lixeira", "Excluir", "Ação"], ["check", "Marcar", "Ação"], ["fechar", "Fechar", "Ação"], ["desfazer", "Desfazer", "Ação"], ["compartilhar", "Compartilhar", "Ação"], ["pessoa", "Pessoa", "Família"], ["familia", "Família", "Família"], ["skip", "Skip dinner", "Tipos de jantar"], ["freestyle", "Free-style (geladeira)", "Tipos de jantar"], ["prato-salvo", "Prato salvo", "Tipos de jantar"], ["falta", "Ingrediente faltando", "Alertas"], ["alerta", "Aviso", "Alertas"], ["info", "Informação", "Alertas"], ["sem-rede", "Sem rede", "Alertas"], ["panela", "Preparo", "Cozinha"], ["ingrediente", "Ingrediente", "Cozinha"], ["relogio", "Tempo", "Cozinha"], ["estrela", "Nota média", "Cozinha"], ["mes", "Visão de mês", "Fase 2"], ["mensagem", "Mensagens", "Fase 2"], ["stats", "Estatísticas", "Fase 2"], ["lista", "Lista de compras", "Fase 2"], ["sticker", "Sticker na foto", "Fase 2"]];
+var groups={};ICONS.forEach(function(i){(groups[i[2]]=groups[i[2]]||[]).push(i)});
+document.getElementById('igroups').innerHTML=Object.keys(groups).map(function(g){return `<div class="groupe"><div class="eyebrow">${g}</div><div class="igrid">`+groups[g].map(function(i){return `<div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${i[0]}"/></svg><span>${i[1]}<br><code>${i[0]}</code></span></div>`}).join('')+`</div></div>`}).join('');
+function swt(a){return a.map(function(x){return `<div><i style="background:${x[1]}"></i><span>${x[0]}<code>${x[1]}</code></span></div>`}).join('')}
+document.getElementById('swl').innerHTML=swt([['Fundo','#F4F6F1'],['Cartão','#FFFFFF'],['Texto','#12263A'],['Ação','#0F7A5C'],['Seleção','#D9F0E4'],['Atenção','#FFEFD0'],['Informação','#E6EEF8']]);
+document.getElementById('swd').innerHTML=swt([['Fundo','#0C1512'],['Cartão','#15211C'],['Texto','#E8F1EC'],['Ação','#4FE0B0'],['Seleção','#153A2D'],['Atenção','#3A2C10'],['Informação','#16294A']]);
+
+var LL='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiMyREI4OEMiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMTYzMzVFIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzMzVFIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==',LD='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiM0RkUwQjAiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzBBMTAxQyIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMEExMDFDIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMEExMDFDIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==';
+function ic(n,c){return `<svg viewBox="0 0 24 24" class="${c||''}" aria-hidden="true"><use href="#i-${n}"/></svg>`}
+function logo(w){return `<img class="lgl" src="${LL}" width="${w}" height="${w}" alt=""><img class="lgd" src="${LD}" width="${w}" height="${w}" alt="" style="display:none">`}
+var NAV=function(on){return `<div class="nav"><div class="${on===0?'on':''}">${ic('semana')}Semana</div><div class="${on===1?'on':''}">${ic('pratos')}Pratos</div></div>`};
+var BK=function(r){return `<div class="bk"><span>${ic('voltar','sm')}Voltar</span><span>${r||''}</span></div>`};
+var ty=function(n){return `<div class="ty">${ic(n)}</div>`};
+function day(a,b,lead,t,sub,bg,cls){return `<div class="day ${cls||''}"><div class="dn">${a}<b>${b}</b></div>${lead}<div class="dt"><b>${t}</b><span>${sub}</span></div><div class="bg">${bg||''}</div></div>`}
+function emp(a,b){return `<div class="day em"><div class="dn">${a}<b>${b}</b></div><div class="dt"><b>+ Planejar</b><span>Escolher prato, skip ou free-style</span></div></div>`}
+function th(){return `<div class="tb">${ic('imagem')}</div>`}
+function dishRow(n,sub,tag,face,big){return `<div class="rw"><div class="tb ${big?'lg2':''}">${ic('imagem')}</div><div class="dt"><b>${n}</b><span>${sub}</span>${tag?`<div style="margin-top:4px">${tag}</div>`:''}</div>${face?`<span style="font-size:24px">${face}</span>`:''}</div>`}
+var SCREENS=[
+{t:'1. Semana',d:'Logo no cabeçalho. Hoje com borda verde. Selo âmbar para ingrediente faltando. Dia vazio convida a planejar.',h:780,b:()=>
+ `<div class="hd"><div class="l1"><span class="brandrow">${logo(30)}What's for dinner?</span><span class="av">D</span></div><div class="wk"><div class="ib">${ic('voltar')}</div><h3>9 – 15 de novembro</h3><div class="ib">${ic('avancar')}</div></div></div><div class="main">`+
+ day('seg','9',ty('pratos'),'Strogonoff de frango','Feito · 4 jantaram','😋 3')+
+ day('ter','10',ty('freestyle'),'Free-style','O que tiver na geladeira','')+
+ day('qua','11',ty('skip'),'Skip dinner','Sem jantar hoje','')+
+ day('qui','12',ty('pratos'),'Lasanha de berinjela','Hoje · 3 de 4 responderam',`<span style="color:var(--wn)">${ic('falta','sm')}</span>🛵 2`,'td')+
+ day('sex','13',ty('pratos'),'Moqueca','Planejado por Ana','')+emp('sáb','14')+emp('dom','15')+`</div>`+NAV(0)},
+{t:'2. Dia',d:'Alerta de ingrediente com ação direta, aviso do dia, quatro respostas com emoji, checklist e reações.',h:900,b:()=>
+ `<div class="pg">${BK('Trocar plano')}
+ <div><div class="ey">Hoje · quinta, 12 nov</div><h2>Lasanha de berinjela</h2><div style="color:var(--mu);font-size:13px;margin-top:2px">Planejado por Ana · feito 6× · média 8,2 😍</div><div style="margin-top:6px"><span class="tg2 w">🤢 Pai enjoou, 12 dias</span></div></div>
+ <div class="ph">${ic('imagem')}</div>
+ <div class="al">${ic('falta')}<div><b>Ingrediente faltando! Quem vai? 😄</b><span>Falta: Ricota</span></div></div>
+ <div class="nt">${ic('info','sm')}1 pessoa quer pedir delivery 🛵</div>
+ <div class="crd"><h4>E aí, vai jantar?</h4>
+  <div class="op on"><span class="e">😋</span><span>MMMM can't wait!</span><small>3</small></div>
+  <div class="op"><span class="e">🛵</span><span>F*#% it, let's order!</span><small>1</small></div>
+  <div class="op"><span class="e">🍸</span><span>I'm in the mood for going out tonight ;)</span></div>
+  <div class="op"><span class="e">🚪</span><span>Not home tonight</span></div></div>
+ <div class="crd"><h4>Ingredientes</h4>
+  <div class="ck"><span class="bx on">${ic('check')}</span>Berinjela<small>2 un</small></div>
+  <div class="ck"><span class="bx"></span>Ricota<small>250 g · falta</small></div>
+  <div class="ck"><span class="bx on">${ic('check')}</span>Muçarela<small>200 g</small></div></div>
+ <div class="em2"><div class="on">😍 3</div><div>🔥 1</div><div>👏 1</div><div class="ad">${ic('mais','sm')}</div></div></div>`},
+{t:'3. Planejar o dia',d:'Três caminhos. Pratos salvos mostram média, vezes feito e quem enjoou.',h:780,b:()=>
+ `<div class="pg">${BK()}<h2>Planejar quinta, 13</h2>
+ <div class="rw" style="min-height:64px"><div class="ty">${ic('skip')}</div><div class="dt"><b>Skip dinner</b><span>Sem jantar neste dia</span></div>${ic('avancar','sm')}</div>
+ <div class="rw" style="min-height:64px"><div class="ty">${ic('freestyle')}</div><div class="dt"><b>Free-style</b><span>O que tiver na geladeira</span></div>${ic('avancar','sm')}</div>
+ <div class="lbl" style="margin-top:4px">Ou escolha um prato</div>
+ <div class="fl">${ic('busca','sm')}Buscar prato ou ingrediente</div>
+ ${dishRow('Strogonoff de frango','Feito 11× · média 8,9 😍','')}
+ ${dishRow('Panqueca de carne','Feito 9× · média 5,8 😐','<span class="tg2 w">🤢 Bia enjoou, 5 dias</span>')}
+ ${dishRow('Lasanha de berinjela','Feito 6× · média 8,2 😍','')}
+ ${dishRow('Risoto de cogumelos','Feito 2× · média 9,1 😍','')}</div>`},
+{t:'4. Pratos',d:'Busca, três ordens, média, minha nota e Enjoei. Botão de novo prato sempre à mão.',h:780,b:()=>
+ `<div class="pg" style="flex:1"><div class="tpt"><h2>Pratos</h2><div class="pill">${ic('mais','sm')}Novo prato</div></div>
+ <div class="fl">${ic('busca','sm')}Buscar prato ou ingrediente</div>
+ <div class="chp"><div class="on">${ic('ordenar','sm')}Mais feitos</div><div>Melhor nota</div><div>Recentes</div></div>
+ ${dishRow('Strogonoff de frango','Feito 11× · família 8,9 · você 9','','😍',1)}
+ ${dishRow('Panqueca de carne','Feito 9× · família 5,8 · você 6','<span class="tg2 w">🤢 Bia enjoou</span>','😐',1)}
+ ${dishRow('Lasanha de berinjela','Feito 6× · família 8,2 · você 8','','😍',1)}
+ ${dishRow('Moqueca','Feito 3× · família 6,5 · você 7','','😐',1)}
+ ${dishRow('Sopa de abóbora','Novo · ainda não feito','','',1)}</div>`+NAV(1)},
+{t:'5. Prato',d:'Nota 0 a 10 com emoji por faixa. Enjoei é um botão separado, por pessoa, e some sozinho em 3 semanas.',h:900,b:()=>
+ `<div class="pg">${BK(ic('editar','sm'))}
+ <div class="ph">${ic('imagem')}</div>
+ <div><h2>Lasanha de berinjela</h2><div style="color:var(--mu);font-size:13px;margin-top:2px">Criado por Ana · feito 6×</div></div>
+ <div class="crd"><h4>Minha nota</h4><div class="scl"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span class="on">8</span><span>9</span><span>10</span></div>
+ <div class="bands"><div>🤢 0 a 4</div><div>😐 5 a 7</div><div class="on">😍 8 a 10</div></div></div>
+ <div class="bs2">🤢 Enjoei</div><div class="hint" style="margin-top:-4px">Some das sugestões por 3 semanas. Você pode desfazer.</div>
+ <div class="lbl">Notas da família</div>
+ <div class="rw" style="min-height:48px"><span class="av">A</span><div class="dt"><b>Ana</b></div><span class="tg2 g">😍 9</span></div>
+ <div class="rw" style="min-height:48px"><span class="av">P</span><div class="dt"><b>Pai</b></div><span class="tg2 w">🤢 Enjoei</span></div>
+ <div class="lbl">Ingredientes</div>
+ <div class="crd"><div class="ck">Berinjela<small>2 un</small></div><div class="ck">Ricota<small>250 g</small></div></div></div>`},
+{t:'6. Novo / editar prato',d:'Formulário em uma coluna, rótulos visíveis. Salvar é a ação principal. Excluir é discreto e pede confirmação.',h:900,b:()=>
+ `<div class="pg">${BK()}<h2>Editar prato</h2>
+ <div class="ph" style="flex-direction:column;gap:4px;display:flex;align-items:center;justify-content:center">${ic('camera')}<span style="font-size:12px">Trocar foto</span></div>
+ <div><div class="lbl" style="margin-bottom:6px">Nome</div><div class="fl v">Lasanha de berinjela</div></div>
+ <div class="lbl">Ingredientes</div>
+ <div class="ing2"><div class="fl v">Berinjela</div><div class="fl v">2 un</div><div class="ib" style="width:36px;height:36px">${ic('fechar','sm')}</div></div>
+ <div class="ing2"><div class="fl v">Ricota</div><div class="fl v">250 g</div><div class="ib" style="width:36px;height:36px">${ic('fechar','sm')}</div></div>
+ <div class="ing2"><div class="fl">Nome</div><div class="fl">Qtd.</div><span></span></div>
+ <div class="bt">${ic('mais','sm')}Adicionar ingrediente</div>
+ <div><div class="lbl" style="margin-bottom:6px">Modo de preparo</div><div class="ta2">Grelhe a berinjela, monte as camadas com a ricota e leve ao forno por 35 minutos.</div></div>
+ <div class="bp">Salvar prato</div><div class="bt dgr" style="justify-content:center">${ic('lixeira','sm')}Excluir prato</div></div>`},
+{t:'Estados',d:'Vazio e carregando usam o logo. Sem rede é direto e sem humor. Excluir diz o que será perdido.',h:900,b:()=>
+ `<div class="pg"><h2>Estados</h2>
+ <div class="box"><div class="lbl">Semana vazia</div><div class="ctr">${logo(64)}<b style="font-size:16px">Ninguém decidiu ainda</b><span class="hint" style="font-size:13px">Quer ser o primeiro a planejar um jantar?</span></div><div class="bp">Planejar um dia</div></div>
+ <div class="box"><div class="lbl">Carregando</div><div class="ctr">${logo(40)}<span class="hint" style="font-size:13px">Pensando no jantar…</span></div><div class="sk"></div><div class="sk"></div></div>
+ <div class="box" style="border-color:var(--wnb)"><div class="lbl" style="color:var(--wn)">Sem rede</div><div style="display:flex;gap:10px;align-items:center;color:var(--wn)">${ic('sem-rede')}<b style="color:var(--tx)">Sem conexão</b></div><span class="hint" style="font-size:13px">O que você já viu continua aqui. Tentamos de novo quando voltar.</span></div>
+ <div class="box"><div class="lbl">Confirmação</div><b>Excluir Lasanha de berinjela?</b><span class="hint" style="font-size:13px">As notas da família também somem. Não dá para desfazer.</span><div style="display:flex;gap:8px"><div class="bs2" style="flex:1">Cancelar</div><div class="bs2" style="flex:1;border-color:var(--dg);color:var(--dg)">Excluir</div></div></div></div>`}
+];
+document.getElementById('wfs').innerHTML=SCREENS.map(function(s){var H=Math.round(s.h*0.8333);return `<figure class="fig"><div class="pw" style="height:${H}px;width:300px" role="img" aria-label="Wireframe ${s.t}"><div class="s pi" style="width:360px;height:${s.h}px;transform:scale(.8333)">${s.b()}</div></div><figcaption><b>${s.t}</b>${s.d}</figcaption></figure>`}).join('');
+var w=document.getElementById('wfs'),ml=document.getElementById('m-l'),md=document.getElementById('m-d'),hl=document.getElementById('hl');
+function mode(d){w.className='wfg '+(d?'bd2':'bl');ml.setAttribute('aria-pressed',d?'false':'true');md.setAttribute('aria-pressed',d?'true':'false')}
+ml.onclick=function(){mode(false)};md.onclick=function(){mode(true)};
+try{if(matchMedia('(prefers-color-scheme:dark)').matches)mode(true)}catch(e){}
+})();
+(function(){
+var LL='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiMyREI4OEMiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzE2MzM1RSIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMTYzMzVFIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTYzMzVFIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE2MzM1RSIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==',LD='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldoYXQncyBmb3IgZGlubmVyPyI+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyMTQiIGZpbGw9IiM0RkUwQjAiLz48Y2lyY2xlIGN4PSIxNzQiIGN5PSIyNTQiIHI9IjU4IiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iMTg4IiBjeT0iMjM4IiByPSIyOSIgZmlsbD0iIzBBMTAxQyIvPjxjaXJjbGUgY3g9IjMzOCIgY3k9IjI1NCIgcj0iNTgiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSIzNTIiIGN5PSIyMzgiIHI9IjI5IiBmaWxsPSIjMEExMDFDIi8+PHBhdGggZD0iTTEyNiAxNjggUTE3NCAxNTYgMjI0IDE3NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMEExMDFDIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjkwIDEzMiBRMzM4IDk4IDM5MCAxMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTIwNCAzNzQgTDMwOCAzNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBBMTAxQyIgc3Ryb2tlLXdpZHRoPSIxNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+Cg==';
+var root=document.getElementById('pf'),wrap=document.getElementById('play');
+if(!root)return;
+function ic(n,c){return `<svg viewBox="0 0 24 24" class="${c||''}" aria-hidden="true"><use href="#i-${n}"/></svg>`}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+var DOW={9:['seg','segunda'],10:['ter','terça'],11:['qua','quarta'],12:['qui','quinta'],13:['sex','sexta'],14:['sáb','sábado'],15:['dom','domingo']};
+var OPTS=[['cant_wait','😋',"MMMM can't wait!",2],['lets_order','🛵',"F*#% it, let's order!",1],['going_out','🍸',"I'm in the mood for going out tonight ;)",0],['not_home','🚪','Not home tonight',0]];
+var QUICK=['😍','🔥','👏','😂','😋','🤤','❤️','👍','🥰','😅','🤯','🙌','🎉','🍕','🍝','🥘','🍷','😴','🤔','😬','🙈','💯','✨','🫶'];
+function seed(){
+ var dishes=[
+  {id:'strog',name:'Strogonoff de frango',times:11,fam:8.9,mine:9,last:1,fed:{},fedMine:false,prep:'Doure o frango, junte o creme de leite e o champignon e sirva com arroz.',ing:[['Frango','500 g'],['Creme de leite','1 cx'],['Champignon','200 g'],['Arroz','2 xíc']]},
+  {id:'panq',name:'Panqueca de carne',times:9,fam:5.8,mine:6,last:14,fed:{Bia:5},fedMine:false,prep:'Recheie as massas com a carne moída e leve ao forno com molho.',ing:[['Massa de panqueca','1 pct'],['Carne moída','400 g'],['Molho de tomate','300 ml']]},
+  {id:'lasa',name:'Lasanha de berinjela',times:6,fam:8.2,mine:8,last:0,fed:{Pai:12},fedMine:false,prep:'Grelhe a berinjela, monte as camadas com a ricota e leve ao forno por 35 minutos.',ing:[['Berinjela','2 un'],['Molho de tomate','500 ml'],['Ricota','250 g'],['Muçarela','200 g'],['Massa de lasanha','1 pct'],['Manjericão','a gosto']]},
+  {id:'moq',name:'Moqueca',times:3,fam:6.5,mine:7,last:30,fed:{},fedMine:false,prep:'Refogue, junte o leite de coco e cozinhe o peixe por 10 minutos.',ing:[['Peixe','600 g'],['Leite de coco','400 ml'],['Pimentão','1 un']]},
+  {id:'ris',name:'Risoto de cogumelos',times:2,fam:9.1,mine:10,last:35,fed:{},fedMine:false,prep:'Mexa o arroz com caldo aos poucos até ficar cremoso.',ing:[['Arroz arbóreo','300 g'],['Cogumelos','250 g'],['Caldo','1 l']]},
+  {id:'sopa',name:'Sopa de abóbora',times:0,fam:0,mine:null,last:99,fed:{},fedMine:false,prep:'',ing:[['Abóbora','500 g']]}
+ ];
+ function d(k,x){x=x||{};x.k=k;x.missing=x.missing||{};x.mine=x.mine||null;x.reacts=x.reacts||{};x.myReacts=x.myReacts||{};x.vol=x.vol||null;return x}
+ return {scr:'semana',stack:[],sel:12,dishSel:'lasa',sort:'times',q:'',q2:'',offline:false,toast:'',sheet:null,dlg:null,draft:null,
+  days:{9:d('dish',{dish:'strog',by:'Ana',reacts:{'😋':3}}),10:d('free'),11:d('skip'),12:d('dish',{dish:'lasa',by:'Ana',missing:{Ricota:true},mine:'cant_wait',reacts:{'😍':2,'🔥':1,'👏':1}}),13:d('dish',{dish:'moq',by:'Ana'}),14:d(null),15:d(null)},dishes:dishes}
+}
+var S=seed(),tt=null;
+function dish(id){return S.dishes.filter(function(x){return x.id===id})[0]}
+function face(n){return n>=7.5?'😍':n>=4.5?'😐':'🤢'}
+function fmt(n){return String(n).replace('.',',')}
+function fedTags(x){var t=[];Object.keys(x.fed).forEach(function(p){t.push(`<span class="tg2 w">🤢 ${p} enjoou, ${x.fed[p]} dias</span>`)});if(x.fedMine)t.push(`<span class="tg2 w">🤢 Você enjoou, 21 dias</span>`);return t.join(' ')}
+function count(day,o){return (day===S.days[12]?o[3]:0)+(day.mine===o[0]?1:0)}
+function reactTotal(day){var n=0;Object.keys(day.reacts).forEach(function(k){n+=day.reacts[k]+(day.myReacts[k]?1:0)});Object.keys(day.myReacts).forEach(function(k){if(!(k in day.reacts)&&day.myReacts[k])n+=1});return n}
+function topReact(day){var best=null,bn=0;var all={};Object.keys(day.reacts).forEach(function(k){all[k]=day.reacts[k]});Object.keys(day.myReacts).forEach(function(k){if(day.myReacts[k])all[k]=(all[k]||0)+1});Object.keys(all).forEach(function(k){if(all[k]>bn){bn=all[k];best=k}});return best?best+' '+reactTotal(day):''}
+function missingList(day){return Object.keys(day.missing).filter(function(k){return day.missing[k]})}
+/* telas */
+function bk(label,right){return `<div class="bk"><button class="tp" data-a="back" style="display:flex;align-items:center;gap:4px;color:var(--pr);font-weight:600;min-height:44px">${ic('voltar','sm')}${label||'Voltar'}</button>${right||''}</div>`}
+function nav(on){return `<div class="nav"><button class="nv ${on===0?'on':''}" data-a="tab" data-v="semana" ${on===0?'aria-current="page"':''}>${ic('semana')}Semana</button><button class="nv ${on===1?'on':''}" data-a="tab" data-v="pratos" ${on===1?'aria-current="page"':''}>${ic('pratos')}Pratos</button></div>`}
+function tyi(n){return `<div class="ty">${ic(n)}</div>`}
+function sSemana(){
+ var h=`<div class="hd"><div class="l1"><span class="brandrow"><img class="lgl" src="${LL}" width="30" height="30" alt=""><img class="lgd" src="${LD}" width="30" height="30" alt="">What's for dinner?</span><span class="av" aria-hidden="true">D</span></div><div class="wk"><button class="ib" data-a="week" aria-label="Semana anterior">${ic('voltar')}</button><h3>9 – 15 de novembro</h3><button class="ib" data-a="week" aria-label="Próxima semana">${ic('avancar')}</button></div></div><div class="main" style="overflow:auto">`;
+ for(var n=9;n<=15;n++){
+  var day=S.days[n],dw=DOW[n],td=n===12;
+  if(!day.k){h+=`<button class="day em w" data-a="day" data-v="${n}"><div class="dn">${dw[0]}<b>${n}</b></div><div class="dt"><b>+ Planejar</b><span>Escolher prato, skip ou free-style</span></div></button>`;continue}
+  var title,sub,lead;
+  if(day.k==='dish'){var x=dish(day.dish);title=x.name;lead=tyi('pratos');sub=td?`Hoje · ${2+(day.mine?1:0)} de 4 responderam`:`Planejado por ${day.by}`}
+  else if(day.k==='skip'){title='Skip dinner';lead=tyi('skip');sub='Sem jantar hoje'}
+  else{title='Free-style';lead=tyi('freestyle');sub='O que tiver na geladeira'}
+  var b=topReact(day);if(missingList(day).length&&!day.vol)b+=` <span style="color:var(--wn)">${ic('falta','sm')}</span>`;
+  var ord=(day.k==='dish'?count(day,OPTS[1]):0);if(ord)b+=` 🛵 ${ord}`;
+  h+=`<button class="day w ${td?'td':''}" data-a="day" data-v="${n}">`+`<div class="dn">${dw[0]}<b>${n}</b></div>${lead}<div class="dt"><b>${esc(title)}</b><span>${sub}</span></div><div class="bg">${b}</div></button>`}
+ return h+`</div>`+nav(0)}
+function aviso(day){var o=count(day,OPTS[1]),g=count(day,OPTS[2]);var p=function(n){return n===1?'1 pessoa quer':n+' pessoas querem'};var t=[];if(o)t.push(p(o)+' pedir delivery 🛵');if(g)t.push(p(g)+' sair 🍸');return t.join(' · ')}
+function sDia(){
+ var n=S.sel,day=S.days[n],dw=DOW[n],x=day.k==='dish'?dish(day.dish):null;
+ var title=x?x.name:(day.k==='skip'?'Skip dinner':'Free-style');
+ var h=`<div class="pg" style="flex:1">${bk('Semana',`<button class="tp" data-a="plan" style="color:var(--pr);font-weight:600;font-size:14px;min-height:44px">Trocar plano</button>`)}`;
+ h+=`<div><div class="ey">${n===12?'Hoje · ':''}${dw[1]}, ${n} nov</div><h2>${esc(title)}</h2>`;
+ if(x){h+=`<div style="color:var(--mu);font-size:13px;margin-top:2px">Planejado por ${day.by} · feito ${x.times}× · média ${fmt(x.fam)} ${face(x.fam)}</div>`;var ft=fedTags(x);if(ft)h+=`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${ft}</div>`}
+ else h+=`<div style="color:var(--mu);font-size:13px;margin-top:2px">${day.k==='skip'?'Sem jantar neste dia':'Cada um se vira com o que tiver'}</div>`;
+ h+=`</div>`;
+ if(x){
+  h+=`<button class="ph w" data-a="dish" data-v="${x.id}" aria-label="Ver prato ${esc(x.name)}">${ic('imagem')}</button>`;
+  var ms=missingList(day);
+  if(ms.length&&!day.vol)h+=`<div class="al">${ic('falta')}<div style="flex:1"><b>Ingrediente faltando! Quem vai? 😄</b><span>Falta: ${esc(ms.join(', '))}</span><button class="bp" data-a="vol" style="margin-top:8px;min-height:44px;width:100%">Eu vou</button></div></div>`;
+  else if(ms.length&&day.vol)h+=`<div class="nt" style="background:var(--acs);border-color:transparent;color:var(--ac)">${ic('check','sm')}<span style="flex:1">${day.vol} vai buscar: ${esc(ms.join(', '))}</span><button data-a="unvol" style="font-weight:600;text-decoration:underline">Desfazer</button></div>`;
+  var av=aviso(day);if(av)h+=`<div class="nt">${ic('info','sm')}${av}</div>`;
+  h+=`<div class="crd"><h4>E aí, vai jantar?</h4>`+OPTS.map(function(o){var c=count(day,o),on=day.mine===o[0];return `<button class="op w ${on?'on':''}" data-a="resp" data-v="${o[0]}" aria-pressed="${on}"><span class="e">${o[1]}</span><span>${esc(o[2])}</span><small>${c||''}</small></button>`}).join('')+`</div>`;
+  h+=`<div class="crd"><h4>Ingredientes</h4><div class="hint">Tudo marcado = temos. Desmarque o que faltar.</div>`+x.ing.map(function(i){var miss=day.missing[i[0]];return `<button class="ck w" data-a="ing" data-v="${esc(i[0])}" role="checkbox" aria-checked="${!miss}"><span class="bx ${miss?'':'on'}">${miss?'':ic('check')}</span>${esc(i[0])}<small>${esc(i[1])}${miss?' · falta':''}</small></button>`}).join('')+`</div>`}
+ else h+=`<div class="box"><b>${day.k==='skip'?'Hoje não tem jantar':'Free-style'}</b><span class="hint" style="font-size:13px">${day.k==='skip'?'Aproveite a folga.':'Abra a geladeira e improvise.'}</span><button class="bs2 w" data-a="plan">Escolher um prato</button></div>`;
+ var keys=Object.keys(day.reacts);Object.keys(day.myReacts).forEach(function(k){if(keys.indexOf(k)<0)keys.push(k)});
+ h+=`<div class="lbl">Reações</div><div class="em2">`+keys.map(function(k){var on=day.myReacts[k],c=(day.reacts[k]||0)+(on?1:0);if(!c)return '';return `<button class="e2 ${on?'on':''}" data-a="react" data-v="${k}" aria-pressed="${!!on}">${k} ${c}</button>`}).join('')+`<button class="e2 ad" data-a="picker" aria-label="Adicionar reação">${ic('mais','sm')}</button></div></div>`;
+ return h}
+function sPlanejar(){
+ var n=S.sel,day=S.days[n],dw=DOW[n];
+ var q=S.q.toLowerCase();var list=S.dishes.filter(function(d){return !q||d.name.toLowerCase().indexOf(q)>=0||d.ing.some(function(i){return i[0].toLowerCase().indexOf(q)>=0})});
+ var h=`<div class="pg" style="flex:1">${bk()}<h2>${day.k?'Trocar plano':'Planejar'} ${dw[1]}, ${n}</h2>
+ <button class="rw w" data-a="set" data-v="skip" style="min-height:64px">${tyi('skip')}<div class="dt"><b>Skip dinner</b><span>Sem jantar neste dia</span></div>${ic('avancar','sm')}</button>
+ <button class="rw w" data-a="set" data-v="free" style="min-height:64px">${tyi('freestyle')}<div class="dt"><b>Free-style</b><span>O que tiver na geladeira</span></div>${ic('avancar','sm')}</button>
+ <div class="lbl" style="margin-top:4px">Ou escolha um prato</div>
+ <label class="fl">${ic('busca','sm')}<input class="f" id="q" value="${esc(S.q)}" placeholder="Buscar prato ou ingrediente" aria-label="Buscar prato"></label>`;
+ h+=list.map(function(d){return `<button class="rw w" data-a="set" data-v="dish:${d.id}"><div class="tb">${ic('imagem')}</div><div class="dt"><b>${esc(d.name)}</b><span>${d.times?`Feito ${d.times}× · média ${fmt(d.fam)} ${face(d.fam)}`:'Novo · ainda não feito'}</span>${fedTags(d)?`<div style="margin-top:4px">${fedTags(d)}</div>`:''}</div></button>`}).join('')||`<div class="hint" style="font-size:13px">Nada encontrado. Que tal criar um novo prato?</div>`;
+ return h+`</div>`}
+function sPratos(){
+ var q=S.q2.toLowerCase();var l=S.dishes.filter(function(d){return !q||d.name.toLowerCase().indexOf(q)>=0||d.ing.some(function(i){return i[0].toLowerCase().indexOf(q)>=0})});
+ l=l.slice().sort(function(a,b){return S.sort==='times'?b.times-a.times:S.sort==='score'?b.fam-a.fam:a.last-b.last});
+ var h=`<div class="pg" style="flex:1"><div class="tpt"><h2>Pratos</h2><button class="pill" data-a="new">${ic('mais','sm')}Novo prato</button></div>
+ <label class="fl">${ic('busca','sm')}<input class="f" id="q2" value="${esc(S.q2)}" placeholder="Buscar prato ou ingrediente" aria-label="Buscar prato"></label>
+ <div class="chp">`+[['times','Mais feitos'],['score','Melhor nota'],['recent','Recentes']].map(function(s){return `<button class="c ${S.sort===s[0]?'on':''}" data-a="sort" data-v="${s[0]}" aria-pressed="${S.sort===s[0]}">${s[0]==='times'?ic('ordenar','sm'):''}${s[1]}</button>`}).join('')+`</div>`;
+ h+=l.map(function(d){return `<button class="rw w" data-a="dish" data-v="${d.id}"><div class="tb lg2">${ic('imagem')}</div><div class="dt"><b>${esc(d.name)}</b><span>${d.times?`Feito ${d.times}× · família ${fmt(d.fam)} · você ${d.mine===null?'–':d.mine}`:'Novo · ainda não feito'}</span>${fedTags(d)?`<div style="margin-top:4px">${fedTags(d)}</div>`:''}</div><span style="font-size:24px">${d.times?face(d.fam):'🆕'}</span></button>`}).join('')||`<div class="hint" style="font-size:13px">Nenhum prato com esse nome.</div>`;
+ return h+`</div>`+nav(1)}
+function sPrato(){
+ var x=dish(S.dishSel);
+ var h=`<div class="pg" style="flex:1">${bk('Voltar',`<button class="tp" data-a="edit" aria-label="Editar prato" style="min-height:44px;min-width:44px;display:grid;place-items:center;color:var(--pr)">${ic('editar','sm')}</button>`)}
+ <div class="ph">${ic('imagem')}</div>
+ <div><h2>${esc(x.name)}</h2><div style="color:var(--mu);font-size:13px;margin-top:2px">Feito ${x.times}× · média da família ${x.times?fmt(x.fam)+' '+face(x.fam):'–'}</div></div>
+ <div class="crd"><h4>Minha nota</h4><div class="scl" role="group" aria-label="Minha nota de 0 a 10">`;
+ for(var i=0;i<=10;i++)h+=`<button class="n ${x.mine===i?'on':''}" data-a="score" data-v="${i}" aria-pressed="${x.mine===i}">${i}</button>`;
+ var m=x.mine;
+ h+=`</div><div class="bands"><div class="${m!==null&&m<=4?'on':''}">🤢 0 a 4</div><div class="${m!==null&&m>=5&&m<=7?'on':''}">😐 5 a 7</div><div class="${m!==null&&m>=8?'on':''}">😍 8 a 10</div></div></div>`;
+ h+=x.fedMine?`<button class="bs2 w" data-a="fed" style="border-color:var(--wnb);background:var(--wns);color:var(--wn)">🤢 Enjoei, 21 dias · Desfazer</button><div class="hint" style="margin-top:-4px">O prato some das suas sugestões por 3 semanas.</div>`:`<button class="bs2 w" data-a="fed">🤢 Enjoei</button><div class="hint" style="margin-top:-4px">Some das sugestões por 3 semanas. Você pode desfazer.</div>`;
+ h+=`<div class="lbl">Notas da família</div><div class="rw" style="min-height:48px"><span class="av">A</span><div class="dt"><b>Ana</b></div><span class="tg2 g">😍 9</span></div>`;
+ if(x.fed.Pai!==undefined||x.fed.Bia!==undefined)Object.keys(x.fed).forEach(function(p){h+=`<div class="rw" style="min-height:48px"><span class="av">${p[0]}</span><div class="dt"><b>${p}</b></div><span class="tg2 w">🤢 Enjoei</span></div>`});
+ h+=`<div class="rw" style="min-height:48px"><span class="av">D</span><div class="dt"><b>Você</b></div>${m===null?'<span class="tg2">sem nota</span>':`<span class="tg2 g">${face(m)} ${m}</span>`}</div>`;
+ h+=`<div class="lbl">Ingredientes</div><div class="crd">`+x.ing.map(function(i){return `<div class="ck">${esc(i[0])}<small>${esc(i[1])}</small></div>`}).join('')+`</div><div class="lbl">Modo de preparo</div><div style="font-size:14px;line-height:20px;color:var(--mu)">${x.prep?esc(x.prep):'Ainda sem preparo. Toque em editar para escrever.'}</div></div>`;
+ return h}
+function sEditar(){
+ var d=S.draft;
+ var h=`<div class="pg" style="flex:1">${bk()}<h2>${d.isNew?'Novo prato':'Editar prato'}</h2>
+ <div class="ph" style="height:96px;flex-direction:column;gap:4px;display:flex;align-items:center;justify-content:center">${ic('camera')}<span style="font-size:12px">${d.isNew?'Adicionar foto':'Trocar foto'}</span></div>
+ <div><label class="lbl" for="e-name" style="display:block;margin-bottom:6px">Nome</label><input class="f ff" id="e-name" value="${esc(d.name)}" placeholder="Ex.: Lasanha de berinjela"></div>
+ <div class="lbl">Ingredientes</div>`;
+ d.ing.forEach(function(i,ix){h+=`<div class="ing2"><input class="f ff" data-i="${ix}" data-f="0" value="${esc(i[0])}" placeholder="Nome" aria-label="Ingrediente ${ix+1}"><input class="f ff" data-i="${ix}" data-f="1" value="${esc(i[1])}" placeholder="Qtd." aria-label="Quantidade ${ix+1}"><button class="ib" data-a="rmi" data-v="${ix}" style="width:36px;height:36px" aria-label="Remover ingrediente ${ix+1}">${ic('fechar','sm')}</button></div>`});
+ h+=`<button class="bt" data-a="addi">${ic('mais','sm')}Adicionar ingrediente</button>
+ <div><label class="lbl" for="e-prep" style="display:block;margin-bottom:6px">Modo de preparo</label><textarea class="f ff" id="e-prep" rows="4" placeholder="Escreva o passo a passo">${esc(d.prep)}</textarea></div>
+ <button class="bp w" data-a="save">Salvar prato</button>`;
+ if(!d.isNew)h+=`<button class="bt dgr w" data-a="del" style="justify-content:center">${ic('lixeira','sm')}Excluir prato</button>`;
+ return h+`</div>`}
+function overlay(){
+ var h='';
+ if(S.sheet==='picker')h+=`<div class="scrim" data-a="closesheet"></div><div class="sheet" role="dialog" aria-label="Escolher emoji"><b>Reagir com qualquer emoji</b><div class="qg">`+QUICK.map(function(e){return `<button data-a="addreact" data-v="${e}" aria-label="Reagir com ${e}">${e}</button>`}).join('')+`</div><div style="display:flex;gap:8px"><input class="f ff" id="emo" placeholder="Digite ou cole um emoji" aria-label="Emoji" style="flex:1"><button class="bp" data-a="addtyped" style="padding:0 16px">Adicionar</button></div><div class="hint">Use o teclado de emojis do celular para escolher qualquer um.</div></div>`;
+ if(S.dlg){h+=`<div class="scrim" data-a="closedlg"></div><div class="dlg" role="alertdialog" aria-label="Confirmar exclusão"><b>Excluir ${esc(S.dlg)}?</b><span class="hint" style="font-size:13px;line-height:18px">As notas da família também somem. Não dá para desfazer.</span><div style="display:flex;gap:8px"><button class="bs2" data-a="closedlg" style="flex:1">Cancelar</button><button class="bs2" data-a="delok" style="flex:1;border-color:var(--dg);color:var(--dg)">Excluir</button></div></div>`}
+ return h}
+function render(keep){
+ var body=S.scr==='semana'?sSemana():S.scr==='dia'?sDia():S.scr==='planejar'?sPlanejar():S.scr==='pratos'?sPratos():S.scr==='prato'?sPrato():sEditar();
+ var off=S.offline?`<div class="off">${ic('sem-rede','sm')}<span><b>Sem conexão.</b> O que você já viu continua aqui.</span></div>`:'';
+ var sc=root.querySelector('.pg,.main');var top=sc?sc.scrollTop:0;
+ root.innerHTML=`<div class="s pf-in">${off}${body}<div class="ov">${overlay()}</div><div class="toast" id="toast" role="status" aria-live="polite">${esc(S.toast)}</div></div>`;
+ var t=document.getElementById('toast');if(S.toast)t.classList.add('on');
+ if(keep){var n=root.querySelector('.pg,.main');if(n)n.scrollTop=top}
+}
+function say(m){S.toast=m;var t=document.getElementById('toast');if(t){t.textContent=m;t.classList.add('on')}clearTimeout(tt);tt=setTimeout(function(){S.toast='';var t2=document.getElementById('toast');if(t2)t2.classList.remove('on')},2400)}
+function go(s,push){if(push)S.stack.push(S.scr);S.scr=s;render()}
+function back(){var p=S.stack.pop()||'semana';S.scr=p;S.q='';render()}
+function firstEmoji(s){s=(s||'').trim();if(!s||!/\p{Extended_Pictographic}/u.test(s))return null;if(window.Intl&&Intl.Segmenter){var it=new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(s)[Symbol.iterator]();var f=it.next();return f.value?f.value.segment:null}return Array.from(s)[0]}
+function addReact(e){if(!e)return;var d=S.days[S.sel];d.myReacts[e]=true;S.sheet=null;render(true);say('Reação '+e+' enviada')}
+function act(a,v){
+ var d=S.days[S.sel];
+ switch(a){
+ case 'tab':S.stack=[];S.q='';S.scr=v;render();break;
+ case 'week':say('Neste protótipo existe só a semana de 9 a 15 de novembro');break;
+ case 'day':S.sel=+v;if(S.days[S.sel].k)go('dia',1);else go('planejar',1);break;
+ case 'back':back();break;
+ case 'plan':S.q='';go('planejar',1);break;
+ case 'set':{var day=S.days[S.sel];day.missing={};day.vol=null;if(v==='skip'){day.k='skip';day.dish=null;say('Skip dinner planejado para o dia '+S.sel)}else if(v==='free'){day.k='free';day.dish=null;say('Free-style planejado para o dia '+S.sel)}else{var id=v.split(':')[1];day.k='dish';day.dish=id;day.by='Você';say('Planejado: '+dish(id).name)}S.stack=[];S.scr='semana';S.q='';render();break}
+ case 'resp':d.mine=(d.mine===v?null:v);render(true);if(d.mine==='lets_order'||d.mine==='going_out')say('Aviso enviado para a casa. O plano continua.');break;
+ case 'ing':d.missing[v]=!d.missing[v];if(!d.missing[v])d.vol=null;render(true);if(d.missing[v])say('Marcado como faltando. Alguém vai?');break;
+ case 'vol':d.vol='Você';render(true);say('Valeu! Você vai buscar.');break;
+ case 'unvol':d.vol=null;render(true);break;
+ case 'react':d.myReacts[v]=!d.myReacts[v];render(true);break;
+ case 'picker':S.sheet='picker';render(true);setTimeout(function(){var i=document.getElementById('emo');if(i)i.focus()},50);break;
+ case 'closesheet':S.sheet=null;render(true);break;
+ case 'addreact':addReact(v);break;
+ case 'addtyped':var e=firstEmoji((document.getElementById('emo')||{}).value);if(e)addReact(e);else say('Digite um emoji, por exemplo 🍕');break;
+ case 'dish':S.dishSel=v;go('prato',1);break;
+ case 'sort':S.sort=v;render(true);break;
+ case 'score':var x=dish(S.dishSel);x.mine=(x.mine===+v?null:+v);render(true);if(x.mine!==null)say('Nota '+x.mine+' '+face(x.mine));break;
+ case 'fed':var y=dish(S.dishSel);y.fedMine=!y.fedMine;render(true);say(y.fedMine?'Prato de molho por 3 semanas.':'Enjoei desfeito.');break;
+ case 'edit':var z=dish(S.dishSel);S.draft={id:z.id,isNew:false,name:z.name,prep:z.prep,ing:z.ing.map(function(i){return [i[0],i[1]]})};go('editar',1);break;
+ case 'new':S.draft={id:null,isNew:true,name:'',prep:'',ing:[['','']]};go('editar',1);break;
+ case 'addi':S.draft.ing.push(['','']);render(true);break;
+ case 'rmi':S.draft.ing.splice(+v,1);if(!S.draft.ing.length)S.draft.ing.push(['','']);render(true);break;
+ case 'save':{var dr=S.draft;var nm=dr.name.trim();if(!nm){say('Dê um nome ao prato para salvar.');break}var ing=dr.ing.filter(function(i){return i[0].trim()});if(dr.isNew){var nd={id:'n'+Date.now(),name:nm,times:0,fam:0,mine:null,last:99,fed:{},fedMine:false,prep:dr.prep,ing:ing};S.dishes.push(nd);S.dishSel=nd.id;say('Prato salvo: '+nm)}else{var o=dish(dr.id);o.name=nm;o.prep=dr.prep;o.ing=ing;say('Alterações salvas')}S.stack=[];S.scr='pratos';render();break}
+ case 'del':S.dlg=S.draft.name||'este prato';render(true);break;
+ case 'closedlg':S.dlg=null;render(true);break;
+ case 'delok':{var id2=S.draft.id;S.dishes=S.dishes.filter(function(q){return q.id!==id2});Object.keys(S.days).forEach(function(k){var dd=S.days[k];if(dd.dish===id2){dd.k=null;dd.dish=null}});S.dlg=null;S.stack=[];S.scr='pratos';render();say('Prato excluído');break}
+ }
+}
+root.addEventListener('click',function(e){var el=e.target.closest('[data-a]');if(!el)return;act(el.getAttribute('data-a'),el.getAttribute('data-v'))});
+root.addEventListener('input',function(e){var t=e.target;
+ if(t.id==='q'){S.q=t.value;var c=t.selectionStart;render(true);var n=document.getElementById('q');if(n){n.focus();n.setSelectionRange(c,c)}}
+ else if(t.id==='q2'){S.q2=t.value;var c2=t.selectionStart;render(true);var n2=document.getElementById('q2');if(n2){n2.focus();n2.setSelectionRange(c2,c2)}}
+ else if(t.id==='e-name')S.draft.name=t.value;
+ else if(t.id==='e-prep')S.draft.prep=t.value;
+ else if(t.getAttribute&&t.getAttribute('data-i')!==null)S.draft.ing[+t.getAttribute('data-i')][+t.getAttribute('data-f')]=t.value});
+root.addEventListener('keydown',function(e){if(e.key==='Escape'){if(S.sheet){S.sheet=null;render(true)}else if(S.dlg){S.dlg=null;render(true)}}if(e.key==='Enter'&&e.target.id==='emo'){e.preventDefault();act('addtyped')}});
+function mode(d){wrap.className='play '+(d?'bd2':'bl');document.getElementById('pm-l').setAttribute('aria-pressed',d?'false':'true');document.getElementById('pm-d').setAttribute('aria-pressed',d?'true':'false')}
+document.getElementById('pm-l').onclick=function(){mode(false)};
+document.getElementById('pm-d').onclick=function(){mode(true)};
+document.getElementById('p-reset').onclick=function(){var o=S.offline;S=seed();S.offline=o;render();say('Protótipo reiniciado')};
+document.getElementById('p-off').onclick=function(){S.offline=!S.offline;this.setAttribute('aria-pressed',S.offline?'true':'false');render(true)};
+try{if(matchMedia('(prefers-color-scheme:dark)').matches)mode(true)}catch(e){}
+render();
+})();
+
+</script>
