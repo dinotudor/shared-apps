@@ -1,0 +1,4 @@
+pnpm-lock.yaml
+# Prose, partly copied from engineering-playbook templates; keep it as written there.
+*.md
+docs/

@@ -6,7 +6,8 @@
     "dev": "pnpm -r --parallel --if-present dev",
     "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "lint": "pnpm -r --if-present lint",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
     "test": "pnpm -r --if-present test",
     "check:deps": "node scripts/check-dependency-sources.mjs"
   },
@@ -22,5 +23,14 @@
       "version": "^26.0.0",
       "onFail": "download"
     }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2"
   }
 }
