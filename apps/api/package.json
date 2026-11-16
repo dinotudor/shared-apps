@@ -1,0 +1,21 @@
+{
+  "name": "@shared-apps/api",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "dev": "node --watch src/main.ts",
+    "start": "node src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@shared-apps/api-core": "workspace:*",
+    "@trpc/server": "catalog:",
+    "fastify": "^5.12.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "vitest": "^5.1.0"
+  }
+}
