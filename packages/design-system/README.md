@@ -99,6 +99,12 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 `<Dialog open={signal} title>text<div q:slot="actions">…</div></Dialog>` and the same API for `<BottomSheet>`: built on the native `<dialog>` with `showModal()`, which traps focus, closes on Esc, makes the page behind inert and returns focus on close. They are labelled by their title and have a "Fechar" button. Closing sets `open` to `false`. Dialog is centred. BottomSheet rises from the bottom edge and is preferred on phones for choices. Use one title, short text and at most two actions, and never make the destructive action the default.
 
+### StatusMessage
+
+`<StatusMessage title icon? level?={2}>text<div q:slot="action">…</div></StatusMessage>`: a centred message for a page or section that has nothing to show. Use it for not found, empty, error and offline states. It has a decorative icon in a `selected` circle, or the logo mark when there's no `icon`. Below that come the title, muted body text and an optional action. Set `level={1}` when the message is the whole page, as on a 404 page. The body and the action are hidden when they are empty.
+
+Follow brief section 10 for the copy: humour is fine in empty states, but never in errors or offline. For an action that navigates, put a link in the slot with the button classes: `<Link q:slot="action" class="wfd-button wfd-button--primary" href="/">`. The `wfd-button` classes work on `<a>` as well as `<button>`.
+
 ## Accessibility
 
 Checked with the token contrast pairs (WCAG 2.1 AA) and by rendering every component in light and dark mode:
