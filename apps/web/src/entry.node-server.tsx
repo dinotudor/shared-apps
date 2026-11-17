@@ -3,6 +3,7 @@ import { createQwikRouter } from "@qwik.dev/router/middleware/node";
 import render from "./entry.ssr.tsx";
 import { ConfigError, parseServerConfig } from "./server/config.ts";
 import type { ServerConfig } from "./server/config.ts";
+import { createRequestListener, shutDown } from "./server/node-server.ts";
 
 const loadConfig = (): ServerConfig => {
   try {
@@ -14,23 +15,21 @@ const loadConfig = (): ServerConfig => {
   }
 };
 
+// Only checked here: apiFor() reads API_URL per request, but a bad value should stop
+// the server at startup rather than fail the first page that calls the API.
 const config = loadConfig();
-const { router, staticFile } = createQwikRouter({ render });
+const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-const server = createServer((req, res) => {
-  void staticFile(req, res, () => {
-    // router also answers 404s.
-    void router(req, res, (error?: unknown) => {
-      console.error(error);
-      if (!res.headersSent) res.writeHead(500);
-      res.end();
-    });
-  });
-});
+const server = createServer(createRequestListener(createQwikRouter({ render }), console));
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
-    server.close(() => process.exit(0));
+    console.info(`${signal}: shutting down`);
+    shutDown(server, {
+      timeoutMs: SHUTDOWN_TIMEOUT_MS,
+      exit: (code) => process.exit(code),
+      log: console,
+    });
   });
 }
 
