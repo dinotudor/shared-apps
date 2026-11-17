@@ -6,7 +6,7 @@ type SignalSource = { once: (signal: Signal, listener: () => void) => unknown };
 export type RunOptions = {
   port: number;
   host: string;
-  /** Budget for a graceful shutdown. apps/web uses the same 10 s. */
+  /** Budget for a graceful shutdown. apps/whats-for-dinner uses the same 10 s. */
   timeoutMs: number;
   /** `process` in production; tests pass an EventEmitter. */
   signals: SignalSource;

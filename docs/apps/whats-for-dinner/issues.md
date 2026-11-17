@@ -16,7 +16,7 @@ Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has t
 - **Acceptance:** `pnpm dev` starts the API; `GET /health` returns 200; tRPC `health.ping` returns `{ ok: true }`; config validated at startup (bad env fails fast, ADR 0012); typecheck, lint, test and build pass in CI.
 - **Tests:** an integration test calls `/health` and `health.ping`.
 
-### 2. Scaffold `apps/web` with Qwik 2
+### 2. Scaffold `apps/whats-for-dinner` with Qwik 2
 - **Goal:** a Qwik 2 app whose server code calls the API through the tRPC client.
 - **Acceptance:** home page shows the API's health result; only server code calls the API; router types imported from the API, no runtime import.
 - **Tests:** a route loader test with a mocked tRPC client.
@@ -28,7 +28,7 @@ Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has t
 
 ### 4. Sign-in with Better Auth, Google and an allowlist
 - **Goal:** Google sign-in with sessions in PostgreSQL and an email allowlist (ADR 0008).
-- **Acceptance:** allowlisted users sign in, others are refused; procedures are protected by default; the API verifies the session on each call; sign-out works; a sign-in page exists in `apps/web`.
+- **Acceptance:** allowlisted users sign in, others are refused; procedures are protected by default; the API verifies the session on each call; sign-out works; a sign-in page exists in `apps/whats-for-dinner`.
 - **Tests:** allowed vs refused email; protected procedure without a session returns UNAUTHORIZED.
 - **Needs from Dino:** a Google OAuth client for local development.
 
@@ -44,7 +44,7 @@ Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has t
 
 ### 7. Design system package
 - **Goal:** `packages/design-system` with the tokens, icons and base components from the design project.
-- **Acceptance:** `tokens-wfd.css` (palette B, light and dark via `prefers-color-scheme` and `data-theme`) and the SkiroLiro base (Figtree, JetBrains Mono, spacing, radius) exported as CSS custom properties and TypeScript; the icon sprite and `packages/design-system/src/icons/*.svg` available as an `<Icon name>` component; logo files from `packages/design-system/brand/` (light and dark); base components: Button (primary, secondary, text, danger), Card, Chip, Checkbox, TextField, TextArea, BottomNav, Avatar, Alert (warning, info, success), Toast, BottomSheet, Dialog; a demo route in `apps/web` shows them in light and dark. Follows brief section 10.
+- **Acceptance:** `tokens-wfd.css` (palette B, light and dark via `prefers-color-scheme` and `data-theme`) and the SkiroLiro base (Figtree, JetBrains Mono, spacing, radius) exported as CSS custom properties and TypeScript; the icon sprite and `packages/design-system/src/icons/*.svg` available as an `<Icon name>` component; logo files from `packages/design-system/brand/` (light and dark); base components: Button (primary, secondary, text, danger), Card, Chip, Checkbox, TextField, TextArea, BottomNav, Avatar, Alert (warning, info, success), Toast, BottomSheet, Dialog; a demo route in `apps/whats-for-dinner` shows them in light and dark. Follows brief section 10.
 - **Tests:** component render tests for each variant.
 
 ### 8. App shell and navigation
@@ -140,7 +140,7 @@ Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has t
 ## E5 — Deploy *(blocked: ADR 0014 and Dino's infrastructure)*
 
 ### 23. Container images and production config
-- **Goal:** Dockerfiles for `apps/api` and `apps/web` with Node pinned like `devEngines` (ADR 0002).
+- **Goal:** Dockerfiles for `apps/api` and `apps/whats-for-dinner` with Node pinned like `devEngines` (ADR 0002).
 - **Acceptance:** images build in CI and run locally with production config.
 
 ### 24. Deploy pipeline

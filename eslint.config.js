@@ -26,9 +26,10 @@ export default defineConfig(
   },
   {
     // Only server code calls the API (playbook ADR 0006): the tRPC client lives in
-    // src/server/, and routes reach it from routeLoader$ or routeAction$.
-    files: ["apps/web/src/**/*.{ts,tsx}"],
-    ignores: ["apps/web/src/server/**"],
+    // src/server/, and routes reach it from routeLoader$ or routeAction$. Applies to
+    // every frontend in apps/ (ADR 0003); apps/api is the backend.
+    files: ["apps/*/src/**/*.{ts,tsx}"],
+    ignores: ["apps/api/**", "apps/*/src/server/**"],
     rules: {
       "no-restricted-imports": [
         "error",
