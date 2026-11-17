@@ -19,5 +19,12 @@ allowBuilds:
 
 # Versions shared by more than one package. Reference them with "catalog:".
 catalog:
+  # Exact: Qwik 2 is a release candidate (ADR 0011).
+  "@qwik.dev/core": 2.0.0-rc.5
+  # Client and server must stay on the same version.
+  "@trpc/client": ^11.26.0
   "@trpc/server": ^11.26.0
+  vite: ^8.3.0
+  # Keep @vitest/ui on the same version as vitest.
+  "@vitest/ui": ^5.1.0
   vitest: ^5.1.0

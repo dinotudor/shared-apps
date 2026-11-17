@@ -17,15 +17,15 @@
     "tokens": "node scripts/write-tokens-css.ts"
   },
   "peerDependencies": {
-    "@qwik.dev/core": "2.0.0-rc.5"
+    "@qwik.dev/core": "catalog:"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0"
   },
   "devDependencies": {
-    "@qwik.dev/core": "2.0.0-rc.5",
-    "vite": "^8.3.0",
+    "@qwik.dev/core": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }
