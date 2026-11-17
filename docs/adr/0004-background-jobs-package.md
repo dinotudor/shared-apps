@@ -17,7 +17,7 @@ Playbook ADR 0009 runs pg-boss inside the API process. Modules will need jobs, s
 2. **The runner logs every failure in one place.** It logs a handler error with the queue and job ID, then rethrows it so pg-boss records the failure and retries. pg-boss's own `error` event goes to the same logger, and so does any job that is still running when shutdown gives up on it. Payloads are never logged.
 3. **pg-boss has its own pool** (3 connections), separate from the requests' pool. Polling can then never take connections that requests need. Its tables stay in its `pgboss` schema (ADR 0002).
 4. **pg-boss starts in Fastify's `onReady` hook, so a failed start fails the API's startup.** If the database is unreachable at boot, `listen()` rejects, the process exits 1, and the container restarts. An API that serves requests while its jobs silently don't run is harder to notice than one that doesn't start.
-5. **Shutdown gives running jobs half the budget (5 s).** pg-boss stops polling, waits for running handlers up to that timeout, then marks the jobs still running as failed, so they are retried later. The rest of the budget covers in-flight requests and closing the pool.
+5. **Shutdown gives running jobs half the budget (5 s), alongside in-flight requests.** The runner stops in Fastify's `preClose` hook, so jobs drain while requests do, and the database pool closes in `onClose`, after both. pg-boss stops polling, waits for running handlers up to that timeout, then marks the jobs still running as failed, so they are retried later.
 6. **Payloads are typed but not validated at runtime.** They come from our own code through `send`. A job whose payload comes from outside gets a Zod schema when it appears.
 
 ## Alternatives considered
@@ -32,3 +32,4 @@ Playbook ADR 0009 runs pg-boss inside the API process. Modules will need jobs, s
 - A pg-boss upgrade migrates the `pgboss` schema on `start()`, outside the Drizzle history. Renovate doesn't auto-merge it (it's a runtime dependency), but those PRs need a manual look at pg-boss's release notes.
 - A schedule removed from code stays in the `pgboss.schedule` table until it is removed with `unschedule`. This should be handled when the first schedule is retired.
 - With the database down at boot, the API now refuses to start. Before, it started and failed on the first query.
+- A handler that outlives the stop timeout keeps running in the background until the process exits. Once handlers query the requests' pool (#21+), such a handler fails on the closed pool. Its job is already marked failed and gets retried, so the error only adds noise to the log.
