@@ -18,11 +18,11 @@ const initialsOf = (name: string): string => {
 
 export const Avatar = component$<AvatarProps>(({ name, size = 32, src }) =>
   src ? (
-    <span class={["wfd-avatar", `wfd-avatar--${size}`]}>
+    <span class={["wfd-avatar", `wfd-avatar--${String(size)}`]}>
       <img src={src} alt={name} width={size} height={size} />
     </span>
   ) : (
-    <span class={["wfd-avatar", `wfd-avatar--${size}`]} role="img" aria-label={name}>
+    <span class={["wfd-avatar", `wfd-avatar--${String(size)}`]} role="img" aria-label={name}>
       {initialsOf(name)}
     </span>
   ),

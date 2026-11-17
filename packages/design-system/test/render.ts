@@ -9,8 +9,8 @@ export const render = async (jsx: JSXOutput) => {
 };
 
 /** Like querySelector, but fails the test when nothing matches. */
-export const get = <E extends Element = HTMLElement>(root: ParentNode, selector: string): E => {
-  const element = root.querySelector<E>(selector);
+export const get = (root: ParentNode, selector: string): HTMLElement => {
+  const element = root.querySelector<HTMLElement>(selector);
   if (!element) throw new Error(`No element matches ${selector}`);
   return element;
 };

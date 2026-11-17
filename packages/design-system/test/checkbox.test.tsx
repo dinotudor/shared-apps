@@ -3,12 +3,12 @@ import { Checkbox } from "../src/index.ts";
 import { get, render } from "./render.ts";
 
 // Module scope: Qwik serializes values captured by $ handlers, so a local spy would be copied.
-const onChange = vi.fn();
+const onChange = vi.fn<(checked: boolean) => void>();
 
 describe("Checkbox", () => {
   it("renders a native checkbox named by its visible label", async () => {
     const { screen } = await render(<Checkbox label="Arroz" name="arroz" />);
-    const input = get<HTMLInputElement>(screen, "label.wfd-checkbox input");
+    const input = get(screen, "label.wfd-checkbox input") as HTMLInputElement;
     expect(input.getAttribute("type")).toBe("checkbox");
     expect(input.getAttribute("name")).toBe("arroz");
     expect(input.hasAttribute("checked")).toBe(false);
@@ -17,7 +17,7 @@ describe("Checkbox", () => {
 
   it("renders the checked state with a check mark", async () => {
     const { screen } = await render(<Checkbox label="Arroz" checked />);
-    expect(get<HTMLInputElement>(screen, "input").checked).toBe(true);
+    expect((get(screen, "input") as HTMLInputElement).checked).toBe(true);
     expect(get(screen, ".wfd-checkbox__box use").getAttribute("href")).toMatch(/#i-check$/);
   });
 
@@ -33,9 +33,14 @@ describe("Checkbox", () => {
 
   it("reports the new checked state", async () => {
     const { screen, userEvent } = await render(
-      <Checkbox label="Arroz" onChange$={(checked) => onChange(checked)} />,
+      <Checkbox
+        label="Arroz"
+        onChange$={(checked) => {
+          onChange(checked);
+        }}
+      />,
     );
-    const input = get<HTMLInputElement>(screen, "input");
+    const input = get(screen, "input") as HTMLInputElement;
     input.checked = true;
     await userEvent(input, "change");
     expect(onChange).toHaveBeenCalledWith(true);

@@ -3,7 +3,7 @@ import { Button } from "../src/index.ts";
 import { get, render } from "./render.ts";
 
 // Module scope: Qwik serializes values captured by $ handlers, so a local spy would be copied.
-const onClick = vi.fn();
+const onClick = vi.fn<() => void>();
 
 describe("Button", () => {
   it.each(["primary", "secondary", "text", "danger"] as const)(
@@ -40,7 +40,13 @@ describe("Button", () => {
 
   it("calls onClick$ when pressed", async () => {
     const { screen, userEvent } = await render(
-      <Button onClick$={() => onClick()}>Salvar</Button>,
+      <Button
+        onClick$={() => {
+          onClick();
+        }}
+      >
+        Salvar
+      </Button>,
     );
     await userEvent(get(screen, "button"), "click");
     expect(onClick).toHaveBeenCalledOnce();

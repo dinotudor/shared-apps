@@ -8,11 +8,11 @@ describe("Logo", () => {
   it("renders the 30 px mark in a light and a dark version, switched by the theme", async () => {
     const { screen } = await render(<Logo variant="mark" />);
     const [light, dark] = images(screen);
-    expect(light?.getAttribute("src")).toMatch(/wfd-mark-light\.svg$/);
-    expect(light?.classList.contains("wfd-logo--light")).toBe(true);
-    expect(dark?.getAttribute("src")).toMatch(/wfd-mark-dark\.svg$/);
-    expect(dark?.classList.contains("wfd-logo--dark")).toBe(true);
-    expect(light?.getAttribute("height")).toBe("30");
+    expect(light.getAttribute("src")).toMatch(/wfd-mark-light\.svg$/);
+    expect(light.classList.contains("wfd-logo--light")).toBe(true);
+    expect(dark.getAttribute("src")).toMatch(/wfd-mark-dark\.svg$/);
+    expect(dark.classList.contains("wfd-logo--dark")).toBe(true);
+    expect(light.getAttribute("height")).toBe("30");
   });
 
   it("renders the lockup with the app name as alternative text", async () => {

@@ -4,7 +4,11 @@ import { get, render } from "./render.ts";
 
 describe("Card", () => {
   it("renders its content on a surface", async () => {
-    const { screen } = await render(<Card><h4>Feijoada</h4></Card>);
+    const { screen } = await render(
+      <Card>
+        <h4>Feijoada</h4>
+      </Card>,
+    );
     const card = get(screen, ".wfd-card");
     expect(card.tagName.toLowerCase()).toBe("div");
     expect(get(card, "h4").textContent).toBe("Feijoada");

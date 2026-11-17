@@ -19,7 +19,7 @@ describe("Avatar", () => {
 
   it.each([24, 40, 56] as const)("renders at %i px", async (size) => {
     const { screen } = await render(<Avatar name="Ana" size={size} />);
-    expect(get(screen, ".wfd-avatar").classList.contains(`wfd-avatar--${size}`)).toBe(true);
+    expect(get(screen, ".wfd-avatar").classList.contains(`wfd-avatar--${String(size)}`)).toBe(true);
   });
 
   it("shows a photo when there is one", async () => {

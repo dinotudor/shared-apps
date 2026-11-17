@@ -10,9 +10,11 @@ describe("Icon", () => {
     const files = readdirSync(iconsDir)
       .filter((file) => file.endsWith(".svg") && file !== "sprite.svg")
       .map((file) => file.replace(/\.svg$/, ""));
-    const symbols = [...readFileSync(new URL("sprite.svg", iconsDir), "utf8").matchAll(/<symbol id="i-([a-z-]+)"/g)].map(
-      (m) => m[1],
-    );
+    const symbols = [
+      ...readFileSync(new URL("sprite.svg", iconsDir), "utf8").matchAll(
+        /<symbol id="i-([a-z-]+)"/g,
+      ),
+    ].map((m) => m[1]);
     expect([...ICON_NAMES].sort()).toEqual(files.sort());
     expect([...ICON_NAMES].sort()).toEqual(symbols.sort());
     expect(ICON_NAMES).toHaveLength(33);

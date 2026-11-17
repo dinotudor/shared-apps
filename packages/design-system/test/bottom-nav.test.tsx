@@ -20,8 +20,8 @@ describe("BottomNav", () => {
   it("marks the current destination as the current page", async () => {
     const { screen } = await render(<BottomNav items={[...items]} current="/pratos" />);
     const [week, dishes] = all(screen, "a");
-    expect(week?.hasAttribute("aria-current")).toBe(false);
-    expect(dishes?.getAttribute("aria-current")).toBe("page");
+    expect(week.hasAttribute("aria-current")).toBe(false);
+    expect(dishes.getAttribute("aria-current")).toBe("page");
   });
 
   it("accepts a different landmark label", async () => {

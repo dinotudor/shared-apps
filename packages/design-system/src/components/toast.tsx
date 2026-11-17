@@ -25,7 +25,9 @@ export const Toast = component$<ToastProps>(({ open, duration = 6000 }) => {
       const timer = setTimeout(() => {
         open.value = false;
       }, duration);
-      cleanup(() => clearTimeout(timer));
+      cleanup(() => {
+        clearTimeout(timer);
+      });
     },
     { strategy: "document-ready" },
   );

@@ -3,7 +3,7 @@ import { Chip } from "../src/index.ts";
 import { all, get, render } from "./render.ts";
 
 // Module scope: Qwik serializes values captured by $ handlers, so a local spy would be copied.
-const onClick = vi.fn();
+const onClick = vi.fn<() => void>();
 
 describe("Chip", () => {
   it("renders an unselected toggle", async () => {
@@ -23,7 +23,13 @@ describe("Chip", () => {
 
   it("calls onClick$ when toggled", async () => {
     const { screen, userEvent } = await render(
-      <Chip onClick$={() => onClick()}>Massas</Chip>,
+      <Chip
+        onClick$={() => {
+          onClick();
+        }}
+      >
+        Massas
+      </Chip>,
     );
     await userEvent(get(screen, "button"), "click");
     expect(onClick).toHaveBeenCalledOnce();

@@ -1,11 +1,4 @@
-import {
-  component$,
-  Slot,
-  useId,
-  useSignal,
-  useVisibleTask$,
-  type Signal,
-} from "@qwik.dev/core";
+import { component$, Slot, useId, useSignal, useVisibleTask$, type Signal } from "@qwik.dev/core";
 import { Icon } from "./icon.tsx";
 
 export type ModalProps = {

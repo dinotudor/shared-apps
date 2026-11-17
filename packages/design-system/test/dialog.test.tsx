@@ -27,7 +27,7 @@ describe.each([
     const { screen } = await render(<Harness kind={kind} />);
     const dialog = get(screen, "dialog.wfd-modal");
     expect(dialog.classList.contains(`wfd-modal--${placement}`)).toBe(true);
-    const title = get(dialog, `#${dialog.getAttribute("aria-labelledby")}`);
+    const title = get(dialog, `#${dialog.getAttribute("aria-labelledby") ?? ""}`);
     expect(title.textContent).toBe("Excluir Feijoada?");
     expect(get(dialog, ".wfd-modal__body").textContent).toContain("Não dá para desfazer.");
     expect(get(dialog, ".wfd-modal__actions").textContent).toBe("CancelarExcluir");

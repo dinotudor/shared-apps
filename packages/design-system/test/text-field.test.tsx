@@ -14,7 +14,7 @@ describe.each([
 ] as const)("%s", (_, tag, Field) => {
   it("is labelled by an always-visible label", async () => {
     const { screen } = await render(<Field label="Nome do prato" name="name" value="Feijoada" />);
-    const control = get<HTMLInputElement>(screen, tag);
+    const control = get(screen, tag) as HTMLInputElement;
     const label = get(screen, "label");
     expect(label.getAttribute("for")).toBe(control.id);
     expect(label.textContent).toBe("Nome do prato");
