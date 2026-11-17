@@ -1,17 +1,17 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { TOKENS_CSS_PATH, tokensCss } from "../scripts/tokens-css.ts";
 import { renderTokensCss, tokens, vars } from "../src/tokens.ts";
 
 const designFile = new URL(
   "../../../docs/apps/whats-for-dinner/design/tokens-wfd.css",
   import.meta.url,
 );
-const committedCss = new URL("../src/tokens.css", import.meta.url);
 
 // Reads `--name:value` pairs from one CSS block of the approved design file.
 const declarations = (block: string): Record<string, string> =>
   Object.fromEntries(
-    [...block.matchAll(/--(wfd-[a-z-]+):([^;}]+)/g)].map((m) => [m[1], m[2]!.trim()]),
+    [...block.matchAll(/--(wfd-[a-z-]+):([^;}]+)/g)].map((m) => [m[1], m[2].trim()]),
   );
 
 describe("tokens", () => {
@@ -23,7 +23,9 @@ describe("tokens", () => {
   it("keeps every palette B colour from the approved design file, light and dark", () => {
     for (const [name, value] of Object.entries(designLight)) {
       if (!name.startsWith("wfd-font") && !name.startsWith("wfd-radius")) {
-        expect(tokens.color.light[name.slice(4) as keyof typeof tokens.color.light], name).toBe(value);
+        expect(tokens.color.light[name.slice(4) as keyof typeof tokens.color.light], name).toBe(
+          value,
+        );
       }
     }
     for (const [name, value] of Object.entries(designDark)) {
@@ -58,12 +60,14 @@ describe("tokens", () => {
 
   it("switches to dark by system preference unless data-theme says light, and by data-theme=dark", () => {
     const css = renderTokensCss();
-    expect(css).toContain('@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {');
+    expect(css).toContain(
+      '@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {',
+    );
     expect(css).toContain(':root[data-theme="dark"] {');
     expect(css).toContain("--wfd-action: #4FE0B0;");
   });
 
-  it("matches the committed tokens.css (run `pnpm tokens` after editing tokens.ts)", () => {
-    expect(readFileSync(committedCss, "utf8")).toBe(renderTokensCss());
+  it("matches the committed tokens.css (run `pnpm tokens` after editing tokens.ts)", async () => {
+    expect(readFileSync(TOKENS_CSS_PATH, "utf8")).toBe(await tokensCss());
   });
 });

@@ -1,6 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { renderTokensCss } from "../src/tokens.ts";
+import { TOKENS_CSS_PATH, tokensCss } from "./tokens-css.ts";
 
-const target = new URL("../src/tokens.css", import.meta.url);
-writeFileSync(target, renderTokensCss());
-console.log(`Wrote ${target.pathname}`);
+writeFileSync(TOKENS_CSS_PATH, await tokensCss());
+console.log(`Wrote ${TOKENS_CSS_PATH.pathname}`);
