@@ -22,6 +22,14 @@ describe("requireViewer", () => {
     });
   });
 
+  it("leaves Qwik's internal query parameters out of the page it remembers", async () => {
+    // A session that expires while an action is submitted: Qwik adds ?qaction=<id>.
+    const event = eventFor("/dishes/42/?tab=notes&qaction=abc123&qfunc=f1&qdata=d1");
+    await expect(requireViewer(event, () => Promise.resolve(null))).rejects.toEqual({
+      redirect: { status: 302, url: "/sign-in/?next=%2Fdishes%2F42%2F%3Ftab%3Dnotes" },
+    });
+  });
+
   it("lets a signed-in viewer through and shares them with the page", async () => {
     const event = eventFor("/dishes/");
     await requireViewer(event, () => Promise.resolve(ANA));
