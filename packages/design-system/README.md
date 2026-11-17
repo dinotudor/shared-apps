@@ -101,9 +101,11 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 ### StatusMessage
 
-`<StatusMessage title icon? level?={2}>text<div q:slot="action">…</div></StatusMessage>`: a centred message for a page or section that has nothing to show. Use it for not found, empty, error and offline states. It has a decorative icon in a `selected` circle, or the logo mark when there's no `icon`. Below that come the title, muted body text and an optional action. Set `level={1}` when the message is the whole page, as on a 404 page. The body and the action are hidden when they are empty.
+`<StatusMessage title icon? level?={2}>text<div q:slot="action">…</div></StatusMessage>`: a centred message for a page or section that has nothing to show. Use it for not found, empty, error and offline states. It has a decorative icon in a `selected` circle, or the logo mark when there's no `icon`. Below that come the title, muted body text and an optional action. Set `level={1}` when the message is the whole page, as on a 404 page. The body and the action are hidden when they are empty. This uses `:empty`, which whitespace defeats, so leave the `action` slot out instead of passing an empty element.
 
 Follow brief section 10 for the copy: humour is fine in empty states, but never in errors or offline. For an action that navigates, put a link in the slot with the button classes: `<Link q:slot="action" class="wfd-button wfd-button--primary" href="/">`. The `wfd-button` classes work on `<a>` as well as `<button>`.
+
+A `404.tsx` route only covers paths that match no route. When a route exists but its data doesn't (for example `/pratos/999`), the loader has to set the status itself, with `event.status(404)` or `event.error(404, …)`, and the page renders a StatusMessage.
 
 ## Accessibility
 

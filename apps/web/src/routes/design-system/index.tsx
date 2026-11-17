@@ -236,9 +236,10 @@ export default component$(() => {
         <Card>
           <StatusMessage icon="search" title="Página não encontrada" level={3}>
             Este endereço não existe ou mudou.
-            <Button q:slot="action" variant="secondary">
+            {/* A link with the button classes, the pattern the README recommends. */}
+            <a q:slot="action" class="wfd-button wfd-button--secondary" href="/">
               Voltar ao início
-            </Button>
+            </a>
           </StatusMessage>
         </Card>
         <Card>
