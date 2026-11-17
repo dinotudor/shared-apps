@@ -6,33 +6,53 @@ export type BottomNavItem = { href: string; label: string; icon: IconName };
 export type BottomNavProps = {
   /** Up to five destinations. Labels are always visible. */
   items: BottomNavItem[];
-  /** `href` of the current destination. */
+  /** The current path. The item with the longest matching href is marked current. */
   current?: string;
   /** Name of the navigation landmark. */
   label?: string;
 };
 
+/** "/pratos/" and "/pratos" are the same page (Qwik Router adds trailing slashes). */
+const normalize = (path: string): string => (path.length > 1 ? path.replace(/\/+$/, "") : path);
+
+/** "/" matches only itself; any other href matches its own path and the paths below it. */
+const matches = (href: string, current: string): boolean =>
+  href === "/" ? current === "/" : current === href || current.startsWith(`${href}/`);
+
+/** The href of the most specific item that matches the current path, if any. */
+const currentHref = (items: BottomNavItem[], current: string | undefined) => {
+  if (current === undefined) return undefined;
+  const path = normalize(current);
+  return items
+    .map((item) => normalize(item.href))
+    .filter((href) => matches(href, path))
+    .sort((a, b) => b.length - a.length)[0];
+};
+
 // Plain links: the package does not depend on the router. The current item gets a
 // pill behind its icon as well as the action colour, so state is not colour alone.
 export const BottomNav = component$<BottomNavProps>(
-  ({ items, current, label = "Navegação principal" }) => (
-    <nav class="wfd-bottom-nav" aria-label={label}>
-      <ul class="wfd-bottom-nav__list">
-        {items.map((item) => (
-          <li key={item.href}>
-            <a
-              class="wfd-bottom-nav__link"
-              href={item.href}
-              aria-current={item.href === current ? "page" : undefined}
-            >
-              <span class="wfd-bottom-nav__indicator">
-                <Icon name={item.icon} />
-              </span>
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  ),
+  ({ items, current, label = "Navegação principal" }) => {
+    const active = currentHref(items, current);
+    return (
+      <nav class="wfd-bottom-nav" aria-label={label}>
+        <ul class="wfd-bottom-nav__list">
+          {items.map((item) => (
+            <li key={item.href}>
+              <a
+                class="wfd-bottom-nav__link"
+                href={item.href}
+                aria-current={normalize(item.href) === active ? "page" : undefined}
+              >
+                <span class="wfd-bottom-nav__indicator">
+                  <Icon name={item.icon} />
+                </span>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    );
+  },
 );
