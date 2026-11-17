@@ -14,7 +14,11 @@ const loadConfig = (): Config => {
   }
 };
 
-const database = createDatabase(loadConfig().databaseUrl);
+const database = createDatabase(loadConfig().databaseUrl, {
+  onError: (error) => {
+    console.error("database connection lost:", error);
+  },
+});
 try {
   await migrate(database.db);
   console.info("migrations applied");

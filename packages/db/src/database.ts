@@ -16,8 +16,18 @@ export type DatabaseHandle = {
 // callers never pass a path.
 const MIGRATIONS_FOLDER = fileURLToPath(new URL("../migrations", import.meta.url));
 
-export const createDatabase = (url: string): DatabaseHandle => {
+export type DatabaseOptions = {
+  /**
+   * Called when the server drops an idle connection, for example on a database
+   * restart. Without a listener, pg's Pool would crash the process. The pool opens
+   * a new connection on the next query. Query errors still reject the query.
+   */
+  onError: (error: Error) => void;
+};
+
+export const createDatabase = (url: string, { onError }: DatabaseOptions): DatabaseHandle => {
   const pool = new Pool({ connectionString: url });
+  pool.on("error", onError);
   // pg rejects a second end(); keep the first one so every caller can await it.
   let ending: Promise<void> | undefined;
   return {

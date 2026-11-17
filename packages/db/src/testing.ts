@@ -42,7 +42,11 @@ export const startEmptyDatabase = async (): Promise<TestDatabase> => {
 
   const url = new URL(adminUrl);
   url.pathname = `/${name}`;
-  const { db, close } = createDatabase(url.href);
+  const { db, close } = createDatabase(url.href, {
+    onError: (error) => {
+      console.error("test database connection dropped:", error);
+    },
+  });
 
   return {
     url: url.href,

@@ -8,10 +8,12 @@ The database connection, the one migration history and disposable test databases
 import { createDatabase, migrate } from "@shared-apps/db";
 import type { Database, DatabaseHandle } from "@shared-apps/db";
 
-const { db, close } = createDatabase(url); // pg Pool + Drizzle. Connects on first query.
+const { db, close } = createDatabase(url, { onError }); // pg Pool + Drizzle. Connects on first query.
 await migrate(db); // applies every pending migration. Safe to run again.
 await close(); // ends the pool. Later calls do nothing.
 ```
+
+`onError` receives errors from idle connections that the server drops, for example on a database restart or after a laptop sleeps. Without it, pg would crash the process. The pool reconnects on the next query, and query errors still reject the query as usual. `apps/api` passes its logger.
 
 `apps/api` creates the one handle at startup and closes it on shutdown. Modules receive `db` and never read `DATABASE_URL`.
 
@@ -61,4 +63,7 @@ Migrations are forward-only. Never edit a migration that has been merged; add a 
 
 - `pg` (node-postgres) is the driver because pg-boss needs it too.
 - The test image (`src/testing.ts`) and `compose.yaml` both use `postgres:18-alpine`. Change them together.
-- An idle connection that PostgreSQL drops (for example, during a database restart) emits an error on the pool. It is not handled yet, so the process exits and the container restarts. Revisit when #24 sets up production.
+
+## Follow-ups
+
+- Each test file that uses the database starts its own container. When there are many such files, start one container in a Vitest `globalSetup` and hand its URL to the tests through `provide`/`inject`.

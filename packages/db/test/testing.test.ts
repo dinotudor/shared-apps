@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createDatabase } from "../src/index.ts";
 import { startTestDatabase } from "../src/testing.ts";
 import type { TestDatabase } from "../src/testing.ts";
@@ -33,7 +33,7 @@ describe("startTestDatabase", () => {
     const database = await startTestDatabase();
     await database.stop();
 
-    const { db, close } = createDatabase(database.url);
+    const { db, close } = createDatabase(database.url, { onError: vi.fn() });
     try {
       // Drizzle wraps the driver error; its cause is PostgreSQL's "database does not exist".
       await expect(db.execute(sql`select 1`)).rejects.toMatchObject({

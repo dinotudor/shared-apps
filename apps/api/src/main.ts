@@ -19,7 +19,14 @@ const loadConfig = (): Config => {
 
 const config = loadConfig();
 // Connects lazily: a database that is down shows up on the first query, not here.
-const database = createDatabase(config.databaseUrl);
+const database = createDatabase(config.databaseUrl, {
+  // A dropped idle connection (database restart, laptop sleep) is logged, not fatal:
+  // the pool reconnects on the next query. `app` exists by the time this can fire,
+  // since no connection opens before the server handles a request.
+  onError: (error) => {
+    app.log.error({ err: error }, "database connection lost");
+  },
+});
 const app = buildApp(config, { database });
 
 await runServer(app, {
