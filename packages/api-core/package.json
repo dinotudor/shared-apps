@@ -4,9 +4,13 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@trpc/server": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
   }
 }
