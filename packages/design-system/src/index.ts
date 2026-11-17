@@ -9,3 +9,7 @@ export { Card } from "./components/card.tsx";
 export type { CardProps } from "./components/card.tsx";
 export { Chip } from "./components/chip.tsx";
 export type { ChipProps } from "./components/chip.tsx";
+export { Checkbox } from "./components/checkbox.tsx";
+export type { CheckboxProps } from "./components/checkbox.tsx";
+export { TextArea, TextField } from "./components/text-field.tsx";
+export type { TextAreaProps, TextFieldProps } from "./components/text-field.tsx";
