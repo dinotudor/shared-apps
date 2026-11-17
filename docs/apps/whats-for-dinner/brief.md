@@ -3,8 +3,8 @@
 > Status: approved by Dino (2026-11-08). Source of truth for planning and implementation in `shared-apps`.
 > Wireframes (all 6 screens plus states): [light](design/screenshots/wireframes-light.png) · [dark](design/screenshots/wireframes-dark.png) · [icons](design/screenshots/icons.png)
 > Visual design (final, clickable prototype + guide, works offline): [`design/wireframes-final.html`](design/wireframes-final.html)
-> Logo: [`design/brand/`](design/brand/) · Brand identity (SkiroLiro): [`dinotudor/design-system`](https://github.com/dinotudor/design-system)
-> Design files (tokens-wfd.css, icons/, brand/, PLAN.md, GUIDE.md): see section 11.
+> Logo: [`packages/design-system/brand/`](../../../packages/design-system/brand/) · Brand identity (SkiroLiro): [`dinotudor/design-system`](https://github.com/dinotudor/design-system)
+> Design files (tokens-wfd.css, PLAN.md, GUIDE.md), icons and logo: see section 11.
 
 ## 1. Goal
 
@@ -139,8 +139,8 @@ Expected new packages: `modules/dishes`, `modules/meals` (names to confirm), `pa
 The design package lives in this repo at `docs/apps/whats-for-dinner/design/` (docs in English; UI copy in pt-BR). Issue 7 turns it into `packages/design-system`:
 
 - `tokens-wfd.css` — `--wfd-*` colour, font and radius tokens, light and dark.
-- `icons/*.svg` and `icons/sprite.svg` — 33 app icons (24 px grid, 1.5 stroke, `currentColor`; 5 are for Phase 2).
-- `brand/` — logo v0: mark, lockup and app icon, light and dark (see `brand/README.md`).
+- Icons, now in `packages/design-system/src/icons/` (`*.svg` and `sprite.svg`) — 33 app icons (24 px grid, 1.5 stroke, `currentColor`; 5 are for Phase 2).
+- Logo v0, now in `packages/design-system/brand/`: mark, lockup and app icon, light and dark (see its `README.md`).
 - `PLAN.md` (product rules), `GUIDE.md` (usage guide, UI copy, accessibility), `wireframes-final.html` (offline prototype), `screenshots/`.
 - Visual base: the SkiroLiro design system (`dinotudor/design-system`).
 

@@ -33,7 +33,7 @@ Each person marks it on the Dish screen. The notice ("Fulano enjoou") shows in P
 Month (same day card, smaller), messages (3rd tab), statistics, shopping list (born from "missing ingredients"), stickers on the photo.
 
 ## Icons
-41 icons in `icons/` (24 grid, 1.5 stroke) and `icons/sprite.svg`. Includes score faces (sick, neutral, love), Enjoei, skip, freestyle, missing ingredient, responses, reactions and Phase 2.
+41 icons in `packages/design-system/src/icons/` (24 grid, 1.5 stroke) and `icons/sprite.svg`. Includes score faces (sick, neutral, love), Enjoei, skip, freestyle, missing ingredient, responses, reactions and Phase 2.
 
 ## Open questions
 - Soft version (future): chosen per family or per person?
@@ -41,12 +41,12 @@ Month (same day card, smaller), messages (3rd tab), statistics, shopping list (b
 - Reactions: fixed list or any emoji?
 
 ## Logo and app icon (v0 approved)
-Approved by Dino on 2026-11-08, to be refined later. A hand-drawn thinking face (mint face, big white eyes, one raised eyebrow, straight mouth) with the name in Figtree Bold. Files in `brand/` (light and dark lockups, mark, 1024 px app icon). Discarded explorations in `brand/explorations/`.
+Approved by Dino on 2026-11-08, to be refined later. A hand-drawn thinking face (mint face, big white eyes, one raised eyebrow, straight mouth) with the name in Figtree Bold. Files in `packages/design-system/brand/` (light and dark lockups, mark, 1024 px app icon).
 
 ## Final identity (2026-11-08)
 - Palette B, Verde de feira: action in green (#0F7A5C light / #4FE0B0 dark), navy text, backgrounds with a light green tint, amber for attention.
-- Logo v0 (thinking face) in the header and in empty/loading states; files in `brand/`.
-- Icons: 33, only for app use (`icons/`). Emojis for responses, scores, reactions and Enjoei.
+- Logo v0 (thinking face) in the header and in empty/loading states; files in `packages/design-system/brand/`.
+- Icons: 33, only for app use (`packages/design-system/src/icons/`). Emojis for responses, scores, reactions and Enjoei.
 - Final wireframes, Play (clickable prototype) and usage Guide: `wireframes-final.html` (and light/dark PNGs).
 - Reactions: any emoji. Soft version of the responses: per family, later.
 - Tokens in `tokens-wfd.css`.
