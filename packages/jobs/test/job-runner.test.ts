@@ -28,7 +28,11 @@ afterEach(async () => {
 
 const startRunner = async (
   jobs: readonly JobDefinition<never>[],
-  options: { stopTimeoutMs?: number; schedules?: readonly ScheduledJob[] } = {},
+  options: {
+    stopTimeoutMs?: number;
+    schedules?: readonly ScheduledJob[];
+    pollingIntervalSeconds?: number;
+  } = {},
 ) => {
   database = await startEmptyDatabase();
   const { url } = database;
@@ -40,7 +44,8 @@ const startRunner = async (
     schedules: options.schedules ?? [],
     stopTimeoutMs: options.stopTimeoutMs ?? 5_000,
     // The minimum pg-boss allows, so tests don't wait out the 2 s default.
-    pollingIntervalSeconds: 0.5,
+    pollingIntervalSeconds:
+      "pollingIntervalSeconds" in options ? options.pollingIntervalSeconds : 0.5,
   });
   await runner.start();
   return { runner, entries, url };
@@ -57,6 +62,22 @@ describe("job runner", () => {
       },
     });
     const { runner } = await startRunner([remember]);
+
+    await runner.send(remember, { dishId: "dish-1" });
+
+    await expect.poll(() => received, { timeout: 10_000 }).toEqual([{ dishId: "dish-1" }]);
+  });
+
+  it("runs jobs with pg-boss's default polling interval when none is given", async () => {
+    const received: { dishId: string }[] = [];
+    const remember = defineJob<{ dishId: string }>({
+      name: "test.remember",
+      handler: (data) => {
+        received.push(data);
+        return Promise.resolve();
+      },
+    });
+    const { runner } = await startRunner([remember], { pollingIntervalSeconds: undefined });
 
     await runner.send(remember, { dishId: "dish-1" });
 

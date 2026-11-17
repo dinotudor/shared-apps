@@ -94,9 +94,11 @@ export const createJobRunner = ({
       for (const job of [...jobs, ...schedules.map((schedule) => schedule.job)]) {
         workers.set(job.name, job);
       }
+      // Left out when not given: pg-boss rejects an explicit `undefined`.
+      const workOptions = pollingIntervalSeconds === undefined ? {} : { pollingIntervalSeconds };
       for (const job of workers.values()) {
         await boss.createQueue(job.name);
-        await boss.work<object>(job.name, { pollingIntervalSeconds }, async (batch) => {
+        await boss.work<object>(job.name, workOptions, async (batch) => {
           for (const { id, data } of batch) await run(job, id, data);
         });
       }
