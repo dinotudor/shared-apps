@@ -18,6 +18,16 @@ export const parseApiUrl = (value: string | undefined): string => {
   return url.href.replace(/\/+$/, "");
 };
 
+/** Where `pnpm dev` starts apps/api (its default HOST and PORT). */
+export const DEV_API_URL = "http://127.0.0.1:3000";
+
+/**
+ * API_URL for a request. In dev it falls back to the local API, so a fresh clone runs
+ * with `pnpm dev` alone. In production it must be set.
+ */
+export const resolveApiUrl = (value: string | undefined, { dev }: { dev: boolean }): string =>
+  parseApiUrl(value ?? (dev ? DEV_API_URL : undefined));
+
 export type ServerConfig = { port: number; host: string; apiUrl: string };
 
 /** Config for the production Node server. It refuses to start if this throws. */

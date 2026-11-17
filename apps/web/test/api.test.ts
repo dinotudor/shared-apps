@@ -32,7 +32,7 @@ describe("apiFor", () => {
     expect(new Headers(init.headers).get("cookie")).toBe("session=abc");
   });
 
-  it("refuses to build a client when API_URL is missing", () => {
-    expect(() => apiFor(eventWith({}))).toThrow("API_URL is not set");
+  it("rejects an invalid API_URL", () => {
+    expect(() => apiFor(eventWith({ API_URL: "not a url" }))).toThrow("API_URL is not a valid URL");
   });
 });

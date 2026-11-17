@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseApiUrl, parseServerConfig } from "../src/server/config.ts";
+import {
+  DEV_API_URL,
+  parseApiUrl,
+  parseServerConfig,
+  resolveApiUrl,
+} from "../src/server/config.ts";
 
 describe("parseApiUrl", () => {
   it("accepts an http URL and drops trailing slashes", () => {
@@ -19,6 +24,20 @@ describe("parseApiUrl", () => {
     expect(() => parseApiUrl("secret-token")).toThrow(
       expect.objectContaining({ message: expect.not.stringContaining("secret-token") as unknown }),
     );
+  });
+});
+
+describe("resolveApiUrl", () => {
+  it("falls back to the local API in dev when API_URL is not set", () => {
+    expect(resolveApiUrl(undefined, { dev: true })).toBe(DEV_API_URL);
+  });
+
+  it("requires API_URL outside dev", () => {
+    expect(() => resolveApiUrl(undefined, { dev: false })).toThrow("API_URL is not set");
+  });
+
+  it("prefers API_URL when it is set", () => {
+    expect(resolveApiUrl("http://api.test/", { dev: true })).toBe("http://api.test");
   });
 });
 

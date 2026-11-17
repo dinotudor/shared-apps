@@ -24,7 +24,6 @@ You need [pnpm](https://pnpm.io/installation) 12. pnpm downloads the Node versio
 
 ```sh
 pnpm install
-cp apps/web/.env.example apps/web/.env
 pnpm dev        # API on http://127.0.0.1:3000, web on http://localhost:5173
 pnpm test       # every package in one Vitest run; pnpm test:ui opens the Vitest UI
 ```
@@ -41,7 +40,7 @@ curl http://127.0.0.1:3000/trpc/health.ping
 # {"result":{"data":{"ok":true}}}
 ```
 
-The API reads `PORT`, `HOST` and `LOG_LEVEL` from the environment and refuses to start if any of them is invalid. See [`apps/api/.env.example`](apps/api/.env.example). The web app needs `API_URL` (see [`apps/web/.env.example`](apps/web/.env.example)). Only its server code reads it: the browser never calls the API.
+The API reads `PORT`, `HOST` and `LOG_LEVEL` from the environment and refuses to start if any of them is invalid. See [`apps/api/.env.example`](apps/api/.env.example). The web app reads `API_URL` (see [`apps/web/.env.example`](apps/web/.env.example)). In dev it defaults to the local API, and the production server refuses to start without it. Only its server code reads it: the browser never calls the API.
 
 Before opening a PR, run:
 
