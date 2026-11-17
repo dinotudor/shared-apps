@@ -12,6 +12,7 @@ apps/            Deployed apps
   web/           Qwik 2 web app; its server code calls the API
 packages/        Shared code
   api-core/      Shared tRPC setup
+  db/            PostgreSQL connection, the one migration history, test databases
   design-system/ Tokens, icons, logo and base Qwik components
 docs/            Briefs, issue plans and design files per app
 ```
@@ -20,10 +21,13 @@ Business logic will live in `modules/` (one package per domain area), wired toge
 
 ## Getting started
 
-You need [pnpm](https://pnpm.io/installation) 12. pnpm downloads the Node version pinned in `package.json` (`devEngines`), so you don't install Node yourself.
+You need [pnpm](https://pnpm.io/installation) 12 and Docker. pnpm downloads the Node version pinned in `package.json` (`devEngines`), so you don't install Node yourself. Docker runs the local PostgreSQL and the database tests.
 
 ```sh
 pnpm install
+docker compose up -d --wait                  # PostgreSQL on 127.0.0.1:5433
+cp apps/api/.env.example apps/api/.env       # points DATABASE_URL at it
+pnpm db:migrate
 pnpm dev        # API on http://127.0.0.1:3000, web on http://localhost:5173
 pnpm test       # every package in one Vitest run; pnpm test:ui opens the Vitest UI
 ```
@@ -40,7 +44,9 @@ curl http://127.0.0.1:3000/trpc/health.ping
 # {"result":{"data":{"ok":true}}}
 ```
 
-The API reads `PORT`, `HOST` and `LOG_LEVEL` from the environment and refuses to start if any of them is invalid. See [`apps/api/.env.example`](apps/api/.env.example). The web app reads `API_URL` (see [`apps/web/.env.example`](apps/web/.env.example)). In dev it defaults to the local API, and the production server refuses to start without it. Only its server code reads it: the browser never calls the API.
+The API reads `PORT`, `HOST`, `LOG_LEVEL` and `DATABASE_URL` (required) from the environment and refuses to start if any of them is invalid. See [`apps/api/.env.example`](apps/api/.env.example). The web app reads `API_URL` (see [`apps/web/.env.example`](apps/web/.env.example)). In dev it defaults to the local API, and the production server refuses to start without it. Only its server code reads it: the browser never calls the API.
+
+Database tests start their own disposable PostgreSQL through Testcontainers, so they don't touch the compose database. See [`packages/db`](packages/db/README.md) for the migration workflow.
 
 Before opening a PR, run:
 
