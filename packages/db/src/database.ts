@@ -8,7 +8,7 @@ export type Database = NodePgDatabase;
 
 export type DatabaseHandle = {
   db: Database;
-  /** Ends the connection pool. Call once, at shutdown. */
+  /** Ends the connection pool. Later calls do nothing. */
   close: () => Promise<void>;
 };
 
@@ -18,7 +18,12 @@ const MIGRATIONS_FOLDER = fileURLToPath(new URL("../migrations", import.meta.url
 
 export const createDatabase = (url: string): DatabaseHandle => {
   const pool = new Pool({ connectionString: url });
-  return { db: drizzle({ client: pool }), close: () => pool.end() };
+  // pg rejects a second end(); keep the first one so every caller can await it.
+  let ending: Promise<void> | undefined;
+  return {
+    db: drizzle({ client: pool }),
+    close: () => (ending ??= pool.end()),
+  };
 };
 
 /** Applies every migration not applied yet, in order. Safe to run again. */
