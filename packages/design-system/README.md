@@ -38,9 +38,13 @@ All components use class names prefixed with `wfd-` (`wfd-button`, modifiers lik
 
 `<Icon name="search" size={16 | 20 | 24} label?="Buscar" />`: a 24-grid stroke icon from the sprite, in `currentColor`. Without `label` it is hidden from screen readers (use this when visible text sits next to it). With `label` it has `role="img"` and that name. An icon-only button needs a `label` on the icon or an `aria-label` on the button.
 
+The sprite must be served from the same origin as the page, because browsers refuse an SVG `<use>` that points to another origin. Vite serves it with the app's other assets, so this holds unless the assets are moved to a separate CDN domain.
+
 ### Logo
 
 `<Logo variant="mark" | "lockup" height?={30} decorative? />`: renders the light and the dark file, and CSS shows the one for the active theme. Its alt text is "What's for dinner?". Set `decorative` when the name is already on screen.
+
+Known trade-off: the browser downloads both images, even though only one shows. The files are small (8 to 17 kB). A possible improvement is one inline SVG whose colours come from tokens, or a `<picture>` element (which follows only the system preference, not `data-theme`).
 
 ### Button
 
@@ -67,11 +71,11 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 ### TextField and TextArea
 
-`<TextField label hint? error? icon? … />` and `<TextArea label hint? error? rows?={3} … />`: the label is always visible above the field. `hint` (muted) and `error` are linked through `aria-describedby`. An error sets `aria-invalid`, a 2 px `danger` border and an alert icon next to the message. TextField takes any `<input>` attribute. `icon` adds a decorative leading icon (use `search` with `type="search"`).
+`<TextField label hint? error? icon? … />` and `<TextArea label hint? error? rows?={3} … />`: the label is always visible above the field. `hint` (muted) and `error` are linked through `aria-describedby`. An error sets `aria-invalid`, a 2 px `danger` border and an alert icon next to the message. TextField takes any `<input>` attribute. `icon` adds a decorative leading icon (use `search` with `type="search"`). Your own `aria-describedby` ids are kept after the hint and error ids, and an `aria-invalid` you pass takes precedence.
 
 ### BottomNav
 
-`<BottomNav items={[{ href, label, icon }]} current?="/semana" label?="Navegação principal" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It uses plain links (see open questions).
+`<BottomNav items={[{ href, label, icon }]} current?="/semana" label?="Navegação principal" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item is the one with the longest `href` that matches `current` segment by segment, ignoring trailing slashes: `/pratos` matches `/pratos/` and `/pratos/42`, but not `/pratosx`. `/` matches only itself. That item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It uses plain links, so the package doesn't depend on the router. Support for router links is planned for #13.
 
 ### Avatar
 
@@ -85,11 +89,11 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 | `info` | info ("Informação") | Neutral information: offline mode |
 | `success` | check ("Sucesso") | Something went well and the message should stay on screen |
 
-`<Alert variant title?>body</Alert>`: a persistent inline message. It has no live region. Use Toast for transient confirmations.
+`<Alert variant title?>body</Alert>`: a persistent inline message. The body sits in a `<div>`, so it can hold block content. It has no live region. Use Toast for transient confirmations.
 
 ### Toast
 
-`<Toast open={signal} duration?={6000}>Prato salvo.</Toast>`: a short confirmation in a polite live region (`role="status"`) that is always in the page. It closes after `duration` (SkiroLiro asks for 5 to 8 s) or from its close button, and sets `open` to `false`. The timer pauses while the pointer or keyboard focus is on the toast. Errors that need action go in an Alert, not a toast.
+`<Toast open={signal} duration?={6000}>Prato salvo.</Toast>`: a short confirmation in a polite live region (`role="status"`) that is always in the page. It closes after `duration` (SkiroLiro asks for 5 to 8 s) or from its close button, and sets `open` to `false`. The timer pauses while the pointer or keyboard focus is on the toast, and only resumes when both have left. When you replace the message while the toast is open, change `messageId` (a counter is enough) so the new message gets its full `duration`. The message sits in a `<div>`, so it can hold block content. Errors that need action go in an Alert, not a toast.
 
 ### Dialog and BottomSheet
 
@@ -105,6 +109,5 @@ Checked with the token contrast pairs (WCAG 2.1 AA) and by rendering every compo
 
 ## Open questions
 
-- **BottomNav and the router:** plain `<a>` links cause a full page load. `apps/web` (#13) may need a Qwik Router `<Link>` here, which means a slot or a link-component prop.
 - **Demo route:** the light and dark demo route asked for in #18 waits for `apps/web` (#13).
 - **Off-grid sizes:** some sizes are copied from the prototype (6, 10 and 14 px gaps, a 22 px checkbox) and are not on the 4 px grid.
