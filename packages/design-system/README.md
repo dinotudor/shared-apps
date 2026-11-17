@@ -75,7 +75,7 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 ### BottomNav
 
-`<BottomNav items={[{ href, label, icon }]} current?="/semana" label?="Navegação principal" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item is the one with the longest `href` that matches `current` segment by segment, ignoring trailing slashes: `/pratos` matches `/pratos/` and `/pratos/42`, but not `/pratosx`. `/` matches only itself. That item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It uses plain links, so the package doesn't depend on the router. Support for router links is planned for #13.
+`<BottomNav items={[{ href, label, icon }]} current?="/semana" label?="Navegação principal" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item is the one with the longest `href` that matches `current` segment by segment, ignoring trailing slashes: `/pratos` matches `/pratos/` and `/pratos/42`, but not `/pratosx`. `/` matches only itself. That item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It renders plain `<a>` links, so the package doesn't depend on the router. To get client-side navigation, pass the router's link component: `link={Link}` (from `@qwik.dev/router`). Any `link` component receives the anchor attributes (`class`, `href`, `aria-current`) and must render an `<a>` with them.
 
 ### Avatar
 
@@ -109,5 +109,4 @@ Checked with the token contrast pairs (WCAG 2.1 AA) and by rendering every compo
 
 ## Open questions
 
-- **Demo route:** the light and dark demo route asked for in #18 waits for `apps/web` (#13).
 - **Off-grid sizes:** some sizes are copied from the prototype (6, 10 and 14 px gaps, a 22 px checkbox) and are not on the 4 px grid.

@@ -1,3 +1,5 @@
+import { component$, Slot } from "@qwik.dev/core";
+import type { PropsOf } from "@qwik.dev/core";
 import { describe, expect, it } from "vitest";
 import { BottomNav } from "../src/index.ts";
 import { all, get, render } from "./render.ts";
@@ -52,5 +54,23 @@ describe("BottomNav", () => {
   it("accepts a different landmark label", async () => {
     const { screen } = await render(<BottomNav items={[...items]} label="Seções" />);
     expect(get(screen, "nav").getAttribute("aria-label")).toBe("Seções");
+  });
+
+  it("renders each destination through the link component it is given", async () => {
+    // Stands in for Qwik Router's Link: it must keep the anchor attributes it receives.
+    const RouterLink = component$<PropsOf<"a">>((props) => (
+      <a {...props} data-router-link="">
+        <Slot />
+      </a>
+    ));
+    const { screen } = await render(
+      <BottomNav items={[...items]} current="/pratos/" link={RouterLink} />,
+    );
+    const links = all<HTMLAnchorElement>(screen, "a");
+    expect(links.map((link) => link.hasAttribute("data-router-link"))).toEqual([true, true]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/semana", "/pratos"]);
+    expect(links.map((link) => link.textContent)).toEqual(["Semana", "Pratos"]);
+    expect(links.map((link) => link.getAttribute("aria-current"))).toEqual([null, "page"]);
+    expect(links[0]?.className).toBe("wfd-bottom-nav__link");
   });
 });

@@ -300,8 +300,8 @@ h1,h2,h3,h4,p{margin:0}h1,h2,h3{letter-spacing:-.02em;text-wrap:balance}
       <tr><td>Final wireframes, play and guide</td><td>this page (<code>wireframes-final.html</code>)</td><td>See and try the screens, light and dark</td></tr>
       <tr><td>Plan</td><td>Plan tab and <code>PLAN.md</code></td><td>Scope, product rules, decisions</td></tr>
       <tr><td>Colour and shape tokens</td><td><code>tokens-wfd.css</code></td><td>Palette B <code>--wfd-*</code> variables, light and dark</td></tr>
-      <tr><td>Icons</td><td><code>icons/*.svg</code> and <code>icons/sprite.svg</code></td><td>33 icons, only for app use</td></tr>
-      <tr><td>Logo v0</td><td><code>brand/</code></td><td>Mark, mark with name and app icon</td></tr>
+      <tr><td>Icons</td><td><code>packages/design-system/src/icons/*.svg</code> and <code>sprite.svg</code></td><td>33 icons, only for app use</td></tr>
+      <tr><td>Logo v0</td><td><code>packages/design-system/brand/</code></td><td>Mark, mark with name and app icon</td></tr>
       <tr><td>Base identity</td><td><code>/skiroliro/DESIGN.md</code></td><td>SkiroLiro typography, spacing and general rules</td></tr>
     </tbody></table></div>
 
@@ -327,7 +327,7 @@ h1,h2,h3,h4,p{margin:0}h1,h2,h3{letter-spacing:-.02em;text-wrap:balance}
     <p>Computed contrast: text on background 14.1:1 (light) and 16.1:1 (dark). Secondary text 5.6:1 and 7.2:1. Action on card 5.3:1 (light) and 11.2:1 (dark). Amber warning 5.6:1 and 7.6:1. All above 4.5:1.</p>
 
     <h2>Icons</h2>
-    <ul><li>Each file in <code>icons/</code> is a 24 px SVG with <code>stroke="currentColor"</code>: the colour comes from the surrounding text.</li>
+    <ul><li>Each file in <code>packages/design-system/src/icons/</code> is a 24 px SVG with <code>stroke="currentColor"</code>: the colour comes from the surrounding text.</li>
     <li>On the web, use the sprite: <code>&lt;svg viewBox="0 0 24 24"&gt;&lt;use href="#i-week"/&gt;&lt;/svg&gt;</code> (include <code>sprite.svg</code> once on the page).</li>
     <li>Sizes: 16 (inside chips), 20 (buttons) and 24 (navigation and rows). Stroke always 1.5 px.</li>
     <li>An icon on its own needs an <code>aria-label</code>. In navigation, always with text.</li>
@@ -348,7 +348,7 @@ h1,h2,h3,h4,p{margin:0}h1,h2,h3{letter-spacing:-.02em;text-wrap:balance}
     <ul><li>Mark with the face in the header (30 px), in empty and loading states (40 to 64 px) and as the app icon.</li>
     <li>Minimum mark size: 24 px. Clear space: half the width of the face.</li>
     <li>In dark mode, use <code>wfd-mark-dark.svg</code> (lighter mint). Do not add shadow, rotation or another colour.</li>
-    <li>It is a v0, to be refined. Replace the files in <code>brand/</code> and everything else still applies.</li></ul>
+    <li>It is a v0, to be refined. Replace the files in <code>packages/design-system/brand/</code> and everything else still applies.</li></ul>
 
     <h2>Flow examples</h2>
     <h3>1. Plan a day</h3>

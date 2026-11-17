@@ -44,7 +44,7 @@ Suggested order: E1 → E2 → E3 → E4. E5 can run in parallel once Dino has t
 
 ### 7. Design system package
 - **Goal:** `packages/design-system` with the tokens, icons and base components from the design project.
-- **Acceptance:** `tokens-wfd.css` (palette B, light and dark via `prefers-color-scheme` and `data-theme`) and the SkiroLiro base (Figtree, JetBrains Mono, spacing, radius) exported as CSS custom properties and TypeScript; the icon sprite and `icons/*.svg` available as an `<Icon name>` component; logo files from `brand/` (light and dark); base components: Button (primary, secondary, text, danger), Card, Chip, Checkbox, TextField, TextArea, BottomNav, Avatar, Alert (warning, info, success), Toast, BottomSheet, Dialog; a demo route in `apps/web` shows them in light and dark. Follows brief section 10.
+- **Acceptance:** `tokens-wfd.css` (palette B, light and dark via `prefers-color-scheme` and `data-theme`) and the SkiroLiro base (Figtree, JetBrains Mono, spacing, radius) exported as CSS custom properties and TypeScript; the icon sprite and `packages/design-system/src/icons/*.svg` available as an `<Icon name>` component; logo files from `packages/design-system/brand/` (light and dark); base components: Button (primary, secondary, text, danger), Card, Chip, Checkbox, TextField, TextArea, BottomNav, Avatar, Alert (warning, info, success), Toast, BottomSheet, Dialog; a demo route in `apps/web` shows them in light and dark. Follows brief section 10.
 - **Tests:** component render tests for each variant.
 
 ### 8. App shell and navigation

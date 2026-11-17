@@ -12,10 +12,12 @@ type Placement = "center" | "bottom";
 // The native <dialog> opened with showModal() gives focus trapping, Esc to close,
 // an inert page behind it and focus return, without extra code.
 const Modal = component$<ModalProps & { placement: Placement }>(({ open, title, placement }) => {
-  const titleId = `${useId()}-title`;
+  const id = useId();
+  const titleId = `${id}-title`;
   const dialog = useSignal<HTMLDialogElement>();
 
   // showModal() exists only in the browser, so this runs in a visible task.
+  // eslint-disable-next-line qwik/no-use-visible-task -- no other hook can call showModal()
   useVisibleTask$(
     ({ track }) => {
       const isOpen = track(open);

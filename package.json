@@ -8,8 +8,9 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "test": "pnpm -r --if-present test",
-    "check:deps": "node scripts/check-dependency-sources.mjs"
+    "test": "vitest run",
+    "check:deps": "node scripts/check-dependency-sources.mjs",
+    "test:ui": "vitest --ui"
   },
   "packageManager": "pnpm@12.19.0",
   "devEngines": {
@@ -27,10 +28,13 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.6",
+    "@vitest/ui": "catalog:",
     "eslint": "^10.14.0",
+    "eslint-plugin-qwik": "2.0.0-rc.5",
     "globals": "^17.14.0",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.2"
+    "typescript-eslint": "^8.72.2",
+    "vitest": "catalog:"
   }
 }
