@@ -8,6 +8,12 @@
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "Qwik 2 packages share one release-candidate version (ADR 0011): update them in one PR, never automerged.",
+      "matchPackageNames": ["@qwik.dev/**", "eslint-plugin-qwik"],
+      "groupName": "qwik",
+      "automerge": false
     }
   ]
 }
