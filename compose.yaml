@@ -1,0 +1,27 @@
+# Local development only. Production runs its own PostgreSQL (#23, #24).
+# A fixed name, so every worktree and checkout uses the same container and data.
+name: shared-apps
+
+services:
+  postgres:
+    # Same image as the tests (packages/db/src/testing.ts).
+    image: postgres:18-alpine
+    environment:
+      # Dev-only placeholders; the database listens on this machine only.
+      POSTGRES_USER: shared_apps
+      POSTGRES_PASSWORD: shared_apps
+      POSTGRES_DB: shared_apps
+    ports:
+      # 5433 on the host, so it doesn't clash with a PostgreSQL installed natively on 5432.
+      - "127.0.0.1:5433:5432"
+    volumes:
+      # PostgreSQL 18 images keep data in a versioned folder under /var/lib/postgresql.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shared_apps -d shared_apps"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres-data:

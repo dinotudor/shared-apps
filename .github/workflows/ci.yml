@@ -22,5 +22,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
+      # Database tests start PostgreSQL through Testcontainers; the runner has Docker.
       - run: pnpm test
+      - name: Check that migrations match the schemas
+        run: |
+          # drizzle-kit fails when no schema file exists yet (before the first module).
+          if [ -n "$(find modules packages -path '*/src/schema.ts' -not -path '*/node_modules/*' 2>/dev/null)" ]; then
+            pnpm db:generate
+            git add --intent-to-add packages/db/migrations
+            git diff --exit-code -- packages/db/migrations
+          else
+            echo "No schema.ts yet; nothing to check."
+          fi
       - run: pnpm build

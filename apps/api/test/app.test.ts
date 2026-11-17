@@ -1,14 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { publicProcedure, router } from "@shared-apps/api-core";
+import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
+import type { AppDependencies } from "../src/app.ts";
 
 let app: FastifyInstance | undefined;
 
-const config = { port: 0, host: "127.0.0.1", logLevel: "silent" } as const;
+// No procedure here queries the database, so these tests need no container.
+const database = { db: {} as Database, close: () => Promise.resolve() };
 
-const startApp = async (appRouter?: Parameters<typeof buildApp>[1]) => {
-  app = buildApp(config, appRouter);
+const startApp = async (appRouter?: AppDependencies["router"]) => {
+  app = buildApp(
+    { port: 0, host: "127.0.0.1", logLevel: "silent", databaseUrl: "postgres://unused/unused" },
+    { database, router: appRouter },
+  );
   await app.ready();
   return app;
 };

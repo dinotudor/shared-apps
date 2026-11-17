@@ -1,10 +1,14 @@
+import { createDatabase } from "@shared-apps/db";
 import { buildApp } from "./app.ts";
 import { ConfigError, parseConfig } from "./config.ts";
 import type { Config } from "./config.ts";
+import { runServer } from "./lifecycle.ts";
+
+const SHUTDOWN_TIMEOUT_MS = 10_000;
 
 const loadConfig = (): Config => {
   try {
-    // The only place that reads process.env (ADR 0012).
+    // The only place, with migrate.ts, that reads process.env (ADR 0012).
     return parseConfig(process.env);
   } catch (error) {
     // No logger exists yet, so report on stderr and refuse to start.
@@ -14,24 +18,21 @@ const loadConfig = (): Config => {
 };
 
 const config = loadConfig();
-const app = buildApp(config);
+// Connects lazily: a database that is down shows up on the first query, not here.
+const database = createDatabase(config.databaseUrl, {
+  // A dropped idle connection (database restart, laptop sleep) is logged, not fatal:
+  // the pool reconnects on the next query. `app` exists by the time this can fire,
+  // since no connection opens before the server handles a request.
+  onError: (error) => {
+    app.log.error({ err: error }, "database connection lost");
+  },
+});
+const app = buildApp(config, { database });
 
-for (const signal of ["SIGINT", "SIGTERM"] as const) {
-  process.once(signal, () => {
-    app.log.info({ signal }, "shutting down");
-    app.close().then(
-      () => process.exit(0),
-      (error: unknown) => {
-        app.log.error({ err: error }, "shutdown failed");
-        process.exit(1);
-      },
-    );
-  });
-}
-
-try {
-  await app.listen({ port: config.port, host: config.host });
-} catch (error) {
-  app.log.fatal({ err: error }, "failed to start");
-  process.exit(1);
-}
+await runServer(app, {
+  port: config.port,
+  host: config.host,
+  timeoutMs: SHUTDOWN_TIMEOUT_MS,
+  signals: process,
+  exit: (code) => process.exit(code),
+});

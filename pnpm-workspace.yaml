@@ -16,6 +16,14 @@ allowBuilds:
   # Required by Qwik. Both ship prebuilt binaries.
   sharp: false
   "@parcel/watcher": false
+  # drizzle-kit (dev). The postinstall only checks the platform binary, which
+  # comes in as an optional dependency anyway.
+  esbuild: false
+  # Testcontainers (dev). Native SSH helpers for remote Docker hosts; tests use
+  # the local socket. protobufjs's script is a version check only.
+  cpu-features: false
+  ssh2: false
+  protobufjs: false
 
 # Versions shared by more than one package. Reference them with "catalog:".
 catalog:
