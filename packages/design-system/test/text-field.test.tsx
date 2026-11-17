@@ -37,6 +37,21 @@ describe.each([
     expect(describedBy(control, screen)).toEqual(["Como a família chama", "Dê um nome ao prato."]);
     expect(get(screen, ".wfd-field__error use").getAttribute("href")).toMatch(/#i-alert$/);
   });
+
+  it("keeps descriptions the caller links, after its own", async () => {
+    const { screen } = await render(
+      <div>
+        <p id="rules">Até 40 letras.</p>
+        <Field label="Nome do prato" hint="Opcional" aria-describedby="rules" />
+      </div>,
+    );
+    expect(describedBy(get(screen, tag), screen)).toEqual(["Opcional", "Até 40 letras."]);
+  });
+
+  it("respects aria-invalid set by the caller", async () => {
+    const { screen } = await render(<Field label="Nome do prato" aria-invalid="true" />);
+    expect(get(screen, tag).getAttribute("aria-invalid")).toBe("true");
+  });
 });
 
 describe("TextField", () => {

@@ -18,8 +18,17 @@ const fieldIds = (base: string, { hint, error }: FieldProps): FieldIds => ({
   ...(error ? { error: `${base}-error` } : {}),
 });
 
-const describedBy = (ids: FieldIds): string | undefined =>
-  [ids.hint, ids.error].filter(Boolean).join(" ") || undefined;
+type CallerAria = Pick<PropsOf<"input">, "aria-describedby" | "aria-invalid">;
+
+/**
+ * The field's own description ids (hint, error) followed by any the caller passed,
+ * and the caller's aria-invalid when given, otherwise "true" when there is an error.
+ */
+const ariaFor = (ids: FieldIds, error: string | undefined, caller: CallerAria): CallerAria => ({
+  "aria-describedby":
+    [ids.hint, ids.error, caller["aria-describedby"]].filter(Boolean).join(" ") || undefined,
+  "aria-invalid": caller["aria-invalid"] ?? (error ? "true" : undefined),
+});
 
 const Messages = ({ ids, hint, error }: { ids: FieldIds } & FieldProps) => (
   <>
@@ -58,8 +67,7 @@ export const TextField = component$<TextFieldProps>(
             id={ids.control}
             type={type}
             class="wfd-field__input"
-            aria-invalid={error ? "true" : undefined}
-            aria-describedby={describedBy(ids)}
+            {...ariaFor(ids, error, rest)}
           />
         </div>
         <Messages ids={ids} label={label} hint={hint} error={error} />
@@ -83,8 +91,7 @@ export const TextArea = component$<TextAreaProps>(
           id={ids.control}
           rows={rows}
           class="wfd-field__input wfd-field__input--multiline"
-          aria-invalid={error ? "true" : undefined}
-          aria-describedby={describedBy(ids)}
+          {...ariaFor(ids, error, rest)}
         />
         <Messages ids={ids} label={label} hint={hint} error={error} />
       </div>
