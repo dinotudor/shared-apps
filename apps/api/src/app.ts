@@ -30,11 +30,12 @@ export const buildApp = (
   // Part of startup: if pg-boss can't start, listen() fails and the process exits, so
   // the API never serves without its jobs running (ADR 0004).
   app.addHook("onReady", () => jobs.start());
-  // Fastify runs onClose hooks last-added first, so this order stops the jobs, and lets
-  // running ones finish, before the database pool closes.
+  // preClose runs as soon as close() starts: new requests already get 503, and in-flight
+  // ones keep running. So jobs stop taking work and finish alongside those requests,
+  // instead of after them, and both are done before onClose closes the database pool.
+  app.addHook("preClose", () => jobs.stop());
   // Every app.close() releases the pool: at shutdown, and in tests.
   app.addHook("onClose", () => database.close());
-  app.addHook("onClose", () => jobs.stop());
 
   app.get("/health", () => ({ status: "ok" }));
 
