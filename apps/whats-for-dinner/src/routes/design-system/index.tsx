@@ -12,7 +12,9 @@ import {
   Dialog,
   ICON_NAMES,
   Icon,
+  LoadingState,
   Logo,
+  OfflineNotice,
   StatusMessage,
   TextArea,
   TextField,
@@ -252,6 +254,14 @@ export default component$(() => {
             O que você já viu continua aqui.
           </StatusMessage>
         </Card>
+      </section>
+
+      <section class="stack" aria-labelledby="ds-states">
+        <h2 id="ds-states">LoadingState e OfflineNotice</h2>
+        <Card>
+          <LoadingState />
+        </Card>
+        <OfflineNotice />
       </section>
 
       <section class="stack" aria-labelledby="ds-nav">
