@@ -28,9 +28,15 @@ pnpm install
 docker compose up -d --wait                  # PostgreSQL on 127.0.0.1:5433
 cp apps/api/.env.example apps/api/.env       # points DATABASE_URL at it
 pnpm db:migrate
-pnpm dev        # API on http://127.0.0.1:3000, What's for dinner on http://localhost:5173
-pnpm test       # every package in one Vitest run; pnpm test:ui opens the Vitest UI
+pnpm dev:wfdinner  # API on http://127.0.0.1:3000 and What's for dinner on http://localhost:5173
+pnpm test          # every package in one Vitest run; pnpm test:ui opens the Vitest UI
 ```
+
+Each app has a root `dev:<short-name>` script that starts the API and that app's frontend ([ADR 0003](docs/adr/0003-one-frontend-per-app.md)). The API needs PostgreSQL, so run `docker compose up -d --wait` first. `pnpm dev` starts every app at once.
+
+| App | Script |
+|---|---|
+| What's for dinner | `pnpm dev:wfdinner` |
 
 The home page shows whether the frontend can reach the API. `/design-system/` shows every base component, with a light and dark switch.
 

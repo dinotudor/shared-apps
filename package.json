@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm -r --parallel --if-present dev",
+    "dev:wfdinner": "pnpm --parallel --filter @shared-apps/api --filter @shared-apps/whats-for-dinner dev",
     "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "eslint . && prettier --check .",

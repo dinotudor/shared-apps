@@ -15,6 +15,7 @@ Each collaborator app gets its own frontend in `apps/<app>`, named after the app
 - Shared UI stays in `packages/` (the design system today), so a new frontend starts from shared components, not copies.
 - `apps/api` stays the single backend for every app, as in playbook ADR 0005.
 - Rules about frontends apply to `apps/*` except `apps/api`, so a new app is covered without changing config. Today that means the ESLint rule that keeps the tRPC client in server code.
+- Each app adds a root script `dev:<short-name>` that starts `apps/api` and that app's frontend together, since every frontend needs the API. What's for dinner uses `dev:wfdinner`. `pnpm dev` keeps starting everything.
 
 ## Alternatives considered
 
