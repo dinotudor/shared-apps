@@ -23,9 +23,9 @@ export const Alert = component$<AlertProps>(({ variant, title }) => (
     <Icon name={VARIANTS[variant].icon} size={20} label={VARIANTS[variant].label} />
     <div class="wfd-alert__content">
       {title && <p class="wfd-alert__title">{title}</p>}
-      <p class="wfd-alert__body">
+      <div class="wfd-alert__body">
         <Slot />
-      </p>
+      </div>
     </div>
   </div>
 ));

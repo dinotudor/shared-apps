@@ -20,7 +20,8 @@ describe("Alert", () => {
       expect(get(alert, "use").getAttribute("href")).toMatch(new RegExp(`#i-${icon}$`));
       expect(get(alert, "svg").getAttribute("aria-label")).toBe(spoken);
       expect(get(alert, ".wfd-alert__title").textContent).toBe("Falta ingrediente");
-      expect(get(alert, ".wfd-alert__body").textContent).toBe("Sem arroz em casa.");
+      // A div, not a p, so block content stays valid HTML.
+      expect(get(alert, "div.wfd-alert__body").textContent).toBe("Sem arroz em casa.");
     },
   );
 
