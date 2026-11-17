@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "check:deps": "node scripts/check-dependency-sources.mjs",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "db:generate": "pnpm --filter @shared-apps/db generate",
+    "db:migrate": "pnpm --filter @shared-apps/api db:migrate"
   },
   "packageManager": "pnpm@12.19.0",
   "devEngines": {
