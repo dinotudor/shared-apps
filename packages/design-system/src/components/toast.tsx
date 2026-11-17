@@ -6,6 +6,11 @@ export type ToastProps = {
   open: Signal<boolean>;
   /** Milliseconds before it closes by itself. SkiroLiro asks for 5 to 8 s. */
   duration?: number;
+  /**
+   * Identifies the message shown. Change it when a new message replaces the current
+   * one while the toast is open, so the new message gets its full duration.
+   */
+  messageId?: string | number;
 };
 
 /**
@@ -13,15 +18,28 @@ export type ToastProps = {
  * not a toast. The live region is always in the page, so screen readers announce
  * each new message.
  */
-export const Toast = component$<ToastProps>(({ open, duration = 6000 }) => {
+export const Toast = component$<ToastProps>((props) => {
+  const { open } = props;
   // Paused while the pointer or focus is on the toast, so nobody loses it mid-read
-  // (WCAG 2.2.1). The timer restarts in full when the pause ends.
-  const paused = useSignal(false);
+  // (WCAG 2.2.1). Pointer and focus are tracked apart, so one leaving does not end
+  // the pause while the other is still there. The timer restarts in full afterwards.
+  const hovered = useSignal(false);
+  const focused = useSignal(false);
 
   // A timer is browser-only work, so it runs in a visible task, not during SSR.
   useVisibleTask$(
     ({ track, cleanup }) => {
-      if (!track(open) || track(paused)) return;
+      const isOpen = track(open);
+      const duration = track(() => props.duration ?? 6000);
+      track(() => props.messageId);
+      if (!isOpen) {
+        // pointerleave and focusout never fire on a toast removed while hovered or
+        // focused, so the pause is reset here for the next time it opens.
+        hovered.value = false;
+        focused.value = false;
+        return;
+      }
+      if (track(hovered) || track(focused)) return;
       const timer = setTimeout(() => {
         open.value = false;
       }, duration);
@@ -38,21 +56,21 @@ export const Toast = component$<ToastProps>(({ open, duration = 6000 }) => {
         <div
           class="wfd-toast"
           onFocusIn$={() => {
-            paused.value = true;
+            focused.value = true;
           }}
           onFocusOut$={() => {
-            paused.value = false;
+            focused.value = false;
           }}
           onPointerEnter$={() => {
-            paused.value = true;
+            hovered.value = true;
           }}
           onPointerLeave$={() => {
-            paused.value = false;
+            hovered.value = false;
           }}
         >
-          <p class="wfd-toast__message">
+          <div class="wfd-toast__message">
             <Slot />
-          </p>
+          </div>
           <button
             type="button"
             class="wfd-toast__close"
