@@ -17,6 +17,16 @@ describe("Avatar", () => {
     expect(get(screen, ".wfd-avatar").textContent).toBe("A");
   });
 
+  it.each([
+    ["\u00c9rica \u00c2ngelo", "\u00c9\u00c2"], // precomposed accents
+    ["E\u0301rica A\u0302ngelo", "\u00c9\u00c2"], // combining accents, normalized
+    ["\u{1F469}\u200D\u{1F373} Cozinha", "\u{1F469}\u200D\u{1F373}C"], // ZWJ emoji stays whole
+    ["\u{1F1E7}\u{1F1F7} Brasil", "\u{1F1E7}\u{1F1F7}B"], // flag stays whole
+  ])("takes whole characters for initials of %s", async (name, initials) => {
+    const { screen } = await render(<Avatar name={name} />);
+    expect(get(screen, ".wfd-avatar").textContent).toBe(initials);
+  });
+
   it.each([24, 40, 56] as const)("renders at %i px", async (size) => {
     const { screen } = await render(<Avatar name="Ana" size={size} />);
     expect(get(screen, ".wfd-avatar").classList.contains(`wfd-avatar--${String(size)}`)).toBe(true);
