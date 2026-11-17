@@ -1,0 +1,599 @@
+/*
+ * What's for dinner? design system: fonts, tokens and component styles.
+ * Apps import this one file. Values come only from tokens (brief section 10: no raw hex).
+ * Shapes and sizes follow the prototype in docs/apps/whats-for-dinner/design/wireframes-final.html.
+ */
+@import "@fontsource-variable/figtree";
+@import "@fontsource-variable/jetbrains-mono";
+@import "./tokens.css";
+
+/* Base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--wfd-bg);
+  color: var(--wfd-text);
+  font: 400 var(--sl-text-md) / var(--sl-leading-md) var(--wfd-font-ui);
+}
+
+:focus-visible {
+  outline: 2px solid var(--wfd-action);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Icon: stroke icons that inherit the text colour. */
+
+.wfd-icon {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Logo: show the version that matches the active theme, like the colour tokens. */
+
+.wfd-logo {
+  display: block;
+}
+
+.wfd-logo--dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wfd-logo--light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .wfd-logo--dark {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] .wfd-logo--light {
+  display: none;
+}
+
+:root[data-theme="dark"] .wfd-logo--dark {
+  display: block;
+}
+
+/* Button */
+
+.wfd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-space-2);
+  min-height: 48px;
+  padding: 0 var(--sl-space-5);
+  border: 1.5px solid transparent;
+  border-radius: var(--wfd-radius-md);
+  background: none;
+  font: 600 var(--sl-text-md) / var(--sl-leading-md) var(--wfd-font-ui);
+  cursor: pointer;
+  transition: background-color var(--sl-duration-fast) var(--sl-ease-standard);
+}
+
+.wfd-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.wfd-button--primary {
+  background: var(--wfd-action);
+  color: var(--wfd-on-action);
+  font-weight: 700;
+}
+
+.wfd-button--secondary {
+  border-color: var(--wfd-border-strong);
+  color: var(--wfd-text);
+}
+
+.wfd-button--text {
+  min-height: 44px;
+  padding: 0 var(--sl-space-2);
+  color: var(--wfd-action);
+}
+
+/* Outlined rather than filled: a destructive action is never the default. */
+.wfd-button--danger {
+  border-color: var(--wfd-danger);
+  color: var(--wfd-danger);
+}
+
+.wfd-button--secondary:hover:not(:disabled),
+.wfd-button--text:hover:not(:disabled),
+.wfd-button--danger:hover:not(:disabled) {
+  background: var(--wfd-sunken);
+}
+
+.wfd-button--primary:active:not(:disabled) {
+  background: var(--wfd-confirm);
+}
+
+/* Card */
+
+.wfd-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+  padding: var(--sl-space-4);
+  border: 1px solid var(--wfd-border);
+  border-radius: var(--wfd-radius-xl);
+  background: var(--wfd-surface);
+}
+
+/* Chip */
+
+.wfd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--wfd-border-strong);
+  border-radius: var(--wfd-radius-full);
+  background: var(--wfd-surface);
+  color: var(--wfd-text);
+  font: 600 var(--sl-text-sm) / var(--sl-leading-sm) var(--wfd-font-ui);
+  cursor: pointer;
+}
+
+.wfd-chip[aria-pressed="true"] {
+  border-color: var(--wfd-text);
+  background: var(--wfd-text);
+  color: var(--wfd-bg);
+}
+
+/* Checkbox */
+
+.wfd-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: var(--sl-text-sm);
+  cursor: pointer;
+}
+
+/* The native input stays in place, invisible, so it keeps focus and form behaviour. */
+.wfd-checkbox__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.wfd-checkbox__box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--wfd-border-strong);
+  border-radius: 6px;
+  background: var(--wfd-surface);
+  color: var(--wfd-on-action);
+}
+
+.wfd-checkbox__box .wfd-icon {
+  stroke-width: 2.5;
+  visibility: hidden;
+}
+
+.wfd-checkbox__input:checked + .wfd-checkbox__box {
+  border-color: var(--wfd-action);
+  background: var(--wfd-action);
+}
+
+.wfd-checkbox__input:checked + .wfd-checkbox__box .wfd-icon {
+  visibility: visible;
+}
+
+.wfd-checkbox__input:focus-visible + .wfd-checkbox__box {
+  outline: 2px solid var(--wfd-action);
+  outline-offset: 2px;
+}
+
+.wfd-checkbox__input:disabled ~ * {
+  opacity: 0.5;
+}
+
+.wfd-checkbox__hint {
+  margin-left: auto;
+  color: var(--wfd-text-muted);
+  font-size: var(--sl-text-xs);
+}
+
+/* TextField and TextArea */
+
+.wfd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wfd-field__label {
+  font: 600 var(--sl-text-sm) / var(--sl-leading-sm) var(--wfd-font-ui);
+}
+
+.wfd-field__control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 var(--sl-space-3);
+  border: 1px solid var(--wfd-border-strong);
+  border-radius: var(--wfd-radius-md);
+  background: var(--wfd-surface);
+  color: var(--wfd-text-muted);
+}
+
+.wfd-field__control:focus-within {
+  outline: 2px solid var(--wfd-action);
+  outline-offset: 2px;
+}
+
+.wfd-field__input {
+  width: 100%;
+  min-width: 0;
+  /* Fills the 48 px wrapper, so the whole field is the touch target. */
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  color: var(--wfd-text);
+  font: 400 var(--sl-text-md) / var(--sl-leading-md) var(--wfd-font-ui);
+}
+
+/* The wrapper draws the focus ring for single-line fields. */
+.wfd-field__control .wfd-field__input:focus-visible {
+  outline: none;
+}
+
+.wfd-field__input::placeholder {
+  color: var(--wfd-text-muted);
+}
+
+.wfd-field__input--multiline {
+  min-height: 96px;
+  padding: 10px var(--sl-space-3);
+  border: 1px solid var(--wfd-border-strong);
+  border-radius: var(--wfd-radius-md);
+  background: var(--wfd-surface);
+  resize: vertical;
+}
+
+.wfd-field:has([aria-invalid="true"]) .wfd-field__control,
+.wfd-field__input--multiline[aria-invalid="true"] {
+  border: 2px solid var(--wfd-danger);
+}
+
+.wfd-field__hint,
+.wfd-field__error {
+  margin: 0;
+  font-size: var(--sl-text-xs);
+  line-height: var(--sl-leading-xs);
+}
+
+.wfd-field__hint {
+  color: var(--wfd-text-muted);
+}
+
+.wfd-field__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--wfd-danger);
+  font-weight: 600;
+}
+
+/* BottomNav */
+
+.wfd-bottom-nav {
+  border-top: 1px solid var(--wfd-border);
+  background: var(--wfd-surface);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.wfd-bottom-nav__list {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wfd-bottom-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 64px;
+  color: var(--wfd-text-muted);
+  font: 600 var(--sl-text-xs) / var(--sl-leading-xs) var(--wfd-font-ui);
+  text-decoration: none;
+}
+
+.wfd-bottom-nav__indicator {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 30px;
+  border-radius: var(--wfd-radius-full);
+}
+
+.wfd-bottom-nav__link[aria-current="page"] {
+  color: var(--wfd-action);
+}
+
+/* The pill marks the current item beyond colour. */
+.wfd-bottom-nav__link[aria-current="page"] .wfd-bottom-nav__indicator {
+  background: var(--wfd-selected);
+}
+
+/* Avatar */
+
+.wfd-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--wfd-radius-full);
+  background: var(--wfd-selected);
+  /* Not the action colour of the prototype: action on selected is 4.4:1 in light mode. */
+  color: var(--wfd-text);
+  font-family: var(--wfd-font-ui);
+  font-weight: 700;
+}
+
+.wfd-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wfd-avatar--24 {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.wfd-avatar--32 {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.wfd-avatar--40 {
+  width: 40px;
+  height: 40px;
+  font-size: var(--sl-text-sm);
+}
+
+.wfd-avatar--56 {
+  width: 56px;
+  height: 56px;
+  font-size: var(--sl-text-xl);
+}
+
+/* Alert */
+
+.wfd-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px var(--sl-space-3);
+  border: 1px solid;
+  border-radius: var(--wfd-radius-lg);
+  color: var(--wfd-text);
+}
+
+.wfd-alert .wfd-icon {
+  margin-top: 2px;
+}
+
+.wfd-alert__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.wfd-alert__title {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--sl-text-sm);
+  line-height: var(--sl-leading-sm);
+}
+
+.wfd-alert__body {
+  margin: 0;
+  font-size: var(--sl-text-sm);
+  line-height: var(--sl-leading-sm);
+}
+
+.wfd-alert--warning {
+  border-color: var(--wfd-warning-border);
+  background: var(--wfd-warning-bg);
+}
+
+.wfd-alert--warning .wfd-icon {
+  color: var(--wfd-warning);
+}
+
+.wfd-alert--info {
+  border-color: var(--wfd-info-border);
+  background: var(--wfd-info-bg);
+  color: var(--wfd-info);
+}
+
+.wfd-alert--success {
+  border-color: var(--wfd-success-border);
+  background: var(--wfd-success-bg);
+}
+
+.wfd-alert--success .wfd-icon {
+  color: var(--wfd-success);
+}
+
+/* Toast */
+
+.wfd-toast-region {
+  position: fixed;
+  inset-inline: var(--sl-space-4);
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.wfd-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-2);
+  width: min(100%, 420px);
+  padding: 4px 4px 4px 14px;
+  border-radius: var(--wfd-radius-md);
+  background: var(--wfd-text);
+  color: var(--wfd-bg);
+  box-shadow: var(--sl-shadow-md);
+  pointer-events: auto;
+  animation: wfd-rise var(--sl-duration-base) var(--sl-ease-enter);
+}
+
+.wfd-toast__message {
+  flex: 1;
+  margin: 0;
+  font-size: var(--sl-text-sm);
+  line-height: var(--sl-leading-sm);
+}
+
+.wfd-toast__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--wfd-radius-md);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.wfd-toast__close:focus-visible {
+  outline-color: var(--wfd-bg);
+  outline-offset: -4px;
+}
+
+/* Dialog and BottomSheet */
+
+.wfd-modal {
+  display: none;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  max-height: calc(100dvh - 32px);
+  padding: var(--sl-space-4);
+  overflow: auto;
+  border: 1px solid var(--wfd-border);
+  background: var(--wfd-surface);
+  color: var(--wfd-text);
+  box-shadow: var(--sl-shadow-lg);
+}
+
+.wfd-modal[open] {
+  display: flex;
+}
+
+.wfd-modal::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.wfd-modal--center {
+  width: min(100% - 32px, 400px);
+  border-radius: var(--wfd-radius-xl);
+}
+
+.wfd-modal--bottom {
+  width: 100%;
+  max-width: 560px;
+  margin: auto auto 0;
+  padding-bottom: calc(var(--sl-space-4) + env(safe-area-inset-bottom, 0px));
+  border-width: 1px 0 0;
+  border-radius: 20px 20px 0 0;
+  animation: wfd-rise var(--sl-duration-slow) var(--sl-ease-enter);
+}
+
+.wfd-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-2);
+}
+
+.wfd-modal__title {
+  margin: 0;
+  padding-top: 10px;
+  font-size: var(--sl-text-lg);
+  line-height: var(--sl-leading-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.wfd-modal__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 -10px 0 0;
+  border: 0;
+  border-radius: var(--wfd-radius-md);
+  background: none;
+  color: var(--wfd-text);
+  cursor: pointer;
+}
+
+.wfd-modal__body {
+  color: var(--wfd-text-muted);
+  font-size: var(--sl-text-sm);
+  line-height: var(--sl-leading-sm);
+}
+
+.wfd-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sl-space-2);
+}
+
+.wfd-modal__actions:empty {
+  display: none;
+}
+
+@keyframes wfd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
