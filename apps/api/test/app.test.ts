@@ -1,21 +1,31 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { publicProcedure, router } from "@shared-apps/api-core";
+import { createDatabase } from "@shared-apps/db";
+import { startTestDatabase } from "@shared-apps/db/testing";
+import type { TestDatabase } from "@shared-apps/db/testing";
 import { buildApp } from "../src/app.ts";
+import type { AppDependencies } from "../src/app.ts";
 
 let app: FastifyInstance | undefined;
+let database: TestDatabase | undefined;
 
-const config = { port: 0, host: "127.0.0.1", logLevel: "silent" } as const;
-
-const startApp = async (appRouter?: Parameters<typeof buildApp>[1]) => {
-  app = buildApp(config, appRouter);
+const startApp = async (appRouter?: AppDependencies["router"]) => {
+  database = await startTestDatabase();
+  app = buildApp(
+    { port: 0, host: "127.0.0.1", logLevel: "silent", databaseUrl: database.url },
+    { database: createDatabase(database.url), router: appRouter },
+  );
   await app.ready();
   return app;
 };
 
 afterEach(async () => {
+  // Closing the app also closes its database pool.
   await app?.close();
+  await database?.stop();
   app = undefined;
+  database = undefined;
 });
 
 describe("api", () => {
