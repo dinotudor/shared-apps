@@ -19,3 +19,7 @@ export { Avatar } from "./components/avatar.tsx";
 export type { AvatarProps } from "./components/avatar.tsx";
 export { BottomNav } from "./components/bottom-nav.tsx";
 export type { BottomNavItem, BottomNavProps } from "./components/bottom-nav.tsx";
+export { BottomSheet, Dialog } from "./components/modal.tsx";
+export type { ModalProps } from "./components/modal.tsx";
+export { Toast } from "./components/toast.tsx";
+export type { ToastProps } from "./components/toast.tsx";
