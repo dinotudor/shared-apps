@@ -5,18 +5,20 @@ import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 import type { Context } from "@shared-apps/api-core";
 import type { DatabaseHandle } from "@shared-apps/db";
+import type { JobRunner } from "@shared-apps/jobs";
 import type { Config } from "./config.ts";
 import { appRouter } from "./router.ts";
 
 export type AppDependencies = {
   database: DatabaseHandle;
+  jobs: Pick<JobRunner, "start" | "stop">;
   // A parameter so tests can mount procedures that fail.
   router?: AnyTRPCRouter;
 };
 
 export const buildApp = (
   config: Config,
-  { database, router = appRouter }: AppDependencies,
+  { database, jobs, router = appRouter }: AppDependencies,
 ): FastifyInstance => {
   const app = Fastify({
     logger: { level: config.logLevel },
@@ -25,8 +27,14 @@ export const buildApp = (
     routerOptions: { maxParamLength: 5000 },
   });
 
+  // Part of startup: if pg-boss can't start, listen() fails and the process exits, so
+  // the API never serves without its jobs running (ADR 0004).
+  app.addHook("onReady", () => jobs.start());
+  // Fastify runs onClose hooks last-added first, so this order stops the jobs, and lets
+  // running ones finish, before the database pool closes.
   // Every app.close() releases the pool: at shutdown, and in tests.
   app.addHook("onClose", () => database.close());
+  app.addHook("onClose", () => jobs.stop());
 
   app.get("/health", () => ({ status: "ok" }));
 

@@ -238,6 +238,9 @@ importers:
       '@shared-apps/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@shared-apps/jobs':
+        specifier: workspace:*
+        version: link:../../packages/jobs
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
@@ -250,7 +253,7 @@ importers:
     devDependencies:
       vitest:
         specifier: 'catalog:'
-        version: 5.1.0(@types/node@26.6.6)(@vitest/ui@5.1.0)(vite@8.3.7(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/ui@5.1.0)(vite@8.3.7(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
   apps/whats-for-dinner:
     dependencies:
