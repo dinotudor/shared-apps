@@ -1,6 +1,7 @@
 node_modules/
 dist/
-server/
+# Qwik server build output. Anchored so src/server/ (server-only code) is tracked.
+apps/*/server/
 coverage/
 *.tsbuildinfo
 .DS_Store
