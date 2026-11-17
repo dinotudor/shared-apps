@@ -19,7 +19,7 @@ export default component$(() => {
 
   return (
     <div class="stack">
-      <h1>Início</h1>
+      <h1>Semana</h1>
       {health.value === ApiHealth.Ok ? (
         <Card>
           <p class="row">

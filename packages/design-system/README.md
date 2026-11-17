@@ -16,7 +16,7 @@ import { Button, Icon, tokens, vars } from "@shared-apps/design-system";
 | `@shared-apps/design-system` | Components, `ICON_NAMES` / `IconName`, `tokens` (values), `vars` (`var(--…)` references) |
 | `@shared-apps/design-system/styles.css` | Self-hosted fonts, tokens and component styles. Import it once |
 | `@shared-apps/design-system/tokens.css` | Tokens only |
-| `@shared-apps/design-system/brand/*` | Logo SVGs: `wfd-mark-*`, `wfd-lockup-*` (light and dark), `wfd-app-icon.svg` (app icon, favicon) |
+| `@shared-apps/design-system/brand/*` | Logo SVGs: `wfd-mark-*`, `wfd-lockup-*` (light and dark), `wfd-app-icon.svg` (app icon, favicon), and `wfd-apple-touch-icon.png` (iOS home screen; to regenerate it, see [`brand/README.md`](brand/README.md#regenerating-the-ios-icon)) |
 
 The package ships TypeScript source with no build step. The app's Vite and Qwik setup compiles it.
 
@@ -107,13 +107,21 @@ Follow brief section 10 for the copy: humour is fine in empty states, but never 
 
 A `404.tsx` route only covers paths that match no route. When a route exists but its data doesn't (for example `/pratos/999`), the loader has to set the status itself, with `event.status(404)` or `event.error(404, …)`, and the page renders a StatusMessage.
 
+### LoadingState
+
+`<LoadingState label?="Pensando no jantar…" blocks?={2} />`: a page or section waiting for data. It shows the logo mark, the guide's loading copy and `blocks` placeholder blocks shaped like cards. The whole thing is a polite `role="status"`, so the label is announced once. The blocks are `aria-hidden`. The mark pulses gently, and not at all with `prefers-reduced-motion`.
+
+### OfflineNotice
+
+`<OfflineNotice />`: the brief's offline copy ("Sem conexão. O que você já viu continua aqui.") in a warning Alert with the offline icon. Put it inside a `role="status"` element that is always on the page, and render the notice in it only while offline. A live region inserted together with its content is often not announced. Use a StatusMessage with `icon="offline"` instead when a section has nothing at all to show offline.
+
 ## Accessibility
 
 Checked with the token contrast pairs (WCAG 2.1 AA) and by rendering every component in light and dark mode:
 
 - Text pairs are 4.5:1 or more in both modes, and control borders and icons are 3:1 or more. The prototype's `action` on `selected` is 4.4:1 in light mode, so avatar initials use `text` instead.
 - Every control is a native element (`button`, `a`, `input`, `textarea`, `dialog`), so keyboard support comes with it. Focus is a 2 px `action` ring with a 2 px offset.
-- `prefers-reduced-motion` turns off transitions and the rise animation.
+- `prefers-reduced-motion` turns off transitions, the rise animation and the LoadingState pulse.
 
 ## Open questions
 

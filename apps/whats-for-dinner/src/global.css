@@ -5,12 +5,55 @@
   min-height: 100dvh;
 }
 
+/* Hidden until focused: the first Tab stop on every page. */
+.app__skip {
+  position: absolute;
+  top: var(--sl-space-2);
+  left: var(--sl-space-2);
+  z-index: 10;
+  padding: var(--sl-space-3) var(--sl-space-4);
+  border-radius: var(--wfd-radius-md);
+  background: var(--wfd-action);
+  color: var(--wfd-on-action);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.app__skip:focus {
+  transform: none;
+}
+
 .app__header {
   display: flex;
   align-items: center;
-  padding: var(--sl-space-3) var(--sl-space-4);
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: var(--sl-space-2) var(--sl-space-4);
   border-bottom: 1px solid var(--wfd-border);
   background: var(--wfd-surface);
+}
+
+/* At least 44 px tall to tap (brief section 10). */
+.app__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 0;
+}
+
+.app__home img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Hidden until the browser reports it is offline (useConnectionProvider). The html
+   selector outranks the notice's own display rule, whatever order the stylesheets load. */
+html:not([data-offline]) .app__offline > * {
+  display: none;
+}
+
+html[data-offline] .app__offline {
+  padding: var(--sl-space-3) var(--sl-space-4) 0;
 }
 
 .app__main {
@@ -18,6 +61,12 @@
   width: min(100%, 720px);
   margin: 0 auto;
   padding: var(--sl-space-4);
+}
+
+/* Focus is moved here by script after navigation; no ring for that, only for keyboard. */
+.app__main:focus:not(:focus-visible),
+.app__main h1:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .app__nav {
@@ -65,4 +114,10 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sl-space-1);
+}
+
+.sign-in {
+  align-items: center;
+  padding-top: var(--sl-space-12);
+  text-align: center;
 }

@@ -640,3 +640,51 @@ body {
 .wfd-status__action {
   margin-top: var(--sl-space-2);
 }
+
+/* LoadingState */
+.wfd-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-space-3);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--sl-space-10) var(--sl-space-4);
+}
+
+.wfd-loading__visual {
+  display: inline-flex;
+  animation: wfd-pulse calc(var(--sl-duration-slow) * 3) var(--sl-ease-standard) infinite alternate;
+}
+
+/* The global reduced-motion rule shortens animations; an endless one would flicker. */
+@media (prefers-reduced-motion: reduce) {
+  .wfd-loading__visual {
+    animation: none;
+  }
+}
+
+.wfd-loading__label {
+  margin: 0;
+  color: var(--wfd-text-muted);
+}
+
+.wfd-loading__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  align-self: stretch;
+  margin-top: var(--sl-space-2);
+}
+
+.wfd-skeleton {
+  height: var(--sl-space-12);
+  border-radius: var(--wfd-radius-lg);
+  background: var(--wfd-sunken);
+}
+
+@keyframes wfd-pulse {
+  to {
+    opacity: 0.55;
+  }
+}
