@@ -1,0 +1,16 @@
+{
+  "name": "@shared-apps/api-core",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@trpc/server": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
+  }
+}

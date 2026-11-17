@@ -2,7 +2,7 @@
 
 ## Project
 
-`shared-apps` is the pnpm workspace monorepo for small apps used by a small group of collaborators, built by one developer working with agents. The apps share a design system, sign-in and a database (ADR 0003 in `engineering-playbook`). Stage: the workspace is set up, with no apps, modules or packages yet.
+`shared-apps` is the pnpm workspace monorepo for small apps used by a small group of collaborators, built by one developer working with agents. The apps share a design system, sign-in and a database (ADR 0003 in `engineering-playbook`). Stage: `apps/api` and `packages/api-core` are scaffolded; no modules yet.
 
 ## Shared guidelines
 
