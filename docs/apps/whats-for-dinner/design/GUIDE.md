@@ -6,8 +6,7 @@ The full version, with tables and flow examples, is in the **Guide** tab of `wir
 - `wireframes-final.html`: Play (clickable prototype), Wireframes, Plan, Guide, Logo and colours, Icons.
 - `PLAN.md`: scope, product rules, decisions.
 - `tokens-wfd.css`: palette B `--wfd-*` variables, light and dark.
-- `icons/`: 33 SVG icons (24 grid, 1.5 stroke, `currentColor`) and `sprite.svg`.
-- `brand/`: logo v0.
+- Icons and logo v0: in the design-system package (`packages/design-system/src/icons/`, `packages/design-system/brand/`).
 
 ## Rules
 - Use semantic colour roles, not hex.
