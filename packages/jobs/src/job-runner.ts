@@ -94,12 +94,17 @@ export const createJobRunner = ({
       for (const job of [...jobs, ...schedules.map((schedule) => schedule.job)]) {
         workers.set(job.name, job);
       }
-      // Left out when not given: pg-boss rejects an explicit `undefined`.
-      const workOptions = pollingIntervalSeconds === undefined ? {} : { pollingIntervalSeconds };
+      // One job per fetch, set explicitly: pg-boss settles a batch as a whole, so with
+      // several jobs one failure would retry the ones that succeeded and skip the rest.
+      // pollingIntervalSeconds is left out when not given: pg-boss rejects an explicit `undefined`.
+      const workOptions = {
+        batchSize: 1,
+        ...(pollingIntervalSeconds === undefined ? {} : { pollingIntervalSeconds }),
+      };
       for (const job of workers.values()) {
         await boss.createQueue(job.name);
-        await boss.work<object>(job.name, workOptions, async (batch) => {
-          for (const { id, data } of batch) await run(job, id, data);
+        await boss.work<object>(job.name, workOptions, async ([{ id, data }]) => {
+          await run(job, id, data);
         });
       }
       // An upsert: restarting the API, or running several instances, keeps one schedule each.
