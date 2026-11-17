@@ -241,20 +241,11 @@ importers:
       '@qwik.dev/core':
         specifier: 2.0.0-rc.5
         version: 2.0.0-rc.5(@oxc-project/types@0.156.0)(prettier@3.9.10)(rolldown@1.2.18)(vite@8.3.7(@types/node@26.6.6))(vitest@5.1.0(@types/node@26.6.6)(vite@8.3.7(@types/node@26.6.6)))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      prettier:
-        specifier: ^3.9.10
-        version: 3.9.10
-      typescript:
-        specifier: ~6.0.3
-        version: 6.0.3
       vite:
         specifier: ^8.3.0
         version: 8.3.7(@types/node@26.6.6)
       vitest:
-        specifier: ^5.1.0
+        specifier: 'catalog:'
         version: 5.1.0(@types/node@26.6.6)(vite@8.3.7(@types/node@26.6.6))
 
 packages:

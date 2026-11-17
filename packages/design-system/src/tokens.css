@@ -26,8 +26,7 @@
   --sl-shadow-lg: 0 12px 32px rgba(14, 27, 46, 0.14);
   color-scheme: light;
   --wfd-font-ui: "Figtree Variable", Figtree, system-ui, sans-serif;
-  --wfd-font-mono:
-    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+  --wfd-font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
   --wfd-radius-sm: 4px;
   --wfd-radius-md: 12px;
   --wfd-radius-lg: 14px;

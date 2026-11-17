@@ -25,10 +25,7 @@
   },
   "devDependencies": {
     "@qwik.dev/core": "2.0.0-rc.5",
-    "@types/node": "^26.6.6",
-    "prettier": "^3.9.10",
-    "typescript": "~6.0.3",
     "vite": "^8.3.0",
-    "vitest": "^5.1.0"
+    "vitest": "catalog:"
   }
 }
