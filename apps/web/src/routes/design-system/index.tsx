@@ -13,6 +13,7 @@ import {
   ICON_NAMES,
   Icon,
   Logo,
+  StatusMessage,
   TextArea,
   TextField,
   Toast,
@@ -228,6 +229,28 @@ export default component$(() => {
             <Button onClick$={closeSheet}>Escolher prato</Button>
           </div>
         </BottomSheet>
+      </section>
+
+      <section class="stack" aria-labelledby="ds-status">
+        <h2 id="ds-status">StatusMessage</h2>
+        <Card>
+          <StatusMessage icon="search" title="Página não encontrada" level={3}>
+            Este endereço não existe ou mudou.
+            <Button q:slot="action" variant="secondary">
+              Voltar ao início
+            </Button>
+          </StatusMessage>
+        </Card>
+        <Card>
+          <StatusMessage title="Nenhum prato ainda" level={3}>
+            A família ainda não salvou nenhum prato. Que tal o primeiro?
+          </StatusMessage>
+        </Card>
+        <Card>
+          <StatusMessage icon="offline" title="Sem conexão" level={3}>
+            O que você já viu continua aqui.
+          </StatusMessage>
+        </Card>
       </section>
 
       <section class="stack" aria-labelledby="ds-nav">
