@@ -8,7 +8,12 @@ import { appRouter } from "./router.ts";
 import type { AppRouter } from "./router.ts";
 
 export const buildApp = (config: Config): FastifyInstance => {
-  const app = Fastify({ logger: { level: config.logLevel } });
+  const app = Fastify({
+    logger: { level: config.logLevel },
+    // Batched tRPC calls put every procedure name in one path segment
+    // (/trpc/a,b,c); Fastify's default limit of 100 characters rejects them.
+    routerOptions: { maxParamLength: 5000 },
+  });
 
   app.get("/health", () => ({ status: "ok" }));
 

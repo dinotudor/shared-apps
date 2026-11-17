@@ -33,4 +33,17 @@ describe("api", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({ result: { data: { ok: true } } });
   });
+
+  it("answers batched tRPC calls whose combined path is long", async () => {
+    const api = await startApp();
+    const calls = 12; // "health.ping" × 12 joined by commas is longer than 100 characters
+
+    const response = await api.inject({
+      method: "GET",
+      url: `/trpc/${Array<string>(calls).fill("health.ping").join(",")}?batch=1`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual(Array(calls).fill({ result: { data: { ok: true } } }));
+  });
 });
