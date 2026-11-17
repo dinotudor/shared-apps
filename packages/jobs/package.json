@@ -1,0 +1,17 @@
+{
+  "name": "@shared-apps/jobs",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "pg-boss": "^12.38.2"
+  },
+  "devDependencies": {
+    "@shared-apps/db": "workspace:*",
+    "vitest": "catalog:"
+  }
+}
