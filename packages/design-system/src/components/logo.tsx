@@ -12,7 +12,7 @@ const FILES = {
 
 export type LogoProps = {
   /** `mark`: the face only (header, empty and loading states). `lockup`: face and name. */
-  kind: "mark" | "lockup";
+  variant: "mark" | "lockup";
   /** Height in px. The header uses the 30 px default. */
   height?: number;
   /** Empty alt text, for when the app name is already visible next to the logo. */
@@ -21,8 +21,8 @@ export type LogoProps = {
 
 // Both versions are rendered; styles.css shows the one that matches the active theme
 // (system preference or data-theme), the same rule the colour tokens follow.
-export const Logo = component$<LogoProps>(({ kind, height = 30, decorative = false }) => {
-  const files = FILES[kind];
+export const Logo = component$<LogoProps>(({ variant, height = 30, decorative = false }) => {
+  const files = FILES[variant];
   const width = Math.round(height * files.ratio);
   const alt = decorative ? "" : "What's for dinner?";
   return (

@@ -7,14 +7,14 @@ describe("Alert", () => {
     ["warning", "alert", "Atenção"],
     ["info", "info", "Informação"],
     ["success", "check", "Sucesso"],
-  ] as const)("renders the %s tone with its own icon and a spoken tone name", async (tone, icon, spoken) => {
+  ] as const)("renders the %s variant with its own icon and a spoken name", async (variant, icon, spoken) => {
     const { screen } = await render(
-      <Alert tone={tone} title="Falta ingrediente">
+      <Alert variant={variant} title="Falta ingrediente">
         Sem arroz em casa.
       </Alert>,
     );
     const alert = get(screen, ".wfd-alert");
-    expect(alert.classList.contains(`wfd-alert--${tone}`)).toBe(true);
+    expect(alert.classList.contains(`wfd-alert--${variant}`)).toBe(true);
     expect(get(alert, "use").getAttribute("href")).toMatch(new RegExp(`#i-${icon}$`));
     expect(get(alert, "svg").getAttribute("aria-label")).toBe(spoken);
     expect(get(alert, ".wfd-alert__title").textContent).toBe("Falta ingrediente");
@@ -22,7 +22,7 @@ describe("Alert", () => {
   });
 
   it("can be just a line of text", async () => {
-    const { screen } = await render(<Alert tone="info">Sem conexão.</Alert>);
+    const { screen } = await render(<Alert variant="info">Sem conexão.</Alert>);
     expect(all(screen, ".wfd-alert__title")).toHaveLength(0);
   });
 });

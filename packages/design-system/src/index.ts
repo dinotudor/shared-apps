@@ -13,7 +13,7 @@ export { Checkbox } from "./components/checkbox.tsx";
 export type { CheckboxProps } from "./components/checkbox.tsx";
 export { TextArea, TextField } from "./components/text-field.tsx";
 export type { TextAreaProps, TextFieldProps } from "./components/text-field.tsx";
-export { Alert, AlertTone } from "./components/alert.tsx";
+export { Alert, AlertVariant } from "./components/alert.tsx";
 export type { AlertProps } from "./components/alert.tsx";
 export { Avatar } from "./components/avatar.tsx";
 export type { AvatarProps } from "./components/avatar.tsx";
