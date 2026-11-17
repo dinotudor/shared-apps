@@ -1,4 +1,5 @@
 import { component$ } from "@qwik.dev/core";
+import type { Component, PropsOf } from "@qwik.dev/core";
 import { Icon, type IconName } from "./icon.tsx";
 
 export type BottomNavItem = { href: string; label: string; icon: IconName };
@@ -10,6 +11,11 @@ export type BottomNavProps = {
   current?: string;
   /** Name of the navigation landmark. */
   label?: string;
+  /**
+   * Renders each link instead of a plain `<a>`, such as Qwik Router's `Link` for client-side
+   * navigation. It receives the anchor attributes and must render an `<a>` with them.
+   */
+  link?: Component<PropsOf<"a">>;
 };
 
 /** "/pratos/" and "/pratos" are the same page (Qwik Router adds trailing slashes). */
@@ -29,26 +35,41 @@ const currentHref = (items: BottomNavItem[], current: string | undefined) => {
     .sort((a, b) => b.length - a.length)[0];
 };
 
-// Plain links: the package does not depend on the router. The current item gets a
-// pill behind its icon as well as the action colour, so state is not colour alone.
+const linkProps = (item: BottomNavItem, active: string | undefined): PropsOf<"a"> => ({
+  class: "wfd-bottom-nav__link",
+  href: item.href,
+  "aria-current": normalize(item.href) === active ? "page" : undefined,
+});
+
+const LinkContent = component$<{ item: BottomNavItem }>(({ item }) => (
+  <>
+    <span class="wfd-bottom-nav__indicator">
+      <Icon name={item.icon} />
+    </span>
+    {item.label}
+  </>
+));
+
+// Plain links unless the app passes `link`: the package does not depend on the router.
+// The current item gets a pill behind its icon as well as the action colour, so state
+// is not colour alone.
 export const BottomNav = component$<BottomNavProps>(
-  ({ items, current, label = "Navegação principal" }) => {
+  ({ items, current, label = "Navegação principal", link: Link }) => {
     const active = currentHref(items, current);
     return (
       <nav class="wfd-bottom-nav" aria-label={label}>
         <ul class="wfd-bottom-nav__list">
           {items.map((item) => (
             <li key={item.href}>
-              <a
-                class="wfd-bottom-nav__link"
-                href={item.href}
-                aria-current={normalize(item.href) === active ? "page" : undefined}
-              >
-                <span class="wfd-bottom-nav__indicator">
-                  <Icon name={item.icon} />
-                </span>
-                {item.label}
-              </a>
+              {Link ? (
+                <Link {...linkProps(item, active)}>
+                  <LinkContent item={item} />
+                </Link>
+              ) : (
+                <a {...linkProps(item, active)}>
+                  <LinkContent item={item} />
+                </a>
+              )}
             </li>
           ))}
         </ul>
