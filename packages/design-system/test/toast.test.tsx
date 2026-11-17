@@ -46,4 +46,13 @@ describe("Toast", () => {
     await waitFor(() => get(screen, "[data-open]").getAttribute("data-open") === "false");
     expect(all(screen, ".wfd-toast")).toHaveLength(0);
   });
+
+  it("does not close by itself while the pointer or focus is on it", async () => {
+    const { screen, userEvent } = await render(<Harness duration={20} />);
+    await userEvent(get(screen, ".wfd-toast"), "focusin");
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    expect(get(screen, "[data-open]").getAttribute("data-open")).toBe("true");
+    await userEvent(get(screen, ".wfd-toast"), "focusout");
+    await waitFor(() => get(screen, "[data-open]").getAttribute("data-open") === "false");
+  });
 });

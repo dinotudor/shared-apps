@@ -1,4 +1,4 @@
-import { component$, Slot, useVisibleTask$, type Signal } from "@qwik.dev/core";
+import { component$, Slot, useSignal, useVisibleTask$, type Signal } from "@qwik.dev/core";
 import { Icon } from "./icon.tsx";
 
 export type ToastProps = {
@@ -14,10 +14,14 @@ export type ToastProps = {
  * each new message.
  */
 export const Toast = component$<ToastProps>(({ open, duration = 6000 }) => {
+  // Paused while the pointer or focus is on the toast, so nobody loses it mid-read
+  // (WCAG 2.2.1). The timer restarts in full when the pause ends.
+  const paused = useSignal(false);
+
   // A timer is browser-only work, so it runs in a visible task, not during SSR.
   useVisibleTask$(
     ({ track, cleanup }) => {
-      if (!track(open)) return;
+      if (!track(open) || track(paused)) return;
       const timer = setTimeout(() => {
         open.value = false;
       }, duration);
@@ -29,7 +33,21 @@ export const Toast = component$<ToastProps>(({ open, duration = 6000 }) => {
   return (
     <div class="wfd-toast-region" role="status">
       {open.value && (
-        <div class="wfd-toast">
+        <div
+          class="wfd-toast"
+          onFocusIn$={() => {
+            paused.value = true;
+          }}
+          onFocusOut$={() => {
+            paused.value = false;
+          }}
+          onPointerEnter$={() => {
+            paused.value = true;
+          }}
+          onPointerLeave$={() => {
+            paused.value = false;
+          }}
+        >
           <p class="wfd-toast__message">
             <Slot />
           </p>
