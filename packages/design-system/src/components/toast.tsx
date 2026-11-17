@@ -27,6 +27,7 @@ export const Toast = component$<ToastProps>((props) => {
   const focused = useSignal(false);
 
   // A timer is browser-only work, so it runs in a visible task, not during SSR.
+  // eslint-disable-next-line qwik/no-use-visible-task -- the timer must start without a user event
   useVisibleTask$(
     ({ track, cleanup }) => {
       const isOpen = track(open);
