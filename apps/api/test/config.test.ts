@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import { ConfigError, parseConfig } from "../src/config.ts";
 
 describe("parseConfig", () => {
-  it("applies defaults when optional variables are missing", () => {
-    expect(parseConfig({})).toEqual({ port: 3000, host: "0.0.0.0", logLevel: "info" });
+  it("applies defaults when optional variables are missing, listening on localhost only", () => {
+    expect(parseConfig({})).toEqual({ port: 3000, host: "127.0.0.1", logLevel: "info" });
   });
 
   it("reads PORT, HOST and LOG_LEVEL from the environment", () => {
-    expect(parseConfig({ PORT: "8080", HOST: "127.0.0.1", LOG_LEVEL: "debug" })).toEqual({
+    expect(parseConfig({ PORT: "8080", HOST: "0.0.0.0", LOG_LEVEL: "debug" })).toEqual({
       port: 8080,
-      host: "127.0.0.1",
+      host: "0.0.0.0",
       logLevel: "debug",
     });
   });
@@ -28,5 +28,9 @@ describe("parseConfig", () => {
 
   it("rejects an empty PORT instead of treating it as port 0", () => {
     expect(() => parseConfig({ PORT: "" })).toThrow(ConfigError);
+  });
+
+  it("rejects an empty HOST instead of falling back to the default", () => {
+    expect(() => parseConfig({ HOST: "" })).toThrow(ConfigError);
   });
 });

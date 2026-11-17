@@ -2,7 +2,9 @@ import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65_535).default(3000),
-  HOST: z.string().min(1).default("0.0.0.0"),
+  // Localhost by default so a dev machine doesn't expose the API to its network.
+  // Containers set HOST=0.0.0.0.
+  HOST: z.string().min(1).default("127.0.0.1"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
 });
 
