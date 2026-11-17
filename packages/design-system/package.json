@@ -1,0 +1,33 @@
+{
+  "name": "@shared-apps/design-system",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css",
+    "./tokens.css": "./src/tokens.css",
+    "./brand/*": "./brand/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "tokens": "node scripts/write-tokens-css.ts"
+  },
+  "peerDependencies": {
+    "@qwik.dev/core": "2.0.0-rc.5"
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0"
+  },
+  "devDependencies": {
+    "@qwik.dev/core": "2.0.0-rc.5",
+    "@types/node": "^26.6.6",
+    "prettier": "^3.9.10",
+    "vite": "^8.3.0",
+    "vitest": "^5.1.0"
+  }
+}
