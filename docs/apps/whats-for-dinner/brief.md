@@ -97,7 +97,7 @@ Derived, not stored: times cooked, family average, fed-up users, vote notices.
 Follows `engineering-playbook` (accepted ADRs 0001–0013):
 
 - pnpm workspace monorepo; Node pinned with `devEngines`; TypeScript run natively.
-- `apps/web`: Qwik 2. Calls the API only from server code. No business logic.
+- `apps/whats-for-dinner`: Qwik 2, this app's own frontend (project ADR 0003). Calls the API only from server code. No business logic.
 - `apps/api`: Fastify 5 + tRPC, a modular monolith built from `modules/*` (router, service, repository each).
 - PostgreSQL + Drizzle. Better Auth sessions in PostgreSQL. pg-boss inside the API for jobs.
 - Proposed: hosting on one VPS with Kamal 2 (playbook ADR 0014, not yet accepted).

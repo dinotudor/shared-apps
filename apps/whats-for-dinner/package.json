@@ -1,5 +1,5 @@
 {
-  "name": "@shared-apps/web",
+  "name": "@shared-apps/whats-for-dinner",
   "private": true,
   "type": "module",
   "scripts": {
