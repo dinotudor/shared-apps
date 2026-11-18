@@ -32,6 +32,9 @@ catalog:
   # Client and server must stay on the same version.
   "@trpc/client": ^11.26.0
   "@trpc/server": ^11.26.0
+  # packages/db and packages/auth (schema and repository) must share one version: Drizzle
+  # table objects only work with the drizzle-orm instance that created the database.
+  drizzle-orm: ^0.45.4
   vite: ^8.3.0
   # Keep @vitest/ui on the same version as vitest.
   "@vitest/ui": ^5.1.0
