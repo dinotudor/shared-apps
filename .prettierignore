@@ -2,3 +2,5 @@ pnpm-lock.yaml
 # Prose, partly copied from engineering-playbook templates; keep it as written there.
 *.md
 docs/
+# Written by drizzle-kit on every `pnpm db:generate`; formatting them would be undone.
+packages/db/migrations/meta/
