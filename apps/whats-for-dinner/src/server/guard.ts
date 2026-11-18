@@ -2,9 +2,8 @@ import type { RequestEvent, RequestEventBase } from "@qwik.dev/router";
 import type { GetViewer, Viewer } from "./viewer.ts";
 
 /**
- * Where signed-out visitors go, with `?next=<page>`. When #15 sends people back after
- * sign-in, it must check `next` first: only a same-origin path (starts with "/", not "//",
- * no scheme) is safe to redirect to. Anything else makes this an open redirect.
+ * Where signed-out visitors go, with `?next=<page>`. Sign-in sends people back to `next`
+ * only through safeNext() (auth.ts), which keeps it on this site.
  */
 export const SIGN_IN_PATH = "/sign-in/";
 
@@ -27,7 +26,7 @@ const requestedPage = (url: URL): string => {
 /**
  * Runs before every page: sends signed-out visitors to sign-in and keeps the viewer in
  * sharedMap, so loaders read it without asking for it again. `next` holds the page they
- * asked for, so sign-in (#15) can return them to it.
+ * asked for, so sign-in can return them to it.
  *
  * Client-side navigation fetches data from `<page>/q-loader-<id>.<hash>.json`. Qwik Router
  * (2.0.0-rc.5) trims that suffix, and `q-route.json`, from `event.url` before onRequest

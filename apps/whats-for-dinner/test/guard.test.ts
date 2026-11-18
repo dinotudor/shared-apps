@@ -3,7 +3,7 @@ import type { RequestEvent } from "@qwik.dev/router";
 import { requireViewer, viewerFrom } from "../src/server/guard.ts";
 import type { Viewer } from "../src/server/viewer.ts";
 
-const ANA: Viewer = { id: "user-1", name: "Ana Teste" };
+const ANA: Viewer = { id: "user-1", name: "Ana Teste", role: "member" };
 
 // Only the parts of the request event the guard uses. redirect() returns the value
 // Qwik expects the handler to throw, so the fake returns something easy to compare.

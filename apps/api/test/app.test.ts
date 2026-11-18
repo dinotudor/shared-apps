@@ -7,19 +7,19 @@ import type { AppDependencies } from "../src/app.ts";
 
 let app: FastifyInstance | undefined;
 
-const config = {
-  port: 0,
-  host: "127.0.0.1",
-  logLevel: "silent",
-  databaseUrl: "postgres://unused/unused",
-} as const;
+const config = { logLevel: "silent" } as const;
 
 // No procedure here queries the database or sends a job, so these tests need no container.
 const database = { db: {} as Database, close: () => Promise.resolve() };
 const jobs = { start: () => Promise.resolve(), stop: () => Promise.resolve() };
+// Nobody is signed in, and nothing here goes through /api/auth.
+const auth = {
+  handler: () => Promise.resolve(new Response(null, { status: 404 })),
+  getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
+};
 
 const startApp = async (appRouter?: AppDependencies["router"]) => {
-  app = buildApp(config, { database, jobs, router: appRouter });
+  app = buildApp(config, { database, jobs, auth, router: appRouter });
   await app.ready();
   return app;
 };
@@ -95,7 +95,7 @@ describe("api", () => {
 describe("background jobs", () => {
   it("starts the job runner when the app is ready", async () => {
     const start = vi.fn(() => Promise.resolve());
-    app = buildApp(config, { database, jobs: { ...jobs, start } });
+    app = buildApp(config, { database, auth, jobs: { ...jobs, start } });
 
     await app.ready();
 
@@ -104,7 +104,11 @@ describe("background jobs", () => {
 
   it("does not start when the job runner can't start", async () => {
     const failure = new Error("connect ECONNREFUSED");
-    app = buildApp(config, { database, jobs: { ...jobs, start: () => Promise.reject(failure) } });
+    app = buildApp(config, {
+      database,
+      auth,
+      jobs: { ...jobs, start: () => Promise.reject(failure) },
+    });
 
     await expect(app.ready()).rejects.toBe(failure);
   });
@@ -114,6 +118,7 @@ describe("background jobs", () => {
     app = buildApp(config, {
       database: { ...database, close: () => Promise.resolve(void calls.push("database")) },
       jobs: { ...jobs, stop: () => Promise.resolve(void calls.push("jobs")) },
+      auth,
     });
     await app.ready();
 

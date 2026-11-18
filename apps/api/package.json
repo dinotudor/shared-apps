@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@shared-apps/auth": "workspace:*",
     "@shared-apps/api-core": "workspace:*",
     "@shared-apps/db": "workspace:*",
     "@shared-apps/jobs": "workspace:*",
@@ -19,6 +20,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "drizzle-orm": "catalog:"
   }
 }

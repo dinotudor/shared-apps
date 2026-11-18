@@ -9,10 +9,14 @@ import { runServer } from "../src/lifecycle.ts";
 const setUp = () => {
   const closeDatabase = vi.fn(() => Promise.resolve());
   const app = buildApp(
-    { port: 0, host: "127.0.0.1", logLevel: "silent", databaseUrl: "postgres://unused/unused" },
+    { logLevel: "silent" },
     {
       database: { db: {} as Database, close: closeDatabase },
       jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
+      auth: {
+        handler: () => Promise.resolve(new Response(null, { status: 404 })),
+        getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
+      },
     },
   );
   const signals = new EventEmitter();

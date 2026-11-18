@@ -33,6 +33,12 @@
   background: var(--wfd-surface);
 }
 
+.app__account {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-2);
+}
+
 /* At least 44 px tall to tap (brief section 10). */
 .app__home {
   display: inline-flex;
@@ -120,4 +126,8 @@ html[data-offline] .app__offline {
   align-items: center;
   padding-top: var(--sl-space-12);
   text-align: center;
+}
+
+.sign-in .wfd-alert {
+  text-align: start;
 }

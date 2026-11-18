@@ -1,10 +1,11 @@
 import { component$, Slot, sync$, useSignal, useVisibleTask$ } from "@qwik.dev/core";
-import { Link, routeLoader$, useLocation } from "@qwik.dev/router";
+import { Form, Link, routeAction$, routeLoader$, useLocation } from "@qwik.dev/router";
 import type { RequestHandler } from "@qwik.dev/router";
-import { Avatar, Logo, OfflineNotice } from "@shared-apps/design-system";
+import { Avatar, Button, Logo, OfflineNotice } from "@shared-apps/design-system";
 import { AppNav } from "../components/app-nav.tsx";
 import { useConnectionProvider } from "../connection.ts";
-import { requireViewer, viewerFrom } from "../server/guard.ts";
+import { signOut } from "../server/auth.ts";
+import { requireViewer, SIGN_IN_PATH, viewerFrom } from "../server/guard.ts";
 import { getViewer } from "../server/viewer.ts";
 import "../global.css";
 
@@ -15,6 +16,13 @@ export const onRequest: RequestHandler = (event) => requireViewer(event, getView
 export const useViewer = routeLoader$((event) => {
   const viewer = viewerFrom(event);
   return viewer ? { name: viewer.name } : null;
+});
+
+export const useSignOut = routeAction$(async (_, event) => {
+  await signOut(event);
+  // Qwik ends the request when the redirect is thrown.
+  // eslint-disable-next-line @typescript-eslint/only-throw-error
+  throw event.redirect(302, SIGN_IN_PATH);
 });
 
 /**
@@ -54,6 +62,7 @@ const focusMain = sync$(() => {
 export default component$(() => {
   const viewer = useViewer();
   const location = useLocation();
+  const signOutAction = useSignOut();
   useConnectionProvider();
   useFocusOnNavigation();
 
@@ -75,7 +84,15 @@ export default component$(() => {
         <Link href="/" class="app__home">
           <Logo variant="lockup" height={30} />
         </Link>
-        <Avatar name={viewer.value.name} size={32} />
+        <div class="app__account">
+          <Avatar name={viewer.value.name} size={32} />
+          {/* A full-page post, so the cleared cookie and the sign-in page arrive together. */}
+          <Form action={signOutAction} reloadDocument>
+            <Button type="submit" variant="text">
+              Sign out
+            </Button>
+          </Form>
+        </div>
       </header>
       {/* Always on the page, so the notice is announced when it appears. CSS shows it
           while <html> has data-offline (see useConnectionProvider). */}

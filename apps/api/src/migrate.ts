@@ -1,13 +1,13 @@
 // `pnpm db:migrate`: applies pending migrations, then exits. It lives in the deployed
 // app so a release can migrate before the new version serves traffic (#24).
 import { createDatabase, migrate } from "@shared-apps/db";
-import { ConfigError, parseConfig } from "./config.ts";
-import type { Config } from "./config.ts";
+import { ConfigError, parseMigrateConfig } from "./config.ts";
+import type { MigrateConfig } from "./config.ts";
 
-const loadConfig = (): Config => {
+const loadConfig = (): MigrateConfig => {
   try {
-    // Same validation as the server, so both agree on what a valid environment is.
-    return parseConfig(process.env);
+    // The server's rule for DATABASE_URL, without the variables only the server needs.
+    return parseMigrateConfig(process.env);
   } catch (error) {
     console.error(error instanceof ConfigError ? error.message : error);
     process.exit(1);

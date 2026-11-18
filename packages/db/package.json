@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "drizzle-orm": "^0.45.4",
+    "drizzle-orm": "catalog:",
     "pg": "^8.23.1"
   },
   "devDependencies": {

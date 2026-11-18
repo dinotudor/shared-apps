@@ -26,7 +26,7 @@ You need [pnpm](https://pnpm.io/installation) 12 and Docker. pnpm downloads the 
 ```sh
 pnpm install
 docker compose up -d --wait                  # PostgreSQL on 127.0.0.1:5433
-cp apps/api/.env.example apps/api/.env       # points DATABASE_URL at it
+cp apps/api/.env.example apps/api/.env       # points DATABASE_URL at it; fill in the sign-in values
 pnpm db:migrate
 pnpm dev:wfdinner  # API on http://127.0.0.1:3000 and What's for dinner on http://localhost:5173
 pnpm test          # every package in one Vitest run; pnpm test:ui opens the Vitest UI
@@ -37,6 +37,8 @@ Each app has a root `dev:<short-name>` script that starts the API and that app's
 | App | Script |
 |---|---|
 | What's for dinner | `pnpm dev:wfdinner` |
+
+Every page except sign-in needs a signed-in collaborator. To sign in locally, fill in the Google OAuth client, `BETTER_AUTH_SECRET` and your email in `AUTH_ALLOWED_EMAILS` in `apps/api/.env`. Then open the app at `http://localhost:5173`, not `127.0.0.1`: the session cookie is set for `localhost` ([ADR 0005](docs/adr/0005-sign-in-across-the-api-and-frontends.md)).
 
 The home page shows whether the frontend can reach the API. `/design-system/` shows every base component, with a light and dark switch.
 
