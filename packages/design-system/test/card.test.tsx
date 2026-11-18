@@ -15,7 +15,7 @@ describe("Card", () => {
   });
 
   it("can be an article or a section for landmarks and lists", async () => {
-    const { screen } = await render(<Card as="article">Prato</Card>);
+    const { screen } = await render(<Card as="article">Dish</Card>);
     expect(get(screen, ".wfd-card").tagName.toLowerCase()).toBe("article");
   });
 });

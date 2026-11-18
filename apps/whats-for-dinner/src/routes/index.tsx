@@ -19,17 +19,17 @@ export default component$(() => {
 
   return (
     <div class="stack">
-      <h1>Semana</h1>
+      <h1>Week</h1>
       {health.value === ApiHealth.Ok ? (
         <Card>
           <p class="row">
-            <Icon name="check" label="Sucesso" />
-            API conectada.
+            <Icon name="check" label="Success" />
+            API connected.
           </p>
         </Card>
       ) : (
-        <Alert variant="warning" title="API indisponível">
-          Não foi possível falar com a API. Tente de novo em instantes.
+        <Alert variant="warning" title="API unavailable">
+          Couldn't reach the API. Please try again in a moment.
         </Alert>
       )}
     </div>

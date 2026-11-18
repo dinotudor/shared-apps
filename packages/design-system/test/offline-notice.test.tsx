@@ -6,8 +6,10 @@ describe("OfflineNotice", () => {
   it("shows the brief's offline copy, without humour", async () => {
     const { screen } = await render(<OfflineNotice />);
     const notice = get(screen, ".wfd-alert");
-    expect(get(notice, ".wfd-alert__title").textContent).toBe("Sem conexão.");
-    expect(get(notice, ".wfd-alert__body").textContent).toBe("O que você já viu continua aqui.");
+    expect(get(notice, ".wfd-alert__title").textContent).toBe("No connection.");
+    expect(get(notice, ".wfd-alert__body").textContent).toBe(
+      "What you've already seen is still here.",
+    );
   });
 
   it("uses the offline icon as decoration, since the title says it", async () => {

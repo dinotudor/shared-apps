@@ -12,16 +12,16 @@ describe("AppNav", () => {
   it("renders the Week and Dishes tabs", async () => {
     const links = await renderNav("/");
     expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
-      ["Semana", "/"],
-      ["Pratos", "/dishes/"],
+      ["Week", "/"],
+      ["Dishes", "/dishes/"],
     ]);
   });
 
   it.each([
-    ["/", "Semana"],
-    ["/day/2026-11-12/", "Semana"],
-    ["/dishes/", "Pratos"],
-    ["/dishes/42/", "Pratos"],
+    ["/", "Week"],
+    ["/day/2026-11-12/", "Week"],
+    ["/dishes/", "Dishes"],
+    ["/dishes/42/", "Dishes"],
   ])("marks the active tab on %s", async (pathname, active) => {
     const links = await renderNav(pathname);
     const current = links.filter((link) => link.getAttribute("aria-current") === "page");

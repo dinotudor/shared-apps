@@ -35,10 +35,10 @@ describe("Icon", () => {
   });
 
   it("is announced with its label when one is given", async () => {
-    const { screen } = await render(<Icon name="trash" label="Excluir" />);
+    const { screen } = await render(<Icon name="trash" label="Delete" />);
     const svg = get(screen, "svg");
     expect(svg.getAttribute("role")).toBe("img");
-    expect(svg.getAttribute("aria-label")).toBe("Excluir");
+    expect(svg.getAttribute("aria-label")).toBe("Delete");
     expect(svg.hasAttribute("aria-hidden")).toBe(false);
   });
 });

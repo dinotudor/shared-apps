@@ -18,7 +18,7 @@ export type BottomNavProps = {
   link?: Component<PropsOf<"a">>;
 };
 
-/** "/pratos/" and "/pratos" are the same page (Qwik Router adds trailing slashes). */
+/** "/dishes/" and "/dishes" are the same page (Qwik Router adds trailing slashes). */
 const normalize = (path: string): string => (path.length > 1 ? path.replace(/\/+$/, "") : path);
 
 /** "/" matches only itself; any other href matches its own path and the paths below it. */
@@ -54,7 +54,7 @@ const LinkContent = component$<{ item: BottomNavItem }>(({ item }) => (
 // The current item gets a pill behind its icon as well as the action colour, so state
 // is not colour alone.
 export const BottomNav = component$<BottomNavProps>(
-  ({ items, current, label = "Navegação principal", link: Link }) => {
+  ({ items, current, label = "Main navigation", link: Link }) => {
     const active = currentHref(items, current);
     return (
       <nav class="wfd-bottom-nav" aria-label={label}>

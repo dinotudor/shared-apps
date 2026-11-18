@@ -27,9 +27,9 @@ const Theme = { Light: "light", System: "system", Dark: "dark" } as const;
 type Theme = (typeof Theme)[keyof typeof Theme];
 
 const THEME_OPTIONS: { value: Theme; label: string }[] = [
-  { value: Theme.Light, label: "Claro" },
-  { value: Theme.System, label: "Sistema" },
-  { value: Theme.Dark, label: "Escuro" },
+  { value: Theme.Light, label: "Light" },
+  { value: Theme.System, label: "System" },
+  { value: Theme.Dark, label: "Dark" },
 ];
 
 const COLOUR_ROLES = Object.keys(tokens.color.light) as (keyof typeof vars.color)[];
@@ -66,10 +66,10 @@ export default component$(() => {
 
   return (
     <div class="stack">
-      <h1>Componentes</h1>
+      <h1>Components</h1>
 
       <section class="stack" aria-labelledby="ds-theme">
-        <h2 id="ds-theme">Tema</h2>
+        <h2 id="ds-theme">Theme</h2>
         <div class="row">
           {THEME_OPTIONS.map((option) => (
             <Chip
@@ -86,7 +86,7 @@ export default component$(() => {
       </section>
 
       <section class="stack" aria-labelledby="ds-colours">
-        <h2 id="ds-colours">Cores</h2>
+        <h2 id="ds-colours">Colours</h2>
         <div class="icon-grid">
           {COLOUR_ROLES.map((role) => (
             <div key={role} class="swatch">
@@ -106,7 +106,7 @@ export default component$(() => {
       </section>
 
       <section class="stack" aria-labelledby="ds-icons">
-        <h2 id="ds-icons">Ícones</h2>
+        <h2 id="ds-icons">Icons</h2>
         <div class="icon-grid">
           {ICON_NAMES.map((name) => (
             <div key={name}>
@@ -123,22 +123,22 @@ export default component$(() => {
       </section>
 
       <section class="stack" aria-labelledby="ds-buttons">
-        <h2 id="ds-buttons">Botões</h2>
+        <h2 id="ds-buttons">Buttons</h2>
         <div class="row">
-          <Button icon="plus">Adicionar prato</Button>
-          <Button variant="secondary">Cancelar</Button>
-          <Button variant="text">Editar</Button>
+          <Button icon="plus">Add dish</Button>
+          <Button variant="secondary">Cancel</Button>
+          <Button variant="text">Edit</Button>
           <Button variant="danger" icon="trash">
-            Excluir
+            Delete
           </Button>
-          <Button disabled>Salvar</Button>
+          <Button disabled>Save</Button>
         </div>
       </section>
 
       <section class="stack" aria-labelledby="ds-card">
-        <h2 id="ds-card">Card e Chip</h2>
+        <h2 id="ds-card">Card and Chip</h2>
         <Card as="article">
-          <p>Arroz, feijão e bife acebolado.</p>
+          <p>Rice, beans and steak with onions.</p>
           <div class="row">
             <Chip
               selected={chipSelected.value}
@@ -148,20 +148,20 @@ export default component$(() => {
             >
               Vegetariano
             </Chip>
-            <Chip>Rápido</Chip>
+            <Chip>Quick</Chip>
           </div>
         </Card>
       </section>
 
       <section class="stack" aria-labelledby="ds-form">
-        <h2 id="ds-form">Formulário</h2>
-        <Checkbox label="Cebola" hint="2 un." checked />
-        <Checkbox label="Alho" hint="1 cabeça" />
-        <Checkbox label="Coentro" disabled />
-        <TextField label="Nome do prato" hint="Como a família chama." />
-        <TextField label="Buscar" type="search" icon="search" />
-        <TextField label="Tempo de preparo" error="Use só números." value="meia hora" />
-        <TextArea label="Observações" />
+        <h2 id="ds-form">Form</h2>
+        <Checkbox label="Onion" hint="2" checked />
+        <Checkbox label="Garlic" hint="1 head" />
+        <Checkbox label="Coriander" disabled />
+        <TextField label="Dish name" hint="What the family calls it." />
+        <TextField label="Search" type="search" icon="search" />
+        <TextField label="Prep time" error="Use numbers only." value="half an hour" />
+        <TextArea label="Notes" />
       </section>
 
       <section class="stack" aria-labelledby="ds-avatar">
@@ -175,12 +175,12 @@ export default component$(() => {
       </section>
 
       <section class="stack" aria-labelledby="ds-alerts">
-        <h2 id="ds-alerts">Alertas e Toast</h2>
-        <Alert variant="warning" title="Falta ingrediente">
-          Ninguém comprou cebola.
+        <h2 id="ds-alerts">Alerts and Toast</h2>
+        <Alert variant="warning" title="Missing ingredient">
+          Nobody bought onions.
         </Alert>
-        <Alert variant="info">Sem conexão. O que você já viu continua aqui.</Alert>
-        <Alert variant="success">Prato salvo.</Alert>
+        <Alert variant="info">No connection. What you've already seen is still here.</Alert>
+        <Alert variant="success">Dish saved.</Alert>
         <div class="row">
           <Button
             variant="secondary"
@@ -188,14 +188,14 @@ export default component$(() => {
               toastOpen.value = true;
             }}
           >
-            Mostrar toast
+            Show toast
           </Button>
         </div>
-        <Toast open={toastOpen}>Prato salvo.</Toast>
+        <Toast open={toastOpen}>Dish saved.</Toast>
       </section>
 
       <section class="stack" aria-labelledby="ds-modals">
-        <h2 id="ds-modals">Dialog e BottomSheet</h2>
+        <h2 id="ds-modals">Dialog and BottomSheet</h2>
         <div class="row">
           <Button
             variant="secondary"
@@ -203,7 +203,7 @@ export default component$(() => {
               dialogOpen.value = true;
             }}
           >
-            Abrir dialog
+            Open dialog
           </Button>
           <Button
             variant="secondary"
@@ -211,24 +211,24 @@ export default component$(() => {
               sheetOpen.value = true;
             }}
           >
-            Abrir bottom sheet
+            Open bottom sheet
           </Button>
         </div>
-        <Dialog open={dialogOpen} title="Excluir Bife acebolado?">
-          As notas da família também somem. Não dá para desfazer.
+        <Dialog open={dialogOpen} title="Delete Steak with onions?">
+          The family's ratings go too. This can't be undone.
           <div q:slot="actions">
             <Button variant="secondary" onClick$={closeDialog}>
-              Cancelar
+              Cancel
             </Button>
             <Button variant="danger" onClick$={closeDialog}>
-              Excluir
+              Delete
             </Button>
           </div>
         </Dialog>
-        <BottomSheet open={sheetOpen} title="Planejar o dia">
-          Escolha um prato salvo ou deixe livre.
+        <BottomSheet open={sheetOpen} title="Plan the day">
+          Pick a saved dish or leave the day open.
           <div q:slot="actions">
-            <Button onClick$={closeSheet}>Escolher prato</Button>
+            <Button onClick$={closeSheet}>Choose a dish</Button>
           </div>
         </BottomSheet>
       </section>
@@ -236,28 +236,28 @@ export default component$(() => {
       <section class="stack" aria-labelledby="ds-status">
         <h2 id="ds-status">StatusMessage</h2>
         <Card>
-          <StatusMessage icon="search" title="Página não encontrada" level={3}>
-            Este endereço não existe ou mudou.
+          <StatusMessage icon="search" title="Page not found" level={3}>
+            This address doesn't exist or has changed.
             {/* A link with the button classes, the pattern the README recommends. */}
             <a q:slot="action" class="wfd-button wfd-button--secondary" href="/">
-              Voltar ao início
+              Back to home
             </a>
           </StatusMessage>
         </Card>
         <Card>
-          <StatusMessage title="Nenhum prato ainda" level={3}>
-            A família ainda não salvou nenhum prato. Que tal o primeiro?
+          <StatusMessage title="No dishes yet" level={3}>
+            The family hasn't saved any dishes yet. How about the first one?
           </StatusMessage>
         </Card>
         <Card>
-          <StatusMessage icon="offline" title="Sem conexão" level={3}>
-            O que você já viu continua aqui.
+          <StatusMessage icon="offline" title="No connection" level={3}>
+            What you've already seen is still here.
           </StatusMessage>
         </Card>
       </section>
 
       <section class="stack" aria-labelledby="ds-states">
-        <h2 id="ds-states">LoadingState e OfflineNotice</h2>
+        <h2 id="ds-states">LoadingState and OfflineNotice</h2>
         <Card>
           <LoadingState />
         </Card>
@@ -267,11 +267,11 @@ export default component$(() => {
       <section class="stack" aria-labelledby="ds-nav">
         <h2 id="ds-nav">BottomNav</h2>
         <BottomNav
-          label="Exemplo de navegação"
-          current="/pratos"
+          label="Navigation example"
+          current="/dishes"
           items={[
-            { href: "/", label: "Semana", icon: "week" },
-            { href: "/pratos", label: "Pratos", icon: "dishes" },
+            { href: "/", label: "Week", icon: "week" },
+            { href: "/dishes", label: "Dishes", icon: "dishes" },
           ]}
         />
       </section>
@@ -279,4 +279,4 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = { title: "Componentes · What's for dinner?" };
+export const head: DocumentHead = { title: "Components · What's for dinner?" };

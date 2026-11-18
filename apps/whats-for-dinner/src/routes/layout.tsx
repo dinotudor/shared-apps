@@ -78,7 +78,7 @@ export default component$(() => {
   return (
     <div class="app">
       <a class="app__skip" href="#main" onClick$={focusMain}>
-        Pular para o conteúdo
+        Skip to content
       </a>
       <header class="app__header">
         <Link href="/" class="app__home">

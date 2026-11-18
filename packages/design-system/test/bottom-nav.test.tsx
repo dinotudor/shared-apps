@@ -5,38 +5,38 @@ import { BottomNav } from "../src/index.ts";
 import { all, get, render } from "./render.ts";
 
 const items = [
-  { href: "/semana", label: "Semana", icon: "week" },
-  { href: "/pratos", label: "Pratos", icon: "dishes" },
+  { href: "/week", label: "Week", icon: "week" },
+  { href: "/dishes", label: "Dishes", icon: "dishes" },
 ] as const;
 
 describe("BottomNav", () => {
   it("renders a labelled navigation landmark with a visible label for each destination", async () => {
-    const { screen } = await render(<BottomNav items={[...items]} current="/semana" />);
+    const { screen } = await render(<BottomNav items={[...items]} current="/week" />);
     const nav = get(screen, "nav.wfd-bottom-nav");
-    expect(nav.getAttribute("aria-label")).toBe("Navegação principal");
+    expect(nav.getAttribute("aria-label")).toBe("Main navigation");
     const links = all<HTMLAnchorElement>(nav, "a");
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/semana", "/pratos"]);
-    expect(links.map((link) => link.textContent)).toEqual(["Semana", "Pratos"]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/week", "/dishes"]);
+    expect(links.map((link) => link.textContent)).toEqual(["Week", "Dishes"]);
   });
 
   it("marks the current destination as the current page", async () => {
-    const { screen } = await render(<BottomNav items={[...items]} current="/pratos" />);
+    const { screen } = await render(<BottomNav items={[...items]} current="/dishes" />);
     const [week, dishes] = all(screen, "a");
     expect(week.hasAttribute("aria-current")).toBe(false);
     expect(dishes.getAttribute("aria-current")).toBe("page");
   });
 
   it.each([
-    ["/pratos/", "Pratos"],
-    ["/pratos/42", "Pratos"],
-    ["/pratos/42/", "Pratos"],
-    ["/", "Início"],
-    ["/semana/", null],
-    ["/pratosx", null],
+    ["/dishes/", "Dishes"],
+    ["/dishes/42", "Dishes"],
+    ["/dishes/42/", "Dishes"],
+    ["/", "Home"],
+    ["/week/", null],
+    ["/dishesx", null],
     [undefined, null],
   ] as const)("marks the item for %s as current", async (current, expected) => {
     // "/" matches only itself; other items match their own path and anything below it.
-    const withHome = [{ href: "/", label: "Início", icon: "pot" } as const, items[1]];
+    const withHome = [{ href: "/", label: "Home", icon: "pot" } as const, items[1]];
     const { screen } = await render(<BottomNav items={[...withHome]} current={current} />);
     const marked = all(screen, "a")
       .filter((link) => link.getAttribute("aria-current") === "page")
@@ -45,15 +45,15 @@ describe("BottomNav", () => {
   });
 
   it("marks only the most specific item when two match", async () => {
-    const nested = [items[1], { href: "/pratos/novo", label: "Novo", icon: "plus" } as const];
-    const { screen } = await render(<BottomNav items={[...nested]} current="/pratos/novo/" />);
+    const nested = [items[1], { href: "/dishes/new", label: "New", icon: "plus" } as const];
+    const { screen } = await render(<BottomNav items={[...nested]} current="/dishes/new/" />);
     const marked = all(screen, "a").filter((link) => link.hasAttribute("aria-current"));
-    expect(marked.map((link) => link.textContent)).toEqual(["Novo"]);
+    expect(marked.map((link) => link.textContent)).toEqual(["New"]);
   });
 
   it("accepts a different landmark label", async () => {
-    const { screen } = await render(<BottomNav items={[...items]} label="Seções" />);
-    expect(get(screen, "nav").getAttribute("aria-label")).toBe("Seções");
+    const { screen } = await render(<BottomNav items={[...items]} label="Sections" />);
+    expect(get(screen, "nav").getAttribute("aria-label")).toBe("Sections");
   });
 
   it("renders each destination through the link component it is given", async () => {
@@ -64,12 +64,12 @@ describe("BottomNav", () => {
       </a>
     ));
     const { screen } = await render(
-      <BottomNav items={[...items]} current="/pratos/" link={RouterLink} />,
+      <BottomNav items={[...items]} current="/dishes/" link={RouterLink} />,
     );
     const links = all<HTMLAnchorElement>(screen, "a");
     expect(links.map((link) => link.hasAttribute("data-router-link"))).toEqual([true, true]);
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/semana", "/pratos"]);
-    expect(links.map((link) => link.textContent)).toEqual(["Semana", "Pratos"]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/week", "/dishes"]);
+    expect(links.map((link) => link.textContent)).toEqual(["Week", "Dishes"]);
     expect(links.map((link) => link.getAttribute("aria-current"))).toEqual([null, "page"]);
     expect(links[0]?.className).toBe("wfd-bottom-nav__link");
   });

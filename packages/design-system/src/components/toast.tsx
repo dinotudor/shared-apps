@@ -14,7 +14,7 @@ export type ToastProps = {
 };
 
 /**
- * A short confirmation ("Prato salvo."). Errors that need action go in an Alert,
+ * A short confirmation ("Dish saved."). Errors that need action go in an Alert,
  * not a toast. The live region is always in the page, so screen readers announce
  * each new message.
  */
@@ -75,7 +75,7 @@ export const Toast = component$<ToastProps>((props) => {
           <button
             type="button"
             class="wfd-toast__close"
-            aria-label="Fechar"
+            aria-label="Close"
             onClick$={() => {
               open.value = false;
             }}

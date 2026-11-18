@@ -6,6 +6,6 @@ export default createRenderer((opts) => ({
   jsx: <Root />,
   options: {
     ...opts,
-    containerAttributes: { lang: "pt-BR", ...opts.containerAttributes },
+    containerAttributes: { lang: "en", ...opts.containerAttributes },
   },
 }));

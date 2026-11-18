@@ -46,7 +46,7 @@ const Modal = component$<ModalProps & { placement: Placement }>(({ open, title, 
         <button
           type="button"
           class="wfd-modal__close"
-          aria-label="Fechar"
+          aria-label="Close"
           onClick$={() => {
             open.value = false;
           }}

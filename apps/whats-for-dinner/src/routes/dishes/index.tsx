@@ -6,11 +6,11 @@ import { StatusMessage } from "@shared-apps/design-system";
 // screen is #24.
 export default component$(() => (
   <div class="stack">
-    <h1>Pratos</h1>
-    <StatusMessage icon="dishes" title="Em breve">
-      A lista de pratos chega numa próxima versão.
+    <h1>Dishes</h1>
+    <StatusMessage icon="dishes" title="Coming soon">
+      The dish list comes in a later version.
     </StatusMessage>
   </div>
 ));
 
-export const head: DocumentHead = { title: "Pratos · What's for dinner?" };
+export const head: DocumentHead = { title: "Dishes · What's for dinner?" };

@@ -12,8 +12,8 @@ export const OfflineNotice = component$(() => (
   <div class="wfd-alert wfd-alert--warning">
     <Icon name="offline" size={20} />
     <div class="wfd-alert__content">
-      <p class="wfd-alert__title">Sem conexão.</p>
-      <div class="wfd-alert__body">O que você já viu continua aqui.</div>
+      <p class="wfd-alert__title">No connection.</p>
+      <div class="wfd-alert__body">What you've already seen is still here.</div>
     </div>
   </div>
 ));
