@@ -13,7 +13,7 @@ const call = async (path: string) => {
     endpoint: "/trpc",
     req: new Request(`http://localhost/trpc/${path}`),
     router: testRouter,
-    createContext: () => ({}),
+    createContext: () => ({ viewer: null }),
   });
   return { status: response.status, body: (await response.json()) as unknown };
 };
