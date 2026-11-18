@@ -7,14 +7,19 @@ import type { AppDependencies } from "../src/app.ts";
 
 let app: FastifyInstance | undefined;
 
-// No procedure here queries the database, so these tests need no container.
+const config = {
+  port: 0,
+  host: "127.0.0.1",
+  logLevel: "silent",
+  databaseUrl: "postgres://unused/unused",
+} as const;
+
+// No procedure here queries the database or sends a job, so these tests need no container.
 const database = { db: {} as Database, close: () => Promise.resolve() };
+const jobs = { start: () => Promise.resolve(), stop: () => Promise.resolve() };
 
 const startApp = async (appRouter?: AppDependencies["router"]) => {
-  app = buildApp(
-    { port: 0, host: "127.0.0.1", logLevel: "silent", databaseUrl: "postgres://unused/unused" },
-    { database, router: appRouter },
-  );
+  app = buildApp(config, { database, jobs, router: appRouter });
   await app.ready();
   return app;
 };
@@ -84,5 +89,37 @@ describe("api", () => {
 
     expect(response.statusCode).toBe(404);
     expect(logError).not.toHaveBeenCalled();
+  });
+});
+
+describe("background jobs", () => {
+  it("starts the job runner when the app is ready", async () => {
+    const start = vi.fn(() => Promise.resolve());
+    app = buildApp(config, { database, jobs: { ...jobs, start } });
+
+    await app.ready();
+
+    expect(start).toHaveBeenCalledOnce();
+  });
+
+  it("does not start when the job runner can't start", async () => {
+    const failure = new Error("connect ECONNREFUSED");
+    app = buildApp(config, { database, jobs: { ...jobs, start: () => Promise.reject(failure) } });
+
+    await expect(app.ready()).rejects.toBe(failure);
+  });
+
+  it("stops the job runner on close, before the database closes", async () => {
+    const calls: string[] = [];
+    app = buildApp(config, {
+      database: { ...database, close: () => Promise.resolve(void calls.push("database")) },
+      jobs: { ...jobs, stop: () => Promise.resolve(void calls.push("jobs")) },
+    });
+    await app.ready();
+
+    await app.close();
+    app = undefined;
+
+    expect(calls).toEqual(["jobs", "database"]);
   });
 });

@@ -13,6 +13,7 @@
   "dependencies": {
     "@shared-apps/api-core": "workspace:*",
     "@shared-apps/db": "workspace:*",
+    "@shared-apps/jobs": "workspace:*",
     "@trpc/server": "catalog:",
     "fastify": "^5.12.8",
     "zod": "^4.6.7"

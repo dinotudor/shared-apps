@@ -10,7 +10,10 @@ const setUp = () => {
   const closeDatabase = vi.fn(() => Promise.resolve());
   const app = buildApp(
     { port: 0, host: "127.0.0.1", logLevel: "silent", databaseUrl: "postgres://unused/unused" },
-    { database: { db: {} as Database, close: closeDatabase } },
+    {
+      database: { db: {} as Database, close: closeDatabase },
+      jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
+    },
   );
   const signals = new EventEmitter();
   const exit = vi.fn<(code: number) => void>();
