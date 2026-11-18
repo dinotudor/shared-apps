@@ -75,7 +75,7 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 ### BottomNav
 
-`<BottomNav items={[{ href, label, icon }]} current?="/semana" label?="Navegação principal" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item is the one with the longest `href` that matches `current` segment by segment, ignoring trailing slashes: `/pratos` matches `/pratos/` and `/pratos/42`, but not `/pratosx`. `/` matches only itself. That item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It renders plain `<a>` links, so the package doesn't depend on the router. To get client-side navigation, pass the router's link component: `link={Link}` (from `@qwik.dev/router`). Any `link` component receives the anchor attributes (`class`, `href`, `aria-current`) and must render an `<a>` with them.
+`<BottomNav items={[{ href, label, icon }]} current?="/week" label?="Main navigation" />`: a `<nav>` landmark with up to 5 destinations. Labels are always visible. The current item is the one with the longest `href` that matches `current` segment by segment, ignoring trailing slashes: `/dishes` matches `/dishes/` and `/dishes/42`, but not `/dishesx`. `/` matches only itself. That item has `aria-current="page"`, the `action` colour and a `selected` pill behind its icon. It renders plain `<a>` links, so the package doesn't depend on the router. To get client-side navigation, pass the router's link component: `link={Link}` (from `@qwik.dev/router`). Any `link` component receives the anchor attributes (`class`, `href`, `aria-current`) and must render an `<a>` with them.
 
 ### Avatar
 
@@ -85,19 +85,19 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 | Variant | Icon (spoken as) | Use when |
 |---|---|---|
-| `warning` | alert ("Atenção") | Something needs attention: the missing-ingredient alert |
-| `info` | info ("Informação") | Neutral information: offline mode |
-| `success` | check ("Sucesso") | Something went well and the message should stay on screen |
+| `warning` | alert ("Warning") | Something needs attention: the missing-ingredient alert |
+| `info` | info ("Information") | Neutral information: offline mode |
+| `success` | check ("Success") | Something went well and the message should stay on screen |
 
 `<Alert variant title?>body</Alert>`: a persistent inline message. The body sits in a `<div>`, so it can hold block content. It has no live region. Use Toast for transient confirmations.
 
 ### Toast
 
-`<Toast open={signal} duration?={6000}>Prato salvo.</Toast>`: a short confirmation in a polite live region (`role="status"`) that is always in the page. It closes after `duration` (SkiroLiro asks for 5 to 8 s) or from its close button, and sets `open` to `false`. The timer pauses while the pointer or keyboard focus is on the toast, and only resumes when both have left. When you replace the message while the toast is open, change `messageId` (a counter is enough) so the new message gets its full `duration`. The message sits in a `<div>`, so it can hold block content. Errors that need action go in an Alert, not a toast.
+`<Toast open={signal} duration?={6000}>Dish saved.</Toast>`: a short confirmation in a polite live region (`role="status"`) that is always in the page. It closes after `duration` (SkiroLiro asks for 5 to 8 s) or from its close button, and sets `open` to `false`. The timer pauses while the pointer or keyboard focus is on the toast, and only resumes when both have left. When you replace the message while the toast is open, change `messageId` (a counter is enough) so the new message gets its full `duration`. The message sits in a `<div>`, so it can hold block content. Errors that need action go in an Alert, not a toast.
 
 ### Dialog and BottomSheet
 
-`<Dialog open={signal} title>text<div q:slot="actions">…</div></Dialog>` and the same API for `<BottomSheet>`: built on the native `<dialog>` with `showModal()`, which traps focus, closes on Esc, makes the page behind inert and returns focus on close. They are labelled by their title and have a "Fechar" button. Closing sets `open` to `false`. Dialog is centred. BottomSheet rises from the bottom edge and is preferred on phones for choices. Use one title, short text and at most two actions, and never make the destructive action the default.
+`<Dialog open={signal} title>text<div q:slot="actions">…</div></Dialog>` and the same API for `<BottomSheet>`: built on the native `<dialog>` with `showModal()`, which traps focus, closes on Esc, makes the page behind inert and returns focus on close. They are labelled by their title and have a "Close" button. Closing sets `open` to `false`. Dialog is centred. BottomSheet rises from the bottom edge and is preferred on phones for choices. Use one title, short text and at most two actions, and never make the destructive action the default.
 
 ### StatusMessage
 
@@ -105,15 +105,15 @@ Props: `variant`, `icon` (decorative, before the label), `type` (defaults to `"b
 
 Follow brief section 10 for the copy: humour is fine in empty states, but never in errors or offline. For an action that navigates, put a link in the slot with the button classes: `<Link q:slot="action" class="wfd-button wfd-button--primary" href="/">`. The `wfd-button` classes work on `<a>` as well as `<button>`.
 
-A `404.tsx` route only covers paths that match no route. When a route exists but its data doesn't (for example `/pratos/999`), the loader has to set the status itself, with `event.status(404)` or `event.error(404, …)`, and the page renders a StatusMessage.
+A `404.tsx` route only covers paths that match no route. When a route exists but its data doesn't (for example `/dishes/999`), the loader has to set the status itself, with `event.status(404)` or `event.error(404, …)`, and the page renders a StatusMessage.
 
 ### LoadingState
 
-`<LoadingState label?="Pensando no jantar…" blocks?={2} />`: a page or section waiting for data. It shows the logo mark, the guide's loading copy and `blocks` placeholder blocks shaped like cards. The whole thing is a polite `role="status"`, so the label is announced once. The blocks are `aria-hidden`. The mark pulses gently, and not at all with `prefers-reduced-motion`.
+`<LoadingState label?="Thinking about dinner…" blocks?={2} />`: a page or section waiting for data. It shows the logo mark, the guide's loading copy and `blocks` placeholder blocks shaped like cards. The whole thing is a polite `role="status"`, so the label is announced once. The blocks are `aria-hidden`. The mark pulses gently, and not at all with `prefers-reduced-motion`.
 
 ### OfflineNotice
 
-`<OfflineNotice />`: the brief's offline copy ("Sem conexão. O que você já viu continua aqui.") in a warning Alert with the offline icon. Put it inside a `role="status"` element that is always on the page, and render the notice in it only while offline. A live region inserted together with its content is often not announced. Use a StatusMessage with `icon="offline"` instead when a section has nothing at all to show offline.
+`<OfflineNotice />`: the brief's offline copy ("No connection. What you've already seen is still here.") in a warning Alert with the offline icon. Put it inside a `role="status"` element that is always on the page, and render the notice in it only while offline. A live region inserted together with its content is often not announced. Use a StatusMessage with `icon="offline"` instead when a section has nothing at all to show offline.
 
 ## Accessibility
 

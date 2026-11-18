@@ -25,7 +25,7 @@ const Harness = component$<{ duration?: number }>(({ duration }) => {
         }}
       />
       <Toast open={open} duration={duration} messageId={count.value}>
-        {count.value === 1 ? "Prato salvo." : `Prato ${String(count.value)} salvo.`}
+        {count.value === 1 ? "Dish saved." : `Dish ${String(count.value)} saved.`}
       </Toast>
     </div>
   );
@@ -49,8 +49,8 @@ describe("Toast", () => {
     const region = get(screen, ".wfd-toast-region");
     expect(region.getAttribute("role")).toBe("status");
     // A div, not a p, so block content stays valid HTML.
-    expect(get(region, "div.wfd-toast__message").textContent).toBe("Prato salvo.");
-    expect(get(region, "button").getAttribute("aria-label")).toBe("Fechar");
+    expect(get(region, "div.wfd-toast__message").textContent).toBe("Dish saved.");
+    expect(get(region, "button").getAttribute("aria-label")).toBe("Close");
   });
 
   it("closes when the close button is pressed", async () => {
@@ -104,7 +104,7 @@ describe("Toast", () => {
     const { screen, userEvent } = await render(<Harness duration={80} />);
     await sleep(50);
     await userEvent(get(screen, ".next"), "click");
-    expect(get(screen, ".wfd-toast__message").textContent).toBe("Prato 2 salvo.");
+    expect(get(screen, ".wfd-toast__message").textContent).toBe("Dish 2 saved.");
     // The first message's timer would have closed the toast at 80 ms.
     await sleep(50);
     expect(isOpen(screen)).toBe(true);

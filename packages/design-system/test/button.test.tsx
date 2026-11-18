@@ -9,11 +9,11 @@ describe("Button", () => {
   it.each(["primary", "secondary", "text", "danger"] as const)(
     "renders the %s variant as a non-submitting button",
     async (variant) => {
-      const { screen } = await render(<Button variant={variant}>Salvar</Button>);
+      const { screen } = await render(<Button variant={variant}>Save</Button>);
       const button = get(screen, "button");
       expect(button.classList.contains(`wfd-button--${variant}`)).toBe(true);
       expect(button.getAttribute("type")).toBe("button");
-      expect(button.textContent).toBe("Salvar");
+      expect(button.textContent).toBe("Save");
     },
   );
 
@@ -28,13 +28,13 @@ describe("Button", () => {
   });
 
   it("shows a decorative icon before the label", async () => {
-    const { screen } = await render(<Button icon="plus">Novo prato</Button>);
+    const { screen } = await render(<Button icon="plus">New dish</Button>);
     expect(get(screen, "button svg").getAttribute("aria-hidden")).toBe("true");
     expect(get(screen, "button use").getAttribute("href")).toMatch(/#i-plus$/);
   });
 
   it("can be disabled", async () => {
-    const { screen } = await render(<Button disabled>Salvar</Button>);
+    const { screen } = await render(<Button disabled>Save</Button>);
     expect(get(screen, "button").hasAttribute("disabled")).toBe(true);
   });
 
@@ -45,7 +45,7 @@ describe("Button", () => {
           onClick();
         }}
       >
-        Salvar
+        Save
       </Button>,
     );
     await userEvent(get(screen, "button"), "click");

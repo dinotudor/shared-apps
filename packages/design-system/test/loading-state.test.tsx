@@ -7,7 +7,7 @@ describe("LoadingState", () => {
     const { screen } = await render(<LoadingState />);
     const loading = get(screen, ".wfd-loading");
     expect(loading.getAttribute("role")).toBe("status");
-    expect(get(loading, ".wfd-loading__label").textContent).toBe("Pensando no jantar…");
+    expect(get(loading, ".wfd-loading__label").textContent).toBe("Thinking about dinner…");
     const images = all<HTMLImageElement>(loading, "img");
     expect(images.length).toBeGreaterThan(0);
     expect(images.every((image) => image.getAttribute("alt") === "")).toBe(true);
@@ -21,7 +21,7 @@ describe("LoadingState", () => {
   });
 
   it("accepts a different label", async () => {
-    const { screen } = await render(<LoadingState label="Carregando pratos…" />);
-    expect(get(screen, ".wfd-loading__label").textContent).toBe("Carregando pratos…");
+    const { screen } = await render(<LoadingState label="Loading dishes…" />);
+    expect(get(screen, ".wfd-loading__label").textContent).toBe("Loading dishes…");
   });
 });

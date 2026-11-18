@@ -7,9 +7,9 @@ export type AlertVariant = (typeof AlertVariant)[keyof typeof AlertVariant];
 // Each variant has its own icon, and the icon names it, so the meaning does not
 // depend on colour.
 const VARIANTS: Record<AlertVariant, { icon: IconName; label: string }> = {
-  warning: { icon: "alert", label: "Atenção" },
-  info: { icon: "info", label: "Informação" },
-  success: { icon: "check", label: "Sucesso" },
+  warning: { icon: "alert", label: "Warning" },
+  info: { icon: "info", label: "Information" },
+  success: { icon: "check", label: "Success" },
 };
 
 export type AlertProps = {

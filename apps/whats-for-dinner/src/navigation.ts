@@ -2,8 +2,8 @@ import type { BottomNavItem } from "@shared-apps/design-system";
 
 /** The bottom navigation tabs (brief section 6). Week is the home screen. */
 export const NAV_ITEMS: BottomNavItem[] = [
-  { href: "/", label: "Semana", icon: "week" },
-  { href: "/dishes/", label: "Pratos", icon: "dishes" },
+  { href: "/", label: "Week", icon: "week" },
+  { href: "/dishes/", label: "Dishes", icon: "dishes" },
 ];
 
 // Each tab also owns the pages reached from it: a day and its planning page belong to

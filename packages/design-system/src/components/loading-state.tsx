@@ -10,11 +10,11 @@ export type LoadingStateProps = {
 
 /**
  * A page or section waiting for data: the logo mark, a short label and placeholder
- * blocks (the guide's "Carregando" state). The label is a polite status, so screen
+ * blocks (the guide's loading state). The label is a polite status, so screen
  * readers announce it once without interrupting; the blocks are decoration.
  */
 export const LoadingState = component$<LoadingStateProps>(
-  ({ label = "Pensando no jantar…", blocks = 2 }) => (
+  ({ label = "Thinking about dinner…", blocks = 2 }) => (
     <div class="wfd-loading" role="status">
       <span class="wfd-loading__visual">
         <Logo variant="mark" height={40} decorative />
