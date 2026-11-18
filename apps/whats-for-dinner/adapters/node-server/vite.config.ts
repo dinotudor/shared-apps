@@ -8,5 +8,7 @@ export default extendConfig(baseConfig, () => ({
     ssr: true,
     rollupOptions: { input: ["src/entry.node-server.tsx", "@qwik-router-config"] },
   },
-  plugins: [nodeServerAdapter({ name: "node-server" })],
+  // No static pages: every page, the 404 page included, depends on who is signed in, and
+  // there is no API to ask at build time. The server renders them on each request.
+  plugins: [nodeServerAdapter({ name: "node-server", ssg: null })],
 }));
