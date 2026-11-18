@@ -89,7 +89,7 @@ export default component$(() => {
           {/* A full-page post, so the cleared cookie and the sign-in page arrive together. */}
           <Form action={signOutAction} reloadDocument>
             <Button type="submit" variant="text">
-              Sair
+              Sign out
             </Button>
           </Form>
         </div>

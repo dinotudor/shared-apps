@@ -32,30 +32,30 @@ export const useSignInWithGoogle = routeAction$(async (form, event) => {
 const errorMessage = (code: string | null): string | null => {
   if (!code) return null;
   if (code === "email_not_allowed") {
-    return "Este e-mail não tem acesso. Peça para alguém da família incluir você.";
+    return "This email doesn't have access. Ask someone in the family to add you.";
   }
-  return "Não foi possível entrar. Tente de novo.";
+  return "Couldn't sign in. Please try again.";
 };
 
 export default component$(() => {
   const location = useLocation();
   const signIn = useSignInWithGoogle();
   const error = signIn.value?.failed
-    ? "Não foi possível entrar agora. Tente de novo em instantes."
+    ? "Couldn't sign in right now. Please try again in a moment."
     : errorMessage(location.url.searchParams.get("error"));
 
   return (
     <div class="stack sign-in">
       <Logo variant="mark" height={56} decorative />
-      <h1>Entrar</h1>
+      <h1>Sign in</h1>
       {error && <Alert variant="warning">{error}</Alert>}
       {/* A full-page post: the browser follows the redirect to Google itself. */}
       <Form action={signIn} reloadDocument>
         <input type="hidden" name="next" value={location.url.searchParams.get("next") ?? ""} />
-        <Button type="submit">Entrar com Google</Button>
+        <Button type="submit">Sign in with Google</Button>
       </Form>
     </div>
   );
 });
 
-export const head: DocumentHead = { title: "Entrar · What's for dinner?" };
+export const head: DocumentHead = { title: "Sign in · What's for dinner?" };
