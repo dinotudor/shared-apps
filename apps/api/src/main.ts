@@ -1,3 +1,4 @@
+import { createAuth } from "@shared-apps/auth";
 import { createDatabase } from "@shared-apps/db";
 import { createJobRunner } from "@shared-apps/jobs";
 import { buildApp } from "./app.ts";
@@ -32,6 +33,7 @@ const database = createDatabase(config.databaseUrl, {
     app.log.error({ err: error }, "database connection lost");
   },
 });
+const auth = createAuth(database.db, config.auth);
 const jobs = createJobRunner({
   url: config.databaseUrl,
   // Forwards to app.log, which exists by the time a job runs: the runner starts in
@@ -46,10 +48,10 @@ const jobs = createJobRunner({
   },
   // Modules add their jobs here (#21+).
   jobs: [],
-  schedules: [heartbeat],
+  schedules: [heartbeat, ...auth.schedules],
   stopTimeoutMs: JOBS_STOP_TIMEOUT_MS,
 });
-const app = buildApp(config, { database, jobs });
+const app = buildApp(config, { database, jobs, auth });
 
 await runServer(app, {
   port: config.port,

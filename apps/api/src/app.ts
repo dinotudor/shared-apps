@@ -4,21 +4,24 @@ import type { AnyTRPCRouter } from "@trpc/server";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 import type { Context } from "@shared-apps/api-core";
+import type { Auth } from "@shared-apps/auth";
 import type { DatabaseHandle } from "@shared-apps/db";
 import type { JobRunner } from "@shared-apps/jobs";
+import { registerAuthRoute, toHeaders } from "./auth-route.ts";
 import type { Config } from "./config.ts";
 import { appRouter } from "./router.ts";
 
 export type AppDependencies = {
   database: DatabaseHandle;
   jobs: Pick<JobRunner, "start" | "stop">;
+  auth: Pick<Auth, "handler" | "getSession">;
   // A parameter so tests can mount procedures that fail.
   router?: AnyTRPCRouter;
 };
 
 export const buildApp = (
-  config: Config,
-  { database, jobs, router = appRouter }: AppDependencies,
+  config: Pick<Config, "logLevel">,
+  { database, jobs, auth, router = appRouter }: AppDependencies,
 ): FastifyInstance => {
   const app = Fastify({
     logger: { level: config.logLevel },
@@ -38,10 +41,19 @@ export const buildApp = (
   app.addHook("onClose", () => database.close());
 
   app.get("/health", () => ({ status: "ok" }));
+  registerAuthRoute(app, auth);
 
   const trpcOptions: FastifyTRPCPluginOptions<AnyTRPCRouter>["trpcOptions"] = {
     router,
-    createContext: (): Context => ({}),
+    // Every call verifies its session against PostgreSQL (playbook ADR 0008): the API
+    // trusts the cookie, never the frontend's word about who is signed in.
+    createContext: async ({ req, res }): Promise<Context> => {
+      const { viewer, headers } = await auth.getSession(toHeaders(req.headers));
+      // A renewed session comes with a new cookie. The frontends pass it on to the browser.
+      const cookies = headers.getSetCookie();
+      if (cookies.length > 0) void res.header("set-cookie", cookies);
+      return { viewer };
+    },
     onError: ({ error, path }) => {
       // Only unexpected failures: client errors (bad input, unknown path) are not ours.
       if (error.code === "INTERNAL_SERVER_ERROR") {

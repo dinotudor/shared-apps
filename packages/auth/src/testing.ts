@@ -1,5 +1,5 @@
+// Test helpers for code that signs in through Better Auth: packages/auth and apps/api.
 import { vi } from "vitest";
-import type { Auth } from "../src/index.ts";
 
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 
@@ -69,16 +69,19 @@ export const cookiesFrom = (response: Response, previous = new Headers()): Heade
 
 type SignInOptions = { origin: string; callbackURL: string; errorCallbackURL: string };
 
+/** Sends a request to wherever Better Auth is mounted: its handler, or the whole API. */
+export type Send = (request: Request) => Promise<Response>;
+
 /**
  * What a browser does: the frontend starts sign-in, the browser goes to Google, and
  * Google sends it back to the callback with a code. Returns where the callback redirects
  * and the cookies the browser holds afterwards.
  */
 export const signInWithGoogle = async (
-  auth: Auth,
+  send: Send,
   { origin, callbackURL, errorCallbackURL }: SignInOptions,
 ): Promise<{ location: string | null; cookieHeaders: Headers; setCookies: string[] }> => {
-  const start = await auth.handler(
+  const start = await send(
     new Request("http://localhost:3000/api/auth/sign-in/social", {
       method: "POST",
       headers: { "content-type": "application/json", origin },
@@ -90,7 +93,7 @@ export const signInWithGoogle = async (
   const state = new URL(url).searchParams.get("state") ?? "";
   const cookies = cookiesFrom(start);
 
-  const callback = await auth.handler(
+  const callback = await send(
     new Request(
       `http://localhost:3000/api/auth/callback/google?code=google-code&state=${encodeURIComponent(state)}`,
       { headers: cookies },

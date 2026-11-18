@@ -5,7 +5,7 @@ import type { TestDatabase } from "@shared-apps/db/testing";
 import { createAuth } from "../src/index.ts";
 import type { Auth, AuthConfig } from "../src/index.ts";
 import { user } from "../src/schema.ts";
-import { cookiesFrom, googleStub, signInWithGoogle } from "./google.ts";
+import { cookiesFrom, googleStub, signInWithGoogle } from "../src/testing.ts";
 
 const API = "http://localhost:3000";
 const WEB = "http://localhost:5173";
@@ -50,7 +50,7 @@ describe("signing in with Google", () => {
   it("signs in an allowlisted email and sends them back to the page they asked for", async () => {
     googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
 
-    const result = await signInWithGoogle(auth, {
+    const result = await signInWithGoogle(auth.handler, {
       origin: WEB,
       callbackURL: `${WEB}/dishes/`,
       errorCallbackURL: `${WEB}/sign-in/`,
@@ -65,7 +65,7 @@ describe("signing in with Google", () => {
   it("refuses an email that is not on the allowlist, without a session", async () => {
     googleStub({ sub: "google-eve", email: "eve@example.com", name: "Eve Teste" });
 
-    const result = await signInWithGoogle(auth, signInFromWeb);
+    const result = await signInWithGoogle(auth.handler, signInFromWeb);
 
     expect(refusal(result.location)).toEqual({
       page: `${WEB}/sign-in/`,
@@ -77,7 +77,7 @@ describe("signing in with Google", () => {
   it("matches allowlisted emails without regard to case", async () => {
     googleStub({ sub: "google-bruno", email: "bruno@EXAMPLE.com", name: "Bruno Teste" });
 
-    const result = await signInWithGoogle(auth, signInFromWeb);
+    const result = await signInWithGoogle(auth.handler, signInFromWeb);
 
     expect((await auth.getSession(result.cookieHeaders)).viewer?.name).toBe("Bruno Teste");
   });
@@ -88,10 +88,10 @@ describe("signing in with Google", () => {
       ...config,
       allowedEmails: [...config.allowedEmails, "carla@example.com"],
     });
-    const first = await signInWithGoogle(withCarla, signInFromWeb);
+    const first = await signInWithGoogle(withCarla.handler, signInFromWeb);
     expect((await withCarla.getSession(first.cookieHeaders)).viewer).not.toBeNull();
 
-    const again = await signInWithGoogle(auth, signInFromWeb);
+    const again = await signInWithGoogle(auth.handler, signInFromWeb);
 
     expect(refusal(again.location)).toEqual({
       page: `${WEB}/sign-in/`,
@@ -119,7 +119,7 @@ describe("redirects", () => {
 
 const signInAna = async () => {
   googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
-  return (await signInWithGoogle(auth, signInFromWeb)).cookieHeaders;
+  return (await signInWithGoogle(auth.handler, signInFromWeb)).cookieHeaders;
 };
 
 describe("signing out", () => {
@@ -178,7 +178,7 @@ describe("the session cookie", () => {
   it("stays on the API's host when no cookie domain is set", async () => {
     googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
 
-    const { setCookies } = await signInWithGoogle(auth, signInFromWeb);
+    const { setCookies } = await signInWithGoogle(auth.handler, signInFromWeb);
 
     const sessionCookie = setCookies.find((cookie) => cookie.includes("session_token="));
     expect(sessionCookie).toMatch(/httponly/i);
@@ -189,7 +189,7 @@ describe("the session cookie", () => {
     googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
     const onSubdomains = createAuth(database.db, { ...config, cookieDomain: "example.test" });
 
-    const { setCookies } = await signInWithGoogle(onSubdomains, signInFromWeb);
+    const { setCookies } = await signInWithGoogle(onSubdomains.handler, signInFromWeb);
 
     const sessionCookie = setCookies.find((cookie) => cookie.includes("session_token="));
     expect(sessionCookie).toMatch(/domain=example\.test/i);
@@ -203,7 +203,7 @@ describe("purging expired rows", () => {
     try {
       const ownAuth = createAuth(own.db, config);
       googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
-      const cookies = (await signInWithGoogle(ownAuth, signInFromWeb)).cookieHeaders;
+      const cookies = (await signInWithGoogle(ownAuth.handler, signInFromWeb)).cookieHeaders;
       // A sign-in that was started and never finished leaves its state behind.
       await ownAuth.handler(
         new Request(`${API}/api/auth/sign-in/social`, {
