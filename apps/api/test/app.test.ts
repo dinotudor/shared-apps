@@ -4,6 +4,7 @@ import { publicProcedure, router } from "@shared-apps/api-core";
 import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
 import type { AppDependencies } from "../src/app.ts";
+import { unusedDishes } from "./support/unused-dishes.ts";
 
 let app: FastifyInstance | undefined;
 
@@ -19,9 +20,10 @@ const auth = {
 };
 // No procedure here is for members only.
 const membership = { isMember: () => Promise.resolve(false) };
+const dishes = unusedDishes;
 
 const startApp = async (appRouter?: AppDependencies["router"]) => {
-  app = buildApp(config, { database, jobs, auth, membership, router: appRouter });
+  app = buildApp(config, { database, jobs, auth, membership, dishes, router: appRouter });
   await app.ready();
   return app;
 };
@@ -100,7 +102,14 @@ describe("request logs", () => {
     const lines: string[] = [];
     app = buildApp(
       { logLevel: "info" },
-      { database, jobs, auth, membership, logStream: { write: (line) => void lines.push(line) } },
+      {
+        database,
+        jobs,
+        auth,
+        membership,
+        dishes,
+        logStream: { write: (line) => void lines.push(line) },
+      },
     );
     await app.ready();
     await app.inject({ method: "GET", url });
@@ -127,7 +136,7 @@ describe("request logs", () => {
 describe("background jobs", () => {
   it("starts the job runner when the app is ready", async () => {
     const start = vi.fn(() => Promise.resolve());
-    app = buildApp(config, { database, auth, membership, jobs: { ...jobs, start } });
+    app = buildApp(config, { database, auth, membership, dishes, jobs: { ...jobs, start } });
 
     await app.ready();
 
@@ -140,6 +149,7 @@ describe("background jobs", () => {
       database,
       auth,
       membership,
+      dishes,
       jobs: { ...jobs, start: () => Promise.reject(failure) },
     });
 
@@ -153,6 +163,7 @@ describe("background jobs", () => {
       jobs: { ...jobs, stop: () => Promise.resolve(void calls.push("jobs")) },
       auth,
       membership,
+      dishes,
     });
     await app.ready();
 

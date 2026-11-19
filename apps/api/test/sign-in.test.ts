@@ -8,6 +8,7 @@ import type { TestDatabase } from "@shared-apps/db/testing";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
 import { sendTo } from "./support/send.ts";
+import { unusedDishes } from "./support/unused-dishes.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -46,6 +47,7 @@ const buildAppWith = async (authConfig: Config["auth"]): Promise<FastifyInstance
     jobs,
     auth: createAuth(database.db, authConfig),
     membership: { isMember: () => Promise.resolve(false) },
+    dishes: unusedDishes,
   });
   await built.ready();
   return built;
