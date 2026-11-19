@@ -150,15 +150,4 @@ describe("request logs", () => {
     expect(logged).not.toContain("secret-code");
     expect(logged).not.toContain("secret-state");
   });
-
-  it("keeps the query string for paths outside /api/auth", async () => {
-    const { built, lines } = await loggingApp();
-    try {
-      await built.inject({ url: "/health?probe=1" });
-    } finally {
-      await built.close();
-    }
-
-    expect(lines.join("\n")).toContain("/health?probe=1");
-  });
 });

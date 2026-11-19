@@ -3,19 +3,6 @@ import type { Auth } from "@shared-apps/auth";
 
 export const AUTH_ROUTE = "/api/auth/*";
 
-/**
- * The request as it goes into the log. Under /api/auth the query string is dropped:
- * Google's callback carries the one-time OAuth `code` and `state` there. Matched on the
- * route rather than the URL text, so an encoded path can't slip past.
- */
-export const serializeRequest = (request: FastifyRequest) => ({
-  method: request.method,
-  url: request.routeOptions.url === AUTH_ROUTE ? request.url.split("?")[0] : request.url,
-  host: request.host,
-  remoteAddress: request.ip,
-  remotePort: request.socket.remotePort,
-});
-
 /** Fastify's headers as fetch Headers, keeping repeated ones. */
 export const toHeaders = (incoming: FastifyRequest["headers"]): Headers => {
   const headers = new Headers();

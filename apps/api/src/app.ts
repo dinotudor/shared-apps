@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { AnyTRPCRouter } from "@trpc/server";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import type { FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
@@ -8,9 +8,22 @@ import type { Auth } from "@shared-apps/auth";
 import type { DatabaseHandle } from "@shared-apps/db";
 import type { JobRunner } from "@shared-apps/jobs";
 import type { Membership } from "@shared-apps/membership";
-import { registerAuthRoute, serializeRequest, toHeaders } from "./auth-route.ts";
+import { registerAuthRoute, toHeaders } from "./auth-route.ts";
 import type { Config } from "./config.ts";
 import { appRouter } from "./router.ts";
+
+/**
+ * The request as it goes into the log, without its query string: tRPC queries carry
+ * their input there (names, emails, search text), and Google's callback under /api/auth
+ * carries the one-time OAuth `code` and `state`.
+ */
+export const serializeRequest = (request: FastifyRequest) => ({
+  method: request.method,
+  url: request.url.split("?")[0],
+  host: request.host,
+  remoteAddress: request.ip,
+  remotePort: request.socket.remotePort,
+});
 
 export type AppDependencies = {
   database: DatabaseHandle;
@@ -48,7 +61,8 @@ export const buildApp = (
   // Every app.close() releases the pool: at shutdown, and in tests.
   app.addHook("onClose", () => database.close());
 
-  app.get("/health", () => ({ status: "ok" }));
+  // Silent: the host checks health every few seconds, which would drown the real lines.
+  app.get("/health", { logLevel: "silent" }, () => ({ status: "ok" }));
   registerAuthRoute(app, auth);
 
   const trpcOptions: FastifyTRPCPluginOptions<AnyTRPCRouter>["trpcOptions"] = {

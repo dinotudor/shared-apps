@@ -94,6 +94,36 @@ describe("api", () => {
   });
 });
 
+describe("request logs", () => {
+  /** Starts an API that logs at info level, and returns what it logged. */
+  const logsOf = async (url: string) => {
+    const lines: string[] = [];
+    app = buildApp(
+      { logLevel: "info" },
+      { database, jobs, auth, membership, logStream: { write: (line) => void lines.push(line) } },
+    );
+    await app.ready();
+    await app.inject({ method: "GET", url });
+    return lines.join("\n");
+  };
+
+  it("logs a tRPC call without its input, which can hold names or emails", async () => {
+    const input = encodeURIComponent(JSON.stringify({ email: "ana@example.com" }));
+
+    const logged = await logsOf(`/trpc/health.ping?input=${input}`);
+
+    expect(logged).toContain("/trpc/health.ping");
+    expect(logged).not.toContain("ana");
+    expect(logged).not.toContain("input=");
+  });
+
+  it("does not log health checks, which the host sends every few seconds", async () => {
+    const logged = await logsOf("/health");
+
+    expect(logged).not.toContain("/health");
+  });
+});
+
 describe("background jobs", () => {
   it("starts the job runner when the app is ready", async () => {
     const start = vi.fn(() => Promise.resolve());
