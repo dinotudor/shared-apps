@@ -4,7 +4,10 @@ import { applyLocale, LOCALE_COOKIE } from "../src/server/locale.ts";
 import { fakeCookie } from "./fake-cookie.ts";
 
 // Only the parts of the request event applyLocale uses.
-const eventFor = (url: string, { cookie, acceptLanguage }: { cookie?: string; acceptLanguage?: string } = {}) => {
+const eventFor = (
+  url: string,
+  { cookie, acceptLanguage }: { cookie?: string; acceptLanguage?: string } = {},
+) => {
   const jar = fakeCookie();
   const locale = vi.fn();
   const event = {

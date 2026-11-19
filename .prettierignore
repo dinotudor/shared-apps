@@ -4,3 +4,6 @@ pnpm-lock.yaml
 docs/
 # Written by drizzle-kit on every `pnpm db:generate`; formatting them would be undone.
 packages/db/migrations/meta/
+# Written by compiled-i18n's Vite plugin and pnpm i18n:translate; pnpm i18n:check validates them.
+apps/*/i18n/
+apps/*/i18n-lock.json
