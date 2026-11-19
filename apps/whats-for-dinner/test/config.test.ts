@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   DEV_API_URL,
   parseApiUrl,
+  DEFAULT_TIME_ZONE,
   parseServerConfig,
   resolveApiUrl,
+  resolveTimeZone,
 } from "../src/server/config.ts";
 
 describe("parseApiUrl", () => {
@@ -47,6 +49,7 @@ describe("parseServerConfig", () => {
       port: 3001,
       host: "127.0.0.1",
       apiUrl: "http://api.test",
+      timeZone: "America/Sao_Paulo",
     });
   });
 
@@ -58,5 +61,22 @@ describe("parseServerConfig", () => {
 
   it("requires API_URL, so the server does not start without it", () => {
     expect(() => parseServerConfig({})).toThrow("API_URL is not set");
+  });
+});
+
+describe("resolveTimeZone", () => {
+  it("defaults to the family's time zone (brief D1)", () => {
+    expect(resolveTimeZone(undefined)).toBe(DEFAULT_TIME_ZONE);
+    expect(DEFAULT_TIME_ZONE).toBe("America/Sao_Paulo");
+  });
+
+  it("accepts any IANA time zone", () => {
+    expect(resolveTimeZone("Europe/Lisbon")).toBe("Europe/Lisbon");
+  });
+
+  it("rejects a name Intl doesn't know", () => {
+    expect(() => resolveTimeZone("Mars/Olympus")).toThrow(
+      "TIME_ZONE is not a valid IANA time zone",
+    );
   });
 });

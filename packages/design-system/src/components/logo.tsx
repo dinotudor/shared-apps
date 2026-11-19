@@ -3,6 +3,7 @@ import lockupDark from "../../brand/wfd-lockup-dark.svg?url";
 import lockupLight from "../../brand/wfd-lockup-light.svg?url";
 import markDark from "../../brand/wfd-mark-dark.svg?url";
 import markLight from "../../brand/wfd-mark-light.svg?url";
+import { useLabels } from "../labels.ts";
 
 const FILES = {
   mark: { light: markLight, dark: markDark, ratio: 1 },
@@ -24,7 +25,8 @@ export type LogoProps = {
 export const Logo = component$<LogoProps>(({ variant, height = 30, decorative = false }) => {
   const files = FILES[variant];
   const width = Math.round(height * files.ratio);
-  const alt = decorative ? "" : "What's for dinner?";
+  const labels = useLabels();
+  const alt = decorative ? "" : labels.appName;
   return (
     <>
       {(["light", "dark"] as const).map((mode) => (

@@ -1,4 +1,5 @@
 import { component$, Slot, useId, useSignal, useVisibleTask$, type Signal } from "@qwik.dev/core";
+import { useLabels } from "../labels.ts";
 import { Icon } from "./icon.tsx";
 
 export type ModalProps = {
@@ -13,6 +14,7 @@ type Placement = "center" | "bottom";
 // an inert page behind it and focus return, without extra code.
 const Modal = component$<ModalProps & { placement: Placement }>(({ open, title, placement }) => {
   const id = useId();
+  const labels = useLabels();
   const titleId = `${id}-title`;
   const dialog = useSignal<HTMLDialogElement>();
 
@@ -46,7 +48,7 @@ const Modal = component$<ModalProps & { placement: Placement }>(({ open, title, 
         <button
           type="button"
           class="wfd-modal__close"
-          aria-label="Close"
+          aria-label={labels.close}
           onClick$={() => {
             open.value = false;
           }}

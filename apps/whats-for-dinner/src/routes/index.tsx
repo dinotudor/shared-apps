@@ -1,6 +1,7 @@
 import { component$ } from "@qwik.dev/core";
 import { routeLoader$ } from "@qwik.dev/router";
 import type { DocumentHead } from "@qwik.dev/router";
+import { _ } from "compiled-i18n";
 import { Alert, Card, Icon } from "@shared-apps/design-system";
 import { ApiHealth } from "../api-health.ts";
 import { apiFor } from "../server/api.ts";
@@ -19,21 +20,21 @@ export default component$(() => {
 
   return (
     <div class="stack">
-      <h1>Week</h1>
+      <h1>{_`Week`}</h1>
       {health.value === ApiHealth.Ok ? (
         <Card>
           <p class="row">
-            <Icon name="check" label="Success" />
-            API connected.
+            <Icon name="check" label={_`Success`} />
+            {_`API connected.`}
           </p>
         </Card>
       ) : (
-        <Alert variant="warning" title="API unavailable">
-          Couldn't reach the API. Please try again in a moment.
+        <Alert variant="warning" title={_`API unavailable`}>
+          {_`Couldn't reach the API. Please try again in a moment.`}
         </Alert>
       )}
     </div>
   );
 });
 
-export const head: DocumentHead = { title: "What's for dinner?" };
+export const head: DocumentHead = () => ({ title: _`What's for dinner?` });
