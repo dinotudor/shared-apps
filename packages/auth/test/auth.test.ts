@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
@@ -97,6 +97,30 @@ describe("signing in with Google", () => {
       page: `${WEB}/sign-in/`,
       error: "email_not_allowed",
     });
+  });
+});
+
+describe("removing an email from the allowlist", () => {
+  it("ends that person's open session, which stays ended if the email comes back", async () => {
+    googleStub({ sub: "google-dani", email: "Dani@Example.com ", name: "Dani Teste" });
+    const withDani = createAuth(database.db, {
+      ...config,
+      allowedEmails: [...config.allowedEmails, " dani@example.com"],
+    });
+    const { cookieHeaders } = await signInWithGoogle(withDani.handler, signInFromWeb);
+    expect((await withDani.getSession(cookieHeaders)).viewer).not.toBeNull();
+    // Old enough that Better Auth renews it on this call, sending a new cookie.
+    await database.db.execute(
+      sql`update auth.session set updated_at = now() - interval '7 days', expires_at = now() + interval '1 hour'
+          where user_id = (select id from auth.user where lower(trim(email)) = 'dani@example.com')`,
+    );
+
+    const removed = await auth.getSession(cookieHeaders);
+
+    expect(removed.viewer).toBeNull();
+    expect(removed.headers.getSetCookie()).toEqual([]);
+    // Deleted, not just hidden: putting the email back doesn't bring the session back.
+    expect((await withDani.getSession(cookieHeaders)).viewer).toBeNull();
   });
 });
 

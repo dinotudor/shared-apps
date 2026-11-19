@@ -57,16 +57,21 @@ const signInFromWeb = { origin: WEB, callbackURL: `${WEB}/`, errorCallbackURL: `
 const me = (cookies?: Headers) =>
   send(new Request("http://localhost:3000/trpc/viewer.me", { headers: cookies }));
 
-beforeAll(async () => {
-  database = await startTestDatabase();
-  const auth = createAuth(database.db, config.auth);
-  // The test database closes itself in afterAll.
-  app = buildApp(config, {
+/** The API on the shared test database, as it starts with `authConfig`. */
+const buildAppWith = async (authConfig: Config["auth"]): Promise<FastifyInstance> => {
+  const built = buildApp(config, {
+    // The test database closes itself in afterAll.
     database: { db: database.db, close: () => Promise.resolve() },
     jobs,
-    auth,
+    auth: createAuth(database.db, authConfig),
   });
-  await app.ready();
+  await built.ready();
+  return built;
+};
+
+beforeAll(async () => {
+  database = await startTestDatabase();
+  app = await buildAppWith(config.auth);
 });
 
 afterAll(async () => {
@@ -122,6 +127,24 @@ describe("signing in through the API", () => {
     expect(signOut.status).toBe(200);
     expect((await me(cookiesFrom(signOut, cookieHeaders))).status).toBe(401);
     expect((await me(cookieHeaders)).status).toBe(401);
+  });
+
+  it("answers viewer.me with UNAUTHORIZED once the person's email is removed from the allowlist", async () => {
+    googleStub({ sub: "google-ana", email: "ana@example.com", name: "Ana Teste" });
+    const { cookieHeaders } = await signInWithGoogle(send, signInFromWeb);
+    expect((await me(cookieHeaders)).status).toBe(200);
+    const withoutAna = await buildAppWith({ ...config.auth, allowedEmails: [] });
+    try {
+      const response = await withoutAna.inject({
+        url: "/trpc/viewer.me",
+        headers: { cookie: cookieHeaders.get("cookie") ?? "" },
+      });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.json()).toMatchObject({ error: { data: { code: "UNAUTHORIZED" } } });
+    } finally {
+      await withoutAna.close();
+    }
   });
 
   it("sends a renewed session cookie with the tRPC response when the session is renewed", async () => {
