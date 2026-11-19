@@ -1,7 +1,7 @@
 import { component$ } from "@qwik.dev/core";
 import type { Component, PropsOf } from "@qwik.dev/core";
 import { BottomNav } from "@shared-apps/design-system";
-import { NAV_ITEMS, navCurrent } from "../navigation.ts";
+import { navCurrent, navItems } from "../navigation.ts";
 
 export type AppNavProps = {
   pathname: string;
@@ -14,5 +14,5 @@ export type AppNavProps = {
  * app maps the path to its tab first: a day page (/day/…) marks Week, whose href is "/".
  */
 export const AppNav = component$<AppNavProps>(({ pathname, link }) => (
-  <BottomNav items={NAV_ITEMS} current={navCurrent(pathname)} link={link} />
+  <BottomNav items={navItems()} current={navCurrent(pathname)} link={link} />
 ));

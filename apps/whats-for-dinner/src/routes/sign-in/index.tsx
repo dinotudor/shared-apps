@@ -1,6 +1,7 @@
 import { component$ } from "@qwik.dev/core";
 import { Form, routeAction$, useLocation } from "@qwik.dev/router";
 import type { DocumentHead, RequestHandler } from "@qwik.dev/router";
+import { _ } from "compiled-i18n";
 import { Alert, Button, Logo } from "@shared-apps/design-system";
 import { safeNext, startGoogleSignIn } from "../../server/auth.ts";
 import { getViewer } from "../../server/viewer.ts";
@@ -32,30 +33,30 @@ export const useSignInWithGoogle = routeAction$(async (form, event) => {
 const errorMessage = (code: string | null): string | null => {
   if (!code) return null;
   if (code === "email_not_allowed") {
-    return "This email doesn't have access. Ask someone in the family to add you.";
+    return _`This email doesn't have access. Ask someone in the family to add you.`;
   }
-  return "Couldn't sign in. Please try again.";
+  return _`Couldn't sign in. Please try again.`;
 };
 
 export default component$(() => {
   const location = useLocation();
   const signIn = useSignInWithGoogle();
   const error = signIn.value?.failed
-    ? "Couldn't sign in right now. Please try again in a moment."
+    ? _`Couldn't sign in right now. Please try again in a moment.`
     : errorMessage(location.url.searchParams.get("error"));
 
   return (
     <div class="stack sign-in">
       <Logo variant="mark" height={56} decorative />
-      <h1>Sign in</h1>
+      <h1>{_`Sign in`}</h1>
       {error && <Alert variant="warning">{error}</Alert>}
       {/* A full-page post: the browser follows the redirect to Google itself. */}
       <Form action={signIn} reloadDocument>
         <input type="hidden" name="next" value={location.url.searchParams.get("next") ?? ""} />
-        <Button type="submit">Sign in with Google</Button>
+        <Button type="submit">{_`Sign in with Google`}</Button>
       </Form>
     </div>
   );
 });
 
-export const head: DocumentHead = { title: "Sign in · What's for dinner?" };
+export const head: DocumentHead = () => ({ title: _`Sign in · What's for dinner?` });

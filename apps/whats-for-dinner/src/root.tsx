@@ -2,10 +2,13 @@ import { component$ } from "@qwik.dev/core";
 import { DocumentHeadTags, RouterOutlet, useQwikRouter } from "@qwik.dev/router";
 import appIcon from "@shared-apps/design-system/brand/wfd-app-icon.svg?url";
 import touchIcon from "@shared-apps/design-system/brand/wfd-apple-touch-icon.png?url";
+import { useLabelsProvider } from "@shared-apps/design-system";
 import "@shared-apps/design-system/styles.css";
+import { designSystemLabels } from "./i18n/labels.ts";
 
 export default component$(() => {
   useQwikRouter();
+  useLabelsProvider(designSystemLabels());
 
   return (
     <>
