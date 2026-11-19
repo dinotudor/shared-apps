@@ -32,17 +32,27 @@ Use roles, never raw hex. In inline styles, use `vars.color.action` rather than 
 
 ## Components
 
-All components use class names prefixed with `wfd-` (`wfd-button`, modifiers like `wfd-button--primary`, parts like `wfd-field__label`) and only token values for colour. Every touch target is at least 44 px. State is never shown by colour alone. UI strings are pt-BR.
+All components use class names prefixed with `wfd-` (`wfd-button`, modifiers like `wfd-button--primary`, parts like `wfd-field__label`) and only token values for colour. Every touch target is at least 44 px. State is never shown by colour alone.
+
+### Text and translation
+
+The package has no translations. Text that you pass in (labels, titles, children) is already translated by the app with `_` (playbook guideline i18n.md). The few strings the components write themselves (close buttons, alert icon names, the logo's alt text, the offline notice, the default loading and navigation labels) come from `DesignSystemLabels`. The app provides them once, in its root layout:
+
+```tsx
+useLabelsProvider({ close: _`Close`, offlineTitle: _`No connection.`, /* … */ });
+```
+
+Without a provider, components use `DEFAULT_LABELS`, in English. The package's own tests rely on that.
 
 ### Icon
 
-`<Icon name="search" size={16 | 20 | 24} label?="Buscar" />`: a 24-grid stroke icon from the sprite, in `currentColor`. Without `label` it is hidden from screen readers (use this when visible text sits next to it). With `label` it has `role="img"` and that name. An icon-only button needs a `label` on the icon or an `aria-label` on the button.
+`<Icon name="search" size={16 | 20 | 24} label?="Search" />`: a 24-grid stroke icon from the sprite, in `currentColor`. Without `label` it is hidden from screen readers (use this when visible text sits next to it). With `label` it has `role="img"` and that name. An icon-only button needs a `label` on the icon or an `aria-label` on the button.
 
 The sprite must be served from the same origin as the page, because browsers refuse an SVG `<use>` that points to another origin. Vite serves it with the app's other assets, so this holds unless the assets are moved to a separate CDN domain.
 
 ### Logo
 
-`<Logo variant="mark" | "lockup" height?={30} decorative? />`: renders the light and the dark file, and CSS shows the one for the active theme. Its alt text is "What's for dinner?". Set `decorative` when the name is already on screen.
+`<Logo variant="mark" | "lockup" height?={30} decorative? />`: renders the light and the dark file, and CSS shows the one for the active theme. Its alt text is `labels.appName` ("What's for dinner?" in English). Set `decorative` when the name is already on screen.
 
 Known trade-off: the browser downloads both images, even though only one shows. The files are small (8 to 17 kB). A possible improvement is one inline SVG whose colours come from tokens, or a `<picture>` element (which follows only the system preference, not `data-theme`).
 

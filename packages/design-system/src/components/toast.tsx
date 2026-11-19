@@ -1,4 +1,5 @@
 import { component$, Slot, useSignal, useVisibleTask$, type Signal } from "@qwik.dev/core";
+import { useLabels } from "../labels.ts";
 import { Icon } from "./icon.tsx";
 
 export type ToastProps = {
@@ -25,6 +26,7 @@ export const Toast = component$<ToastProps>((props) => {
   // the pause while the other is still there. The timer restarts in full afterwards.
   const hovered = useSignal(false);
   const focused = useSignal(false);
+  const labels = useLabels();
 
   // A timer is browser-only work, so it runs in a visible task, not during SSR.
   // eslint-disable-next-line qwik/no-use-visible-task -- the timer must start without a user event
@@ -75,7 +77,7 @@ export const Toast = component$<ToastProps>((props) => {
           <button
             type="button"
             class="wfd-toast__close"
-            aria-label="Close"
+            aria-label={labels.close}
             onClick$={() => {
               open.value = false;
             }}
