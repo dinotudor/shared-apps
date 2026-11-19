@@ -98,6 +98,9 @@ export const createAuth = (db: Database, config: AuthConfig): Auth => {
       // comes from the frontend's server, so every person shares that one IP's limit.
       customRules: { "/sign-in/social": false },
     },
+    // Nothing here lets people edit their profile, and Google is the source of their name
+    // and picture. Open, it would let a signed-in person rename themselves.
+    disabledPaths: ["/update-user"],
     telemetry: { enabled: false },
   });
 
