@@ -21,7 +21,11 @@ const t = initTRPC.context<Context>().create({
   isDev: false,
   errorFormatter: ({ shape, error }) => {
     const domainCode = error.cause instanceof DomainError ? error.cause.code : null;
-    return { ...shape, data: { ...shape.data, domainCode } };
+    // tRPC copies an unexpected error's own message into the response, which can carry
+    // SQL, names or emails. Callers get a generic one; apps/api logs the original in full.
+    const message =
+      error.code === "INTERNAL_SERVER_ERROR" ? "Internal server error" : shape.message;
+    return { ...shape, message, data: { ...shape.data, domainCode } };
   },
 });
 
