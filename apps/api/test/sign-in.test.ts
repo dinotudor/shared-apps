@@ -64,6 +64,7 @@ const buildAppWith = async (authConfig: Config["auth"]): Promise<FastifyInstance
     database: { db: database.db, close: () => Promise.resolve() },
     jobs,
     auth: createAuth(database.db, authConfig),
+    membership: { isMember: () => Promise.resolve(false) },
   });
   await built.ready();
   return built;

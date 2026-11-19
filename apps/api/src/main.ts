@@ -1,6 +1,7 @@
 import { createAuth } from "@shared-apps/auth";
 import { createDatabase } from "@shared-apps/db";
 import { createJobRunner } from "@shared-apps/jobs";
+import { createMembership } from "@shared-apps/membership";
 import { buildApp } from "./app.ts";
 import { ConfigError, parseConfig } from "./config.ts";
 import type { Config } from "./config.ts";
@@ -51,7 +52,8 @@ const jobs = createJobRunner({
   schedules: [heartbeat, ...auth.schedules],
   stopTimeoutMs: JOBS_STOP_TIMEOUT_MS,
 });
-const app = buildApp(config, { database, jobs, auth });
+const membership = createMembership(database.db);
+const app = buildApp(config, { database, jobs, auth, membership });
 
 await runServer(app, {
   port: config.port,

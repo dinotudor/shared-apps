@@ -1,0 +1,114 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import type { FastifyInstance } from "fastify";
+import { App, memberProcedure, router } from "@shared-apps/api-core";
+import { createAuth, findUserIdByEmail } from "@shared-apps/auth";
+import { googleStub, signInWithGoogle } from "@shared-apps/auth/testing";
+import { startTestDatabase } from "@shared-apps/db/testing";
+import type { TestDatabase } from "@shared-apps/db/testing";
+import { createMembership } from "@shared-apps/membership";
+import { buildApp } from "../src/app.ts";
+import type { Config } from "../src/config.ts";
+
+const WEB = "http://localhost:5173";
+
+const config: Config = {
+  port: 0,
+  host: "127.0.0.1",
+  logLevel: "silent",
+  databaseUrl: "postgres://unused/unused",
+  auth: {
+    secret: "test-secret-that-is-at-least-32-characters-long",
+    baseUrl: "http://localhost:3000",
+    google: { clientId: "test-client-id", clientSecret: "test-client-secret" },
+    allowedEmails: ["ana@example.com", "bruno@example.com"],
+    trustedOrigins: [WEB],
+    cookieDomain: undefined,
+  },
+};
+
+// Stands in for What's for dinner's procedures, which don't exist yet.
+const testRouter = router({
+  dinner: router({
+    today: memberProcedure(App.WhatsForDinner).query(() => "pasta"),
+  }),
+});
+
+let database: TestDatabase;
+let app: FastifyInstance;
+
+const send = async (request: Request) => {
+  const url = new URL(request.url);
+  const response = await app.inject({
+    method: request.method as "GET" | "POST",
+    url: url.pathname + url.search,
+    headers: Object.fromEntries(request.headers),
+    ...(request.body ? { payload: await request.text() } : {}),
+  });
+  const headers = new Headers();
+  for (const [name, value] of Object.entries(response.headers)) {
+    for (const item of [value ?? []].flat()) headers.append(name, String(item));
+  }
+  const hasBody = response.rawPayload.length > 0 && response.statusCode !== 204;
+  return new Response(hasBody ? new Uint8Array(response.rawPayload) : null, {
+    status: response.statusCode,
+    headers,
+  });
+};
+
+const signIn = async (email: string, name: string) => {
+  googleStub({ sub: `google-${email}`, email, name });
+  const { cookieHeaders } = await signInWithGoogle(send, {
+    origin: WEB,
+    callbackURL: `${WEB}/`,
+    errorCallbackURL: `${WEB}/sign-in/`,
+  });
+  return cookieHeaders;
+};
+
+const today = (cookies: Headers) =>
+  send(new Request("http://localhost:3000/trpc/dinner.today", { headers: cookies }));
+
+beforeAll(async () => {
+  database = await startTestDatabase();
+  app = buildApp(config, {
+    database: { db: database.db, close: () => Promise.resolve() },
+    jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
+    auth: createAuth(database.db, config.auth),
+    membership: createMembership(database.db),
+    router: testRouter,
+  });
+  await app.ready();
+});
+
+afterAll(async () => {
+  await app.close();
+  await database.stop();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe("app membership through the API", () => {
+  it("lets a member of What's for dinner use its procedures", async () => {
+    const cookies = await signIn("ana@example.com", "Ana Teste");
+    const ana = await findUserIdByEmail(database.db, "ana@example.com");
+    await createMembership(database.db).add(App.WhatsForDinner, ana ?? "");
+
+    const response = await today(cookies);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ result: { data: "pasta" } });
+  });
+
+  it("refuses a signed-in collaborator who is not a member as FORBIDDEN, with not_a_member", async () => {
+    const cookies = await signIn("bruno@example.com", "Bruno Teste");
+
+    const response = await today(cookies);
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({
+      error: { data: { code: "FORBIDDEN", domainCode: "not_a_member" } },
+    });
+  });
+});
