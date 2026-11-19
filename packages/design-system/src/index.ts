@@ -28,3 +28,5 @@ export type { StatusMessageProps } from "./components/status-message.tsx";
 export { LoadingState } from "./components/loading-state.tsx";
 export type { LoadingStateProps } from "./components/loading-state.tsx";
 export { OfflineNotice } from "./components/offline-notice.tsx";
+export { DEFAULT_LABELS, useLabelsProvider } from "./labels.ts";
+export type { DesignSystemLabels } from "./labels.ts";
