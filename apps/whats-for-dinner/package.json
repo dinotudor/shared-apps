@@ -8,7 +8,9 @@
     "preview": "vite build && vite build --ssr src/entry.preview.tsx && vite preview",
     "start": "node server/entry.node-server.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "i18n:check": "node scripts/i18n-check.ts",
+    "i18n:translate": "node scripts/i18n-translate.ts"
   },
   "dependencies": {
     "@qwik.dev/core": "catalog:",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@shared-apps/api": "workspace:*",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   }
