@@ -1,0 +1,30 @@
+diff --git a/dist/transform-localize.cjs b/dist/transform-localize.cjs
+index 362818fabaf26f4ee7dc122a88d3016b7f8135bb..933dbfed497747ed081febc676da2f8c3c1b915b 100644
+--- a/dist/transform-localize.cjs
++++ b/dist/transform-localize.cjs
+@@ -215,7 +215,9 @@ const replaceGlobals = ({
+     if (!argExprs.length) {
+       throw new Error(`No arguments found for __$LOCALIZE$__`);
+     }
+-    const key = JSON.parse(argExprs.shift());
++    const rawKey = argExprs.shift();
++    // Vite 8's Oxc minifier prints string literals as template literals: unescape ` and $ and re-quote.
++    const key = rawKey.startsWith("`") ? JSON.parse(`"${rawKey.slice(1, -1).replace(/\\([`$])/g, "$1").replace(/"/g, '\\"')}"`) : JSON.parse(rawKey);
+     const tr = getTr(key, locale, translations);
+     code = code.slice(0, startIndex) + makeTranslatedExpr(tr, argExprs) + chunk.slice(i + 1);
+   }
+diff --git a/dist/transform-localize.mjs b/dist/transform-localize.mjs
+index fe349f867a0f58f0e63d930714bc9d83a9086723..456dbf8d889fa658f94ab1adc59d2d5b722e70d8 100644
+--- a/dist/transform-localize.mjs
++++ b/dist/transform-localize.mjs
+@@ -212,7 +212,9 @@ const replaceGlobals = ({
+     if (!argExprs.length) {
+       throw new Error(`No arguments found for __$LOCALIZE$__`);
+     }
+-    const key = JSON.parse(argExprs.shift());
++    const rawKey = argExprs.shift();
++    // Vite 8's Oxc minifier prints string literals as template literals: unescape ` and $ and re-quote.
++    const key = rawKey.startsWith("`") ? JSON.parse(`"${rawKey.slice(1, -1).replace(/\\([`$])/g, "$1").replace(/"/g, '\\"')}"`) : JSON.parse(rawKey);
+     const tr = getTr(key, locale, translations);
+     code = code.slice(0, startIndex) + makeTranslatedExpr(tr, argExprs) + chunk.slice(i + 1);
+   }

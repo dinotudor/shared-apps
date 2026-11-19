@@ -40,3 +40,9 @@ catalog:
   # Keep @vitest/ui on the same version as vitest.
   "@vitest/ui": ^5.1.0
   vitest: ^5.1.0
+
+# compiled-i18n reads each key with JSON.parse, but Vite 8's Oxc minifier prints keys as
+# template literals, so every production build fails without this. Remove it once fixed
+# upstream (playbook ADR 0015).
+patchedDependencies:
+  compiled-i18n@1.3.0: patches/compiled-i18n@1.3.0.patch
