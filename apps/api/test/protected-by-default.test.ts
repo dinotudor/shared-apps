@@ -13,7 +13,7 @@ const procedures = Object.keys(appRouter._def.procedures);
 const callSignedOut = (path: string): Promise<unknown> => {
   const caller: unknown = createCallerFactory(appRouter)({
     viewer: null,
-    isMember: () => Promise.resolve(false),
+    isMemberOf: () => Promise.resolve(false),
   });
   const procedure = path
     .split(".")

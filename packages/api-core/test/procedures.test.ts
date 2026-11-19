@@ -23,7 +23,7 @@ const testRouter = router({
 const callerFor = (viewer: Viewer | null, members: readonly string[] = []) =>
   createCallerFactory(testRouter)({
     viewer,
-    isMember: (_app, userId) => Promise.resolve(members.includes(userId)),
+    isMemberOf: () => Promise.resolve(viewer !== null && members.includes(viewer.id)),
   });
 
 const codeOf = async (call: Promise<unknown>) => {

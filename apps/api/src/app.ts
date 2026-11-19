@@ -60,7 +60,12 @@ export const buildApp = (
       // A renewed session comes with a new cookie. The frontends pass it on to the browser.
       const cookies = headers.getSetCookie();
       if (cookies.length > 0) void res.header("set-cookie", cookies);
-      return { viewer, isMember: membership.isMember };
+      return {
+        viewer,
+        // Bound to this call's viewer, so a procedure can't ask about someone else.
+        isMemberOf: (app) =>
+          viewer ? membership.isMember(app, viewer.id) : Promise.resolve(false),
+      };
     },
     onError: ({ error, path }) => {
       // Only unexpected failures: client errors (bad input, unknown path) are not ours.
