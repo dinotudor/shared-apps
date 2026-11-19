@@ -4,7 +4,7 @@ import type { Database } from "@shared-apps/db";
 import { defineJob } from "@shared-apps/jobs";
 import type { ScheduledJob } from "@shared-apps/jobs";
 import { createAllowlist } from "./allowlist.ts";
-import { deleteExpired } from "./repository.ts";
+import { deleteExpired, deleteSession } from "./repository.ts";
 import type { PurgeResult } from "./repository.ts";
 import { parseRole } from "./roles.ts";
 import type { Viewer } from "./roles.ts";
@@ -69,8 +69,8 @@ export const createAuth = (db: Database, config: AuthConfig): Auth => {
     user: {
       // Runs before a user is created and on every Google sign-in, with the email Google
       // sends now. So a stranger never gets a row, and removing an email from the
-      // allowlist stops that person's next sign-in. Existing sessions run until they
-      // expire or are revoked.
+      // allowlist stops that person's next sign-in. Their open sessions end in
+      // getSession below.
       validateUserInfo: ({ user }) =>
         isAllowed(user.email) ? undefined : { error: EMAIL_NOT_ALLOWED },
       additionalFields: {
@@ -110,10 +110,16 @@ export const createAuth = (db: Database, config: AuthConfig): Auth => {
         headers: requestHeaders,
         returnHeaders: true,
       });
-      const viewer = response
-        ? { id: response.user.id, name: response.user.name, role: parseRole(response.user.role) }
-        : null;
-      return { viewer, headers };
+      if (!response) return { viewer: null, headers };
+      // Removing an email from the allowlist ends that person's sessions too, not only
+      // their next sign-in. Deleted rather than ignored, so the session can't be renewed.
+      // The headers are dropped, because they may carry a renewed cookie for it.
+      if (!isAllowed(response.user.email)) {
+        await deleteSession(db, response.session.id);
+        return { viewer: null, headers: new Headers() };
+      }
+      const { id, name, role } = response.user;
+      return { viewer: { id, name, role: parseRole(role) }, headers };
     },
     purgeExpired,
     schedules: [
