@@ -36,6 +36,8 @@ export const createCallerFactory = t.createCallerFactory;
 // DomainErrorCode without a status here doesn't compile.
 const STATUS_BY_DOMAIN_CODE: Record<DomainErrorCode, TRPCError["code"]> = {
   not_a_member: "FORBIDDEN",
+  dish_not_found: "NOT_FOUND",
+  unknown_ingredient: "BAD_REQUEST",
 };
 
 // Every procedure starts here. tRPC wraps anything a procedure or a later middleware throws

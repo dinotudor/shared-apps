@@ -1,5 +1,5 @@
 /** Every domain error code. Adding one makes trpc.ts map it to a tRPC code, or it won't compile. */
-export type DomainErrorCode = "not_a_member";
+export type DomainErrorCode = "not_a_member" | "dish_not_found" | "unknown_ingredient";
 
 /**
  * A business rule a call broke. Modules throw it from anywhere in a call; api-core turns it
