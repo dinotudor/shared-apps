@@ -222,7 +222,7 @@ importers:
         version: runtime:26.13.1
       prettier:
         specifier: ^3.9.10
-        version: 3.10.0
+        version: 3.10.1
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -268,10 +268,10 @@ importers:
     dependencies:
       '@qwik.dev/core':
         specifier: 'catalog:'
-        version: 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
+        version: 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
       '@qwik.dev/router':
         specifier: 2.0.0-rc.5
-        version: 2.0.0-rc.5(@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0))(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 2.0.0-rc.5(@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0))(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
       '@shared-apps/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
@@ -354,7 +354,7 @@ importers:
     devDependencies:
       '@qwik.dev/core':
         specifier: 'catalog:'
-        version: 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
+        version: 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
       vite:
         specifier: 'catalog:'
         version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1)
@@ -3675,8 +3675,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.10.0:
-    resolution: {integrity: sha512-mBi4765LgjO1PFjlEs7pUeK0nb1bw71c+N4/ItfeUWNdY5cV2pRKaFpbbFRYmDJMO+5ZwzGxHRqHxFZna7iv5w==}
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -5176,7 +5176,7 @@ snapshots:
 
   '@protobufjs/utf8@1.1.2': {}
 
-  '@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)':
+  '@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)':
     dependencies:
       '@emnapi/core': 1.11.3
       '@emnapi/runtime': 1.11.3
@@ -5192,7 +5192,7 @@ snapshots:
       siphash: 1.2.0
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1)
     optionalDependencies:
-      prettier: 3.10.0
+      prettier: 3.10.1
       vitest: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/ui@5.1.0)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
@@ -5208,12 +5208,12 @@ snapshots:
 
   '@qwik.dev/optimizer@2.1.0-rc.11': {}
 
-  '@qwik.dev/router@2.0.0-rc.5(@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0))(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))':
+  '@qwik.dev/router@2.0.0-rc.5(@qwik.dev/core@2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0))(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
       '@netlify/edge-functions': 3.0.8
-      '@qwik.dev/core': 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.0)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
+      '@qwik.dev/core': 2.0.0-rc.5(@oxc-project/types@0.156.0)(esbuild@0.28.2)(prettier@3.10.1)(rolldown@1.2.18)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.1.0)
       '@types/mdx': 2.0.14
       estree-util-value-to-estree: 3.5.0
       github-slugger: 2.0.0
@@ -7650,7 +7650,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.10.0: {}
+  prettier@3.10.1: {}
 
   process-nextick-args@2.0.1: {}
 
