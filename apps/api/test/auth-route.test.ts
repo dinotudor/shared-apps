@@ -56,6 +56,7 @@ beforeAll(async () => {
       database: { db: database.db, close: () => Promise.resolve() },
       jobs,
       auth: createAuth(database.db, authConfig),
+      membership: { isMember: () => Promise.resolve(false) },
     },
   );
   await app.ready();
@@ -128,6 +129,7 @@ describe("request logs", () => {
         database: { db: database.db, close: () => Promise.resolve() },
         jobs,
         auth: createAuth(database.db, authConfig),
+        membership: { isMember: () => Promise.resolve(false) },
         logStream: { write: (line: string) => void lines.push(line) },
       },
     );

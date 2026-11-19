@@ -17,6 +17,7 @@ const setUp = () => {
         handler: () => Promise.resolve(new Response(null, { status: 404 })),
         getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
       },
+      membership: { isMember: () => Promise.resolve(false) },
     },
   );
   const signals = new EventEmitter();

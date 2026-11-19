@@ -11,7 +11,10 @@ const procedures = Object.keys(appRouter._def.procedures);
 
 /** Calls a procedure by its dotted path, with no session and no input. */
 const callSignedOut = (path: string): Promise<unknown> => {
-  const caller: unknown = createCallerFactory(appRouter)({ viewer: null });
+  const caller: unknown = createCallerFactory(appRouter)({
+    viewer: null,
+    isMemberOf: () => Promise.resolve(false),
+  });
   const procedure = path
     .split(".")
     .reduce<unknown>((node, key) => (node as Record<string, unknown>)[key], caller);

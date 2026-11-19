@@ -17,9 +17,11 @@ const auth = {
   handler: () => Promise.resolve(new Response(null, { status: 404 })),
   getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
 };
+// No procedure here is for members only.
+const membership = { isMember: () => Promise.resolve(false) };
 
 const startApp = async (appRouter?: AppDependencies["router"]) => {
-  app = buildApp(config, { database, jobs, auth, router: appRouter });
+  app = buildApp(config, { database, jobs, auth, membership, router: appRouter });
   await app.ready();
   return app;
 };
@@ -95,7 +97,7 @@ describe("api", () => {
 describe("background jobs", () => {
   it("starts the job runner when the app is ready", async () => {
     const start = vi.fn(() => Promise.resolve());
-    app = buildApp(config, { database, auth, jobs: { ...jobs, start } });
+    app = buildApp(config, { database, auth, membership, jobs: { ...jobs, start } });
 
     await app.ready();
 
@@ -107,6 +109,7 @@ describe("background jobs", () => {
     app = buildApp(config, {
       database,
       auth,
+      membership,
       jobs: { ...jobs, start: () => Promise.reject(failure) },
     });
 
@@ -119,6 +122,7 @@ describe("background jobs", () => {
       database: { ...database, close: () => Promise.resolve(void calls.push("database")) },
       jobs: { ...jobs, stop: () => Promise.resolve(void calls.push("jobs")) },
       auth,
+      membership,
     });
     await app.ready();
 

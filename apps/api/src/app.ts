@@ -7,6 +7,7 @@ import type { Context } from "@shared-apps/api-core";
 import type { Auth } from "@shared-apps/auth";
 import type { DatabaseHandle } from "@shared-apps/db";
 import type { JobRunner } from "@shared-apps/jobs";
+import type { Membership } from "@shared-apps/membership";
 import { registerAuthRoute, serializeRequest, toHeaders } from "./auth-route.ts";
 import type { Config } from "./config.ts";
 import { appRouter } from "./router.ts";
@@ -15,6 +16,7 @@ export type AppDependencies = {
   database: DatabaseHandle;
   jobs: Pick<JobRunner, "start" | "stop">;
   auth: Pick<Auth, "handler" | "getSession">;
+  membership: Pick<Membership, "isMember">;
   // A parameter so tests can mount procedures that fail.
   router?: AnyTRPCRouter;
   // Where log lines go: stdout by default, and an array in tests that read them.
@@ -23,7 +25,7 @@ export type AppDependencies = {
 
 export const buildApp = (
   config: Pick<Config, "logLevel">,
-  { database, jobs, auth, router = appRouter, logStream }: AppDependencies,
+  { database, jobs, auth, membership, router = appRouter, logStream }: AppDependencies,
 ): FastifyInstance => {
   const app = Fastify({
     logger: {
@@ -58,7 +60,12 @@ export const buildApp = (
       // A renewed session comes with a new cookie. The frontends pass it on to the browser.
       const cookies = headers.getSetCookie();
       if (cookies.length > 0) void res.header("set-cookie", cookies);
-      return { viewer };
+      return {
+        viewer,
+        // Bound to this call's viewer, so a procedure can't ask about someone else.
+        isMemberOf: (app) =>
+          viewer ? membership.isMember(app, viewer.id) : Promise.resolve(false),
+      };
     },
     onError: ({ error, path }) => {
       // Only unexpected failures: client errors (bad input, unknown path) are not ours.
