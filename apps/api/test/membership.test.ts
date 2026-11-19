@@ -1,10 +1,11 @@
 import { afterAll, afterEach, assert, beforeAll, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
-import { App, memberProcedure, router } from "@shared-apps/api-core";
+import { App } from "@shared-apps/api-core";
 import { createAuth, findUserIdByEmail } from "@shared-apps/auth";
 import { googleStub, signInWithGoogle } from "@shared-apps/auth/testing";
 import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
+import { createDishes } from "@shared-apps/dishes";
 import { createMembership } from "@shared-apps/membership";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
@@ -27,13 +28,6 @@ const config: Config = {
   },
 };
 
-// Stands in for What's for dinner's procedures, which don't exist yet.
-const testRouter = router({
-  dinner: router({
-    today: memberProcedure(App.WhatsForDinner).query(() => "pasta"),
-  }),
-});
-
 let database: TestDatabase;
 let app: FastifyInstance;
 
@@ -49,8 +43,9 @@ const signIn = async (email: string, name: string) => {
   return cookieHeaders;
 };
 
-const today = (cookies: Headers) =>
-  send(new Request("http://localhost:3000/trpc/dinner.today", { headers: cookies }));
+// A What's for dinner procedure, called the way the frontend's server calls it.
+const listDishes = (cookies: Headers) =>
+  send(new Request("http://localhost:3000/trpc/dishes.list", { headers: cookies }));
 
 beforeAll(async () => {
   database = await startTestDatabase();
@@ -59,7 +54,7 @@ beforeAll(async () => {
     jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
     auth: createAuth(database.db, config.auth),
     membership: createMembership(database.db),
-    router: testRouter,
+    dishes: createDishes(database.db),
   });
   await app.ready();
 });
@@ -80,16 +75,16 @@ describe("app membership through the API", () => {
     assert(ana !== null, "signing in creates Ana's account");
     await createMembership(database.db).add(App.WhatsForDinner, ana);
 
-    const response = await today(cookies);
+    const response = await listDishes(cookies);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ result: { data: "pasta" } });
+    expect(await response.json()).toEqual({ result: { data: [] } });
   });
 
   it("refuses a signed-in collaborator who is not a member as FORBIDDEN, with not_a_member", async () => {
     const cookies = await signIn("bruno@example.com", "Bruno Teste");
 
-    const response = await today(cookies);
+    const response = await listDishes(cookies);
 
     expect(response.status).toBe(403);
     expect(await response.json()).toMatchObject({

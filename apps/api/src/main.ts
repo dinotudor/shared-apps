@@ -1,5 +1,6 @@
 import { createAuth } from "@shared-apps/auth";
 import { createDatabase } from "@shared-apps/db";
+import { createDishes } from "@shared-apps/dishes";
 import { createJobRunner } from "@shared-apps/jobs";
 import { createMembership } from "@shared-apps/membership";
 import { buildApp } from "./app.ts";
@@ -53,7 +54,8 @@ const jobs = createJobRunner({
   stopTimeoutMs: JOBS_STOP_TIMEOUT_MS,
 });
 const membership = createMembership(database.db);
-const app = buildApp(config, { database, jobs, auth, membership });
+const dishes = createDishes(database.db);
+const app = buildApp(config, { database, jobs, auth, membership, dishes });
 
 await runServer(app, {
   port: config.port,

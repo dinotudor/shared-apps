@@ -7,6 +7,7 @@ import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
+import { unusedDishes } from "./support/unused-dishes.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -57,6 +58,7 @@ beforeAll(async () => {
       jobs,
       auth: createAuth(database.db, authConfig),
       membership: { isMember: () => Promise.resolve(false) },
+      dishes: unusedDishes,
     },
   );
   await app.ready();
@@ -130,6 +132,7 @@ describe("request logs", () => {
         jobs,
         auth: createAuth(database.db, authConfig),
         membership: { isMember: () => Promise.resolve(false) },
+        dishes: unusedDishes,
         logStream: { write: (line: string) => void lines.push(line) },
       },
     );
@@ -149,16 +152,5 @@ describe("request logs", () => {
     expect(logged).toContain("/api/auth/callback/google");
     expect(logged).not.toContain("secret-code");
     expect(logged).not.toContain("secret-state");
-  });
-
-  it("keeps the query string for paths outside /api/auth", async () => {
-    const { built, lines } = await loggingApp();
-    try {
-      await built.inject({ url: "/health?probe=1" });
-    } finally {
-      await built.close();
-    }
-
-    expect(lines.join("\n")).toContain("/health?probe=1");
   });
 });

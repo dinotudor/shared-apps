@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { describe, expect, it } from "vitest";
 import type { Viewer } from "@shared-apps/auth";
@@ -15,6 +16,9 @@ const VIEWER: Viewer = { id: "user-1", name: "Ana Teste", role: "member" };
 const testRouter = router({
   fails: publicProcedure.query(() => {
     throw new Error("internal detail");
+  }),
+  notFound: publicProcedure.query(() => {
+    throw new TRPCError({ code: "NOT_FOUND", message: "No such thing" });
   }),
   dinnerOnly: memberProcedure(App.WhatsForDinner).query(() => "ok"),
   // A rule broken inside a procedure, the way a module's service throws one.
@@ -43,6 +47,19 @@ describe("tRPC errors", () => {
 
     expect(status).toBe(500);
     expect(JSON.stringify(body)).not.toContain("stack");
+  });
+
+  it("give callers a generic message for an unexpected error, not its own message", async () => {
+    const { body } = await call("fails");
+
+    expect(JSON.stringify(body)).not.toContain("internal detail");
+    expect(body).toMatchObject({ error: { message: "Internal server error" } });
+  });
+
+  it("keep the message of an error a procedure throws on purpose", async () => {
+    const { body } = await call("notFound");
+
+    expect(body).toMatchObject({ error: { message: "No such thing" } });
   });
 
   it("carry a stable domain code the frontend can branch on, such as not_a_member", async () => {

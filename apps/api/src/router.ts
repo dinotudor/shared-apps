@@ -1,4 +1,6 @@
 import { protectedProcedure, publicProcedure, router } from "@shared-apps/api-core";
+import { dishesRouter } from "@shared-apps/dishes";
+import type { Dishes } from "@shared-apps/dishes";
 
 // Health lives here, not in modules/: it has no business rules or tables.
 const healthRouter = router({
@@ -11,9 +13,15 @@ const viewerRouter = router({
   me: protectedProcedure.query(({ ctx }) => ctx.viewer),
 });
 
-export const appRouter = router({
-  health: healthRouter,
-  viewer: viewerRouter,
-});
+/** The module instances the procedures call, built once in main.ts. */
+export type Modules = { dishes: Dishes };
 
-export type AppRouter = typeof appRouter;
+export const createAppRouter = ({ dishes }: Modules) =>
+  router({
+    health: healthRouter,
+    viewer: viewerRouter,
+    // What's for dinner. Every procedure is for its members only.
+    dishes: dishesRouter(dishes),
+  });
+
+export type AppRouter = ReturnType<typeof createAppRouter>;

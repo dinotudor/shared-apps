@@ -4,7 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts",
+    "./schema": "./src/user-table.ts",
     "./testing": "./src/testing.ts"
   },
   "scripts": {
