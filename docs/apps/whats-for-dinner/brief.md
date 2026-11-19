@@ -57,6 +57,7 @@ It is also the first app in `shared-apps`. It must prove the shared stack end to
 
 ### 3.6 Language
 - UI in Brazilian Portuguese. Code, identifiers, routes, commits and translation keys in English.
+- UI text is written in English with `_`, and the pt-BR copy lives in `apps/whats-for-dinner/i18n/pt-BR.json` (playbook ADR 0015, project ADR 0008). The pt-BR copy in this brief and the design guide is what that file should say.
 - The i18n approach is decided in playbook ADR 0015 (i18n, proposed).
 
 ## 4. Out of scope (later phases)
