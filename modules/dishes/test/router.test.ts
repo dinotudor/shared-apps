@@ -116,6 +116,13 @@ describe("dishes procedures", () => {
     expect(await ana.dishes.get({ id, includeDeleted: true })).toMatchObject({ name: "Rabada" });
   });
 
+  it("list every dish when called without input", async () => {
+    const ana = callerFor(ANA);
+    const { id } = await ana.dishes.create({ ...feijoada, name: "Baião de dois" });
+
+    expect((await ana.dishes.list()).map((dish) => dish.id)).toContain(id);
+  });
+
   it("list by most recent unless another sort is asked for", async () => {
     const ana = callerFor(ANA);
     await ana.dishes.create({ ...feijoada, name: "Tutu A" });

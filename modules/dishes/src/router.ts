@@ -37,15 +37,18 @@ const dishChangesInput = z.object({
   ),
 });
 
-const listInput = z.object({
-  search: z
-    .string()
-    .trim()
-    .max(NAME_MAX)
-    .optional()
-    .transform((value) => value || undefined),
-  sort: z.enum(Object.values(DishSort)).default(DishSort.Recent),
-});
+const listInput = z
+  .object({
+    search: z
+      .string()
+      .trim()
+      .max(NAME_MAX)
+      .optional()
+      .transform((value) => value || undefined),
+    sort: z.enum(Object.values(DishSort)).default(DishSort.Recent),
+  })
+  // No input at all lists every dish, newest first.
+  .prefault({});
 
 // Every procedure is for members of What's for dinner (docs/adr/0006).
 const procedure = memberProcedure(App.WhatsForDinner);
