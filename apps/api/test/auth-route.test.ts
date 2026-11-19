@@ -85,3 +85,46 @@ describe("Better Auth's endpoints", () => {
     expect(response.statusCode).toBe(404);
   });
 });
+
+describe("request logs", () => {
+  /** An API that logs at info level into `lines`. */
+  const loggingApp = async () => {
+    const lines: string[] = [];
+    const built = buildApp(
+      { logLevel: "info" },
+      {
+        database: { db: database.db, close: () => Promise.resolve() },
+        jobs,
+        auth: createAuth(database.db, authConfig),
+        logStream: { write: (line: string) => void lines.push(line) },
+      },
+    );
+    await built.ready();
+    return { built, lines };
+  };
+
+  it("logs Google's callback without its one-time code and state", async () => {
+    const { built, lines } = await loggingApp();
+    try {
+      await built.inject({ url: "/api/auth/callback/google?code=secret-code&state=secret-state" });
+    } finally {
+      await built.close();
+    }
+
+    const logged = lines.join("\n");
+    expect(logged).toContain("/api/auth/callback/google");
+    expect(logged).not.toContain("secret-code");
+    expect(logged).not.toContain("secret-state");
+  });
+
+  it("keeps the query string for paths outside /api/auth", async () => {
+    const { built, lines } = await loggingApp();
+    try {
+      await built.inject({ url: "/health?probe=1" });
+    } finally {
+      await built.close();
+    }
+
+    expect(lines.join("\n")).toContain("/health?probe=1");
+  });
+});

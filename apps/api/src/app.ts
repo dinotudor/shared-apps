@@ -7,7 +7,7 @@ import type { Context } from "@shared-apps/api-core";
 import type { Auth } from "@shared-apps/auth";
 import type { DatabaseHandle } from "@shared-apps/db";
 import type { JobRunner } from "@shared-apps/jobs";
-import { registerAuthRoute, toHeaders } from "./auth-route.ts";
+import { registerAuthRoute, serializeRequest, toHeaders } from "./auth-route.ts";
 import type { Config } from "./config.ts";
 import { appRouter } from "./router.ts";
 
@@ -17,14 +17,20 @@ export type AppDependencies = {
   auth: Pick<Auth, "handler" | "getSession">;
   // A parameter so tests can mount procedures that fail.
   router?: AnyTRPCRouter;
+  // Where log lines go: stdout by default, and an array in tests that read them.
+  logStream?: { write: (line: string) => void };
 };
 
 export const buildApp = (
   config: Pick<Config, "logLevel">,
-  { database, jobs, auth, router = appRouter }: AppDependencies,
+  { database, jobs, auth, router = appRouter, logStream }: AppDependencies,
 ): FastifyInstance => {
   const app = Fastify({
-    logger: { level: config.logLevel },
+    logger: {
+      level: config.logLevel,
+      serializers: { req: serializeRequest },
+      ...(logStream ? { stream: logStream } : {}),
+    },
     // Batched tRPC calls put every procedure name in one path segment
     // (/trpc/a,b,c); Fastify's default limit of 100 characters rejects them.
     routerOptions: { maxParamLength: 5000 },
