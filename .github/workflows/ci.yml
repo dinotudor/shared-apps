@@ -35,3 +35,10 @@ jobs:
             echo "No schema.ts yet; nothing to check."
           fi
       - run: pnpm build
+      # The build adds new keys to i18n/*.json (playbook guideline i18n.md). The check fails on
+      # missing, empty, unused or broken translations; the diff fails on keys not committed.
+      - run: pnpm --filter @shared-apps/whats-for-dinner i18n:check
+      - name: Check that the build added no uncommitted translation keys
+        run: |
+          git add --intent-to-add apps/whats-for-dinner/i18n
+          git diff --exit-code -- apps/whats-for-dinner/i18n
