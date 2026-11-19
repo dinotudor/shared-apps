@@ -36,10 +36,15 @@ export const registerAuthRoute = (app: FastifyInstance, auth: Pick<Auth, "handle
     url: AUTH_ROUTE,
     handler: async (request, reply) => {
       const url = new URL(request.url, `http://${request.headers.host ?? "localhost"}`);
+      const headers = toHeaders(request.headers);
+      // Better Auth rate-limits by the IP in x-forwarded-for. It gets Fastify's request.ip,
+      // never the caller's own header: anyone could send that to get a fresh limit.
+      // request.ip honours x-forwarded-for only from proxies in Fastify's trustProxy.
+      headers.set("x-forwarded-for", request.ip);
       const response = await auth.handler(
         new Request(url, {
           method: request.method,
-          headers: toHeaders(request.headers),
+          headers,
           // Fastify has already parsed JSON bodies. Better Auth only takes JSON.
           ...(request.body === undefined ? {} : { body: JSON.stringify(request.body) }),
         }),

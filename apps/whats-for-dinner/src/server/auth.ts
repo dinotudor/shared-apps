@@ -26,7 +26,7 @@ export const safeNext = (next: string | null): string => {
   return next;
 };
 
-type AuthEvent = Pick<RequestEventBase, "env" | "url" | "request" | "cookie">;
+type AuthEvent = Pick<RequestEventBase, "env" | "url" | "request" | "cookie" | "clientConn">;
 
 /** Calls Better Auth on the API, as this site, with the visitor's cookies. */
 const callAuth = async (event: AuthEvent, path: string, body?: object): Promise<Response> => {
@@ -36,6 +36,10 @@ const callAuth = async (event: AuthEvent, path: string, body?: object): Promise<
     origin: event.url.origin,
     cookie: event.request.headers.get("cookie") ?? "",
   });
+  // Better Auth rate-limits by client IP, and without this it would see this server's.
+  // The browser's own x-forwarded-for is never passed on: it could say anything. The API
+  // reads this header only once its trustProxy lists this server (#34/#35).
+  if (event.clientConn.ip) headers.set("x-forwarded-for", event.clientConn.ip);
   if (body) headers.set("content-type", "application/json");
   const response = await fetch(`${apiUrl}/api/auth${path}`, {
     method: "POST",

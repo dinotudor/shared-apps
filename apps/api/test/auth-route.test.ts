@@ -86,6 +86,38 @@ describe("Better Auth's endpoints", () => {
   });
 });
 
+describe("rate limiting", () => {
+  // Better Auth allows 3 sign-in attempts per 10 s from one IP. Email sign-in is off,
+  // so each attempt fails, but it still counts.
+  const attemptSignIn = (remoteAddress: string, headers: Record<string, string> = {}) =>
+    app.inject({
+      method: "POST",
+      url: "/api/auth/sign-in/email",
+      remoteAddress,
+      headers: { origin: WEB, ...headers },
+      payload: { email: "ana@example.com", password: "guess" },
+    });
+
+  it("counts sign-in attempts per client IP", async () => {
+    for (let attempt = 0; attempt < 3; attempt++) await attemptSignIn("203.0.113.1");
+
+    expect((await attemptSignIn("203.0.113.1")).statusCode).toBe(429);
+    expect((await attemptSignIn("203.0.113.2")).statusCode).not.toBe(429);
+  });
+
+  it("ignores an x-forwarded-for header sent by the caller", async () => {
+    const statuses = [];
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      const response = await attemptSignIn("203.0.113.3", {
+        "x-forwarded-for": `198.51.100.${String(attempt)}`,
+      });
+      statuses.push(response.statusCode);
+    }
+
+    expect(statuses.at(-1)).toBe(429);
+  });
+});
+
 describe("request logs", () => {
   /** An API that logs at info level into `lines`. */
   const loggingApp = async () => {
