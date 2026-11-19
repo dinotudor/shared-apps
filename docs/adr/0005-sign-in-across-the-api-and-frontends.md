@@ -28,7 +28,8 @@ Here, only Qwik's server code calls the API (playbook ADR 0006), and each app ha
    - the origin check is always on, where Better Auth would turn it off under test;
    - rate limiting is always on, where Better Auth would turn it on only in production.
 
-   Starting Google sign-in is exempt from the strict sign-in rate limit, because it comes from the frontend's server, whose one IP every person shares. Google's tokens are stored encrypted, and ID-token sign-in is off.
+   Starting Google sign-in is exempt from the strict sign-in rate limit, because it comes from the frontend's server, whose one IP every person shares. Google's tokens are stored encrypted, ID-token sign-in is off, and `/update-user` is disabled: names and pictures come from Google (amended by #57).
+9. **Better Auth rate-limits by Fastify's `request.ip`** (amended by #57). The auth route replaces any `x-forwarded-for` the caller sent with `request.ip`, so nobody can pick their own rate-limit bucket. The frontends' servers send the browser's IP in `x-forwarded-for`, and `request.ip` uses it only once Fastify's `trustProxy` lists them. Request logs leave out the query string under `/api/auth/*`, where Google's callback carries the one-time `code` and `state`.
 
 ## Alternatives considered
 
@@ -47,6 +48,6 @@ Here, only Qwik's server code calls the API (playbook ADR 0006), and each app ha
   - `AUTH_COOKIE_DOMAIN` to the parent domain;
   - the production callback URL on the Google client.
 
-  It also has to make sure the API sees the browser's IP behind the proxy, for rate limiting.
+  It also has to make sure the API sees the browser's IP behind the proxy, for rate limiting: Fastify's `trustProxy` set to the reverse proxy and the frontends' servers, and Qwik's `getClientConn` reading the proxy's header. Until then, `request.ip` is the socket's address: the browser's for Google's callback, and the frontend server's for sign-in and sign-out.
 - The cookie workaround in `apps/whats-for-dinner/src/server/cookies.ts` should be rechecked when Qwik is upgraded.
 - The role named `member` is not the glossary's **Member** (a collaborator who may use a given app, #16). See the glossary.

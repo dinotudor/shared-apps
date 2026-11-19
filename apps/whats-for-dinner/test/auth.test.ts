@@ -12,6 +12,7 @@ const eventFor = (cookie = "") => {
     env: { get: (key: string) => ({ API_URL: "http://api.test" })[key] },
     url: new URL("http://localhost:5173/sign-in/"),
     request: new Request("http://localhost:5173/sign-in/", { headers: { cookie } }),
+    clientConn: { ip: "203.0.113.7" },
     ...jar.event,
   } as unknown as RequestEventBase;
   /** The cookies passed on to the browser, by name. */
@@ -59,6 +60,14 @@ describe("startGoogleSignIn", () => {
     });
   });
 
+  it("tells the API the browser's IP, for its rate limit", async () => {
+    const sent = stubApi(withCookies(JSON.stringify({ url: GOOGLE_URL, redirect: true }), []));
+
+    await startGoogleSignIn(eventFor(), "/");
+
+    expect(sent().headers.get("x-forwarded-for")).toBe("203.0.113.7");
+  });
+
   it("never comes back to another site, whatever next says", async () => {
     const sent = stubApi(withCookies(JSON.stringify({ url: GOOGLE_URL, redirect: true }), []));
 
@@ -101,6 +110,7 @@ describe("signOut", () => {
     expect(sent().url).toBe("http://api.test/api/auth/sign-out");
     expect(sent().init.method).toBe("POST");
     expect(sent().headers.get("cookie")).toBe("better-auth.session_token=abc");
+    expect(sent().headers.get("x-forwarded-for")).toBe("203.0.113.7");
     expect(event.cookiesSet()).toEqual(["better-auth.session_token="]);
   });
 });

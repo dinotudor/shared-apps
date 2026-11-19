@@ -1,6 +1,21 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { Auth } from "@shared-apps/auth";
 
+export const AUTH_ROUTE = "/api/auth/*";
+
+/**
+ * The request as it goes into the log. Under /api/auth the query string is dropped:
+ * Google's callback carries the one-time OAuth `code` and `state` there. Matched on the
+ * route rather than the URL text, so an encoded path can't slip past.
+ */
+export const serializeRequest = (request: FastifyRequest) => ({
+  method: request.method,
+  url: request.routeOptions.url === AUTH_ROUTE ? request.url.split("?")[0] : request.url,
+  host: request.host,
+  remoteAddress: request.ip,
+  remotePort: request.socket.remotePort,
+});
+
 /** Fastify's headers as fetch Headers, keeping repeated ones. */
 export const toHeaders = (incoming: FastifyRequest["headers"]): Headers => {
   const headers = new Headers();
@@ -18,13 +33,18 @@ export const toHeaders = (incoming: FastifyRequest["headers"]): Headers => {
 export const registerAuthRoute = (app: FastifyInstance, auth: Pick<Auth, "handler">): void => {
   app.route({
     method: ["GET", "POST"],
-    url: "/api/auth/*",
+    url: AUTH_ROUTE,
     handler: async (request, reply) => {
       const url = new URL(request.url, `http://${request.headers.host ?? "localhost"}`);
+      const headers = toHeaders(request.headers);
+      // Better Auth rate-limits by the IP in x-forwarded-for. It gets Fastify's request.ip,
+      // never the caller's own header: anyone could send that to get a fresh limit.
+      // request.ip honours x-forwarded-for only from proxies in Fastify's trustProxy.
+      headers.set("x-forwarded-for", request.ip);
       const response = await auth.handler(
         new Request(url, {
           method: request.method,
-          headers: toHeaders(request.headers),
+          headers,
           // Fastify has already parsed JSON bodies. Better Auth only takes JSON.
           ...(request.body === undefined ? {} : { body: JSON.stringify(request.body) }),
         }),
