@@ -2,15 +2,17 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
 import { findUserIdByEmail } from "../src/index.ts";
-import { user } from "../src/schema.ts";
+import { createTestUser } from "../src/testing.ts";
 
 let database: TestDatabase;
 
 beforeAll(async () => {
   database = await startTestDatabase();
-  await database.db
-    .insert(user)
-    .values({ id: "user-ana", name: "Ana Teste", email: "ana@example.com" });
+  await createTestUser(database.db, {
+    id: "user-ana",
+    name: "Ana Teste",
+    email: "ana@example.com",
+  });
 });
 
 afterAll(async () => {

@@ -1,5 +1,7 @@
 // Test helpers for code that signs in through Better Auth: packages/auth and apps/api.
 import { vi } from "vitest";
+import type { Database } from "@shared-apps/db";
+import { deleteUser, insertUser } from "./repository.ts";
 
 const GOOGLE_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 
@@ -104,4 +106,21 @@ export const signInWithGoogle = async (
     cookieHeaders: cookiesFrom(callback, cookies),
     setCookies: callback.headers.getSetCookie(),
   };
+};
+
+type TestUser = { id: string; email: string; name: string };
+
+/**
+ * An account as Better Auth creates it at first sign-in, for tests that need someone who
+ * has signed in without going through Google. Other packages use this, never auth's tables.
+ */
+export const createTestUser = async (db: Database, testUser: TestUser): Promise<string> => {
+  // Lowercased, as Better Auth stores it.
+  await insertUser(db, { ...testUser, email: testUser.email.toLowerCase() });
+  return testUser.id;
+};
+
+/** Deletes an account, as an admin removing someone would. */
+export const deleteTestUser = async (db: Database, id: string): Promise<void> => {
+  await deleteUser(db, id);
 };

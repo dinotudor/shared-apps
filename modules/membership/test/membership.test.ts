@@ -1,7 +1,6 @@
-import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { App } from "@shared-apps/api-core";
-import { user } from "@shared-apps/auth/schema";
+import { createTestUser, deleteTestUser } from "@shared-apps/auth/testing";
 import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
 import { createMembership } from "../src/index.ts";
@@ -10,11 +9,9 @@ import type { Membership } from "../src/index.ts";
 let database: TestDatabase;
 let membership: Membership;
 
-/** A signed-up collaborator: Better Auth would have created this row at first sign-in. */
-const signedUp = async (id: string) => {
-  await database.db.insert(user).values({ id, name: `Teste ${id}`, email: `${id}@example.com` });
-  return id;
-};
+/** A collaborator who has signed in once, so their account exists. */
+const signedUp = (id: string) =>
+  createTestUser(database.db, { id, name: `Teste ${id}`, email: `${id}@example.com` });
 
 beforeAll(async () => {
   database = await startTestDatabase();
@@ -51,7 +48,7 @@ describe("app membership", () => {
     const davi = await signedUp("davi");
     await membership.add(App.WhatsForDinner, davi);
 
-    await database.db.delete(user).where(eq(user.id, davi));
+    await deleteTestUser(database.db, davi);
 
     expect(await membership.isMember(App.WhatsForDinner, davi)).toBe(false);
   });
