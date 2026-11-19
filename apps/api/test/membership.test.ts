@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, assert, beforeAll, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { App, memberProcedure, router } from "@shared-apps/api-core";
 import { createAuth, findUserIdByEmail } from "@shared-apps/auth";
@@ -8,6 +8,7 @@ import type { TestDatabase } from "@shared-apps/db/testing";
 import { createMembership } from "@shared-apps/membership";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
+import { sendTo } from "./support/send.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -36,24 +37,7 @@ const testRouter = router({
 let database: TestDatabase;
 let app: FastifyInstance;
 
-const send = async (request: Request) => {
-  const url = new URL(request.url);
-  const response = await app.inject({
-    method: request.method as "GET" | "POST",
-    url: url.pathname + url.search,
-    headers: Object.fromEntries(request.headers),
-    ...(request.body ? { payload: await request.text() } : {}),
-  });
-  const headers = new Headers();
-  for (const [name, value] of Object.entries(response.headers)) {
-    for (const item of [value ?? []].flat()) headers.append(name, String(item));
-  }
-  const hasBody = response.rawPayload.length > 0 && response.statusCode !== 204;
-  return new Response(hasBody ? new Uint8Array(response.rawPayload) : null, {
-    status: response.statusCode,
-    headers,
-  });
-};
+const send = sendTo(() => app);
 
 const signIn = async (email: string, name: string) => {
   googleStub({ sub: `google-${email}`, email, name });
@@ -93,7 +77,8 @@ describe("app membership through the API", () => {
   it("lets a member of What's for dinner use its procedures", async () => {
     const cookies = await signIn("ana@example.com", "Ana Teste");
     const ana = await findUserIdByEmail(database.db, "ana@example.com");
-    await createMembership(database.db).add(App.WhatsForDinner, ana ?? "");
+    assert(ana !== null, "signing in creates Ana's account");
+    await createMembership(database.db).add(App.WhatsForDinner, ana);
 
     const response = await today(cookies);
 
