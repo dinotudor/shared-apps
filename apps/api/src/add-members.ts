@@ -1,6 +1,7 @@
 // `pnpm --filter @shared-apps/api members:add <app> <email>...`: makes people members of
 // an app (GLOSSARY: Member). Each person must have signed in once, so their account exists.
 import { createDatabase } from "@shared-apps/db";
+import { createMembership } from "@shared-apps/membership";
 import { ConfigError, parseMigrateConfig } from "./config.ts";
 import { addMembers, parseAddMembersArgs, UsageError } from "./members.ts";
 
@@ -32,10 +33,16 @@ const database = createDatabase(config.databaseUrl, {
   },
 });
 try {
-  const results = await addMembers(database.db, args.app, args.emails);
-  // The person running the script typed these emails: printing them back is not a log.
-  for (const { email, result } of results) console.info(`${email}: ${MESSAGES[result]}`);
-  if (results.some(({ result }) => result === "no-account")) process.exitCode = 1;
+  const membership = createMembership(database.db);
+  for await (const { email, result } of addMembers(
+    { db: database.db, membership },
+    args.app,
+    args.emails,
+  )) {
+    // The person running the script typed these emails: printing them back is not a log.
+    console.info(`${email}: ${MESSAGES[result]}`);
+    if (result === "no-account") process.exitCode = 1;
+  }
 } catch (error) {
   console.error("adding members failed:", error);
   process.exitCode = 1;
