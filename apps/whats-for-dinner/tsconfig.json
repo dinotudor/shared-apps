@@ -4,7 +4,10 @@
     "lib": ["es2024", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "@qwik.dev/core",
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "paths": {
+      "compiled-i18n": ["./types/compiled-i18n.d.ts"]
+    }
   },
-  "include": ["src", "test", "adapters", "*.ts"]
+  "include": ["src", "test", "adapters", "scripts", "types", "*.ts"]
 }
