@@ -178,10 +178,10 @@ catalogs:
       version: 2.0.0-rc.5
     '@trpc/client':
       specifier: ^11.26.0
-      version: 11.28.0
+      version: 11.28.2
     '@trpc/server':
       specifier: ^11.26.0
-      version: 11.28.0
+      version: 11.28.2
     '@vitest/ui':
       specifier: ^5.1.0
       version: 5.1.0
@@ -252,7 +252,7 @@ importers:
         version: link:../../modules/membership
       '@trpc/server':
         specifier: 'catalog:'
-        version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+        version: 11.28.2(fastify@5.12.8)(typescript@6.0.3)
       fastify:
         specifier: ^5.12.8
         version: 5.12.8
@@ -280,7 +280,7 @@ importers:
         version: link:../../packages/design-system
       '@trpc/client':
         specifier: 'catalog:'
-        version: 11.28.0(@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)
+        version: 11.28.2(@trpc/server@11.28.2(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)
     devDependencies:
       '@shared-apps/api':
         specifier: workspace:*
@@ -318,7 +318,7 @@ importers:
         version: link:../auth
       '@trpc/server':
         specifier: 'catalog:'
-        version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+        version: 11.28.2(fastify@5.12.8)(typescript@6.0.3)
     devDependencies:
       vitest:
         specifier: 'catalog:'
@@ -1691,14 +1691,14 @@ packages:
   '@testcontainers/postgresql@12.2.1':
     resolution: {integrity: sha512-MIbI5KjZ9M4SY4+xzxg/w4ZLBeV+Jd6ognXoWn7dh/mhIhBbn7ss0MiZHNg2XbCbu03BW9YQ9+H9xW8PFkJWaA==}
 
-  '@trpc/client@11.28.0':
-    resolution: {integrity: sha512-uaj/19rUZKcUkQHAw8mBpjHeR5N/SJyCEy1HPPOC0fpgfV7Zz3cXbz/L9Tqhy+0YMlHwb0PuFGEo2krNjV+Sng==}
+  '@trpc/client@11.28.2':
+    resolution: {integrity: sha512-fmMAXYybpjy8L812i9fI3JbMDZE8OtE4Y9i5ch5pQLvJwT08Ioo35wdH0Z3CoweWlfnyQp1eCv0V7s2xjjPo2g==}
     peerDependencies:
-      '@trpc/server': 11.28.0
+      '@trpc/server': 11.28.2
       typescript: '>=5.7.2'
 
-  '@trpc/server@11.28.0':
-    resolution: {integrity: sha512-jj/JplNMKCyNZChmOxYRVnN4vNsS1zvLEnFfPkuvoYmrouKMuFNi4zaIMn1lDx6yyuuru/e5+rjcrBrIGc3p4g==}
+  '@trpc/server@11.28.2':
+    resolution: {integrity: sha512-7A55XS4c3xtxHFZQdLREckOYNuEY5sQXuEoZBniIZ5pNFcC5cLqm0rGg/a+2nqPfJOaTnznHf1g6MqKmw3O2zA==}
     peerDependencies:
       '@types/aws-lambda': '*'
       '@types/express': '*'
@@ -5338,12 +5338,12 @@ snapshots:
       - react-native-b4a
       - supports-color
 
-  '@trpc/client@11.28.0(@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)':
+  '@trpc/client@11.28.2(@trpc/server@11.28.2(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@trpc/server': 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+      '@trpc/server': 11.28.2(fastify@5.12.8)(typescript@6.0.3)
       typescript: 6.0.3
 
-  '@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3)':
+  '@trpc/server@11.28.2(fastify@5.12.8)(typescript@6.0.3)':
     dependencies:
       typescript: 6.0.3
     optionalDependencies:
