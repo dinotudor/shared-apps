@@ -52,7 +52,8 @@ export const findDish = async (db: Database, id: string): Promise<Dish | null> =
 export const markDishDeleted = async (db: Database, id: string): Promise<boolean> => {
   const rows = await db
     .update(dish)
-    .set({ deletedAt: new Date() })
+    // The database's clock, as for createdAt and updatedAt.
+    .set({ deletedAt: sql`now()` })
     .where(and(eq(dish.id, id), isNull(dish.deletedAt)))
     .returning({ id: dish.id });
   return rows.length > 0;
