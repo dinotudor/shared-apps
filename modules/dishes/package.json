@@ -11,11 +11,11 @@
     "@shared-apps/api-core": "workspace:*",
     "@shared-apps/auth": "workspace:*",
     "@shared-apps/db": "workspace:*",
-    "@trpc/server": "catalog:",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@trpc/server": "catalog:",
     "vitest": "catalog:"
   }
 }
