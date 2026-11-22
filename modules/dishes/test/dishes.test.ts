@@ -151,7 +151,8 @@ describe("listing dishes", () => {
     await add("Pão de queijo", ["Cheese", "Tapioca flour"]);
     await add("Feijoada", ["Black beans", "Pork sausage"]);
     await add("Bolo 100% cenoura", ["Carrot", "Sugar"]);
-    await add("Arroz de forno", ["Rice", "Cheese"]);
+    // Two ingredients match "chee", and the dish is still listed once.
+    await add("Arroz de forno", ["Rice", "Cheese", "Grated cheese"]);
     const deleted = await add("Sopa de queijo", ["Cheese"]);
     await list.delete(deleted.id);
   });
