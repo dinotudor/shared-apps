@@ -89,7 +89,7 @@ export const listDishes = (db: Database, { search, sort }: DishQuery): Promise<D
     .orderBy(
       ...(sort === DishSort.Recent
         ? [desc(dish.createdAt), asc(dish.id)]
-        : // Times cooked (E3) and the family average (#22) don't exist yet, so every dish
+        : // Times cooked (E3) and the average score (#22) don't exist yet, so every dish
           // ties on them. Those sorts will order by that value first, then by name.
           [asc(dish.name), asc(dish.id)]),
     );

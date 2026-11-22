@@ -9,7 +9,7 @@ export const dish = dishes.table("dish", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   instructions: text("instructions").notNull().default(""),
-  // Null once the creator's account is deleted: the family keeps the dish.
+  // Null once the creator's account is deleted: the dish stays for the other members.
   createdById: text("created_by_id").references(() => user.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

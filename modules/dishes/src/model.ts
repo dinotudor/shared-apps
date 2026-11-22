@@ -23,7 +23,7 @@ export const DishSort = {
   Recent: "recent",
   /** Highest Times cooked first. */
   MostCooked: "mostCooked",
-  /** Highest Family average first. */
+  /** Highest average score first (#22). */
   BestScore: "bestScore",
 } as const;
 export type DishSort = (typeof DishSort)[keyof typeof DishSort];
