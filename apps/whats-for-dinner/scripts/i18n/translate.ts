@@ -28,7 +28,10 @@ const answerProblems = (
     { locale, translations: answer },
   );
 
-/** Translates one batch, asking once more if the first answer breaks a rule. */
+/**
+ * Translates one batch, asking once more if the first try fails: an answer that breaks a
+ * rule, or a call that throws (a refusal, malformed JSON, the network).
+ */
 const translateBatch = async (
   locale: string,
   entries: { key: string; english: string }[],
@@ -36,12 +39,23 @@ const translateBatch = async (
   translate: TranslateBatch,
 ): Promise<Record<string, string>> => {
   let problems: string[] = [];
+  let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const answer = await translate({ locale, entries, glossary });
+    let answer: Record<string, string>;
+    try {
+      answer = await translate({ locale, entries, glossary });
+    } catch (error) {
+      lastError = error;
+      problems = [error instanceof Error ? error.message : String(error)];
+      continue;
+    }
+    lastError = undefined;
     problems = answerProblems(locale, entries, answer);
     if (problems.length === 0) return answer;
   }
-  throw new Error(`The translation for ${locale} failed twice:\n  ${problems.join("\n  ")}`);
+  throw new Error(`The translation for ${locale} failed twice:\n  ${problems.join("\n  ")}`, {
+    cause: lastError,
+  });
 };
 
 const DEFAULT_BATCH_SIZE = 40;

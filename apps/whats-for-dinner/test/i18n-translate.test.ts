@@ -120,6 +120,25 @@ describe("translateLocale", () => {
       expect(translate).toHaveBeenCalledTimes(2);
     });
 
+    it("asks again once when the provider call fails", async () => {
+      const translate = vi
+        .fn<TranslateBatch>()
+        .mockRejectedValueOnce(new Error("stopped with refusal"))
+        .mockResolvedValueOnce({ "Hello $1": "Olá $1" });
+
+      const result = await translateLocale({ ...options, translate });
+
+      expect(translate).toHaveBeenCalledTimes(2);
+      expect(result.file.translations).toEqual({ "Hello $1": "Olá $1" });
+    });
+
+    it("fails with the provider's error when the second call fails too", async () => {
+      const translate = vi.fn<TranslateBatch>().mockRejectedValue(new Error("network down"));
+
+      await expect(translateLocale({ ...options, translate })).rejects.toThrow("network down");
+      expect(translate).toHaveBeenCalledTimes(2);
+    });
+
     it("rejects keys that weren't asked for", async () => {
       const translate = vi
         .fn<TranslateBatch>()
