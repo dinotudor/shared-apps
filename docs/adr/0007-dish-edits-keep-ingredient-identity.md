@@ -1,6 +1,6 @@
 # 0007. Editing a dish keeps the identity of its ingredients
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-11-19
 - Issue: #21
 
