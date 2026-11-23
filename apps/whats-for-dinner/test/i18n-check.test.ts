@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { findLocaleProblems, findSourceProblems } from "../scripts/i18n/check.ts";
+import {
+  findEnglishProblems,
+  findLocaleProblems,
+  findSourceProblems,
+} from "../scripts/i18n/check.ts";
 import type { LocaleFile } from "../scripts/i18n/check.ts";
 
 const en = (translations: LocaleFile["translations"]): LocaleFile => ({
@@ -115,5 +119,24 @@ describe("findSourceProblems", () => {
     expect(findSourceProblems(new Set(["Week"]), en({ Week: "", Old: "" }))).toEqual([
       'en: unused "Old"',
     ]);
+  });
+});
+
+describe("findEnglishProblems", () => {
+  it("accepts plain English keys with empty values, since the key is the text", () => {
+    expect(findEnglishProblems(en({ Week: "", "Sign in": "", StatusMessage: "" }))).toEqual([]);
+  });
+
+  it("reports a named key with an empty value, which would show the identifier", () => {
+    expect(findEnglishProblems(en({ countTitle: "", "Right-direction": "" }))).toEqual([
+      'en: named key "countTitle" needs its English text',
+      'en: named key "Right-direction" needs its English text',
+    ]);
+  });
+
+  it("accepts a named key with its English text", () => {
+    expect(
+      findEnglishProblems(en({ countTitle: "Dishes: $1", "Right-direction": "Right" })),
+    ).toEqual([]);
   });
 });

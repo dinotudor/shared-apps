@@ -1,7 +1,7 @@
 // pnpm i18n:check: validates i18n/*.json against the code and en.json (playbook guideline
 // i18n.md). Run it after `pnpm build`, which adds new keys. Exits 1 on any problem.
 import { LOCALES } from "../src/i18n/locale.ts";
-import { findLocaleProblems, findSourceProblems } from "./i18n/check.ts";
+import { findEnglishProblems, findLocaleProblems, findSourceProblems } from "./i18n/check.ts";
 import { keysInAppSource, readLocaleFile } from "./i18n/files.ts";
 
 const SOURCE_LOCALE = "en";
@@ -9,7 +9,7 @@ const SOURCE_LOCALE = "en";
 const problems: string[] = [];
 try {
   const en = readLocaleFile(SOURCE_LOCALE);
-  problems.push(...findSourceProblems(keysInAppSource(), en));
+  problems.push(...findEnglishProblems(en), ...findSourceProblems(keysInAppSource(), en));
   for (const locale of LOCALES) {
     if (locale !== SOURCE_LOCALE) problems.push(...findLocaleProblems(en, readLocaleFile(locale)));
   }

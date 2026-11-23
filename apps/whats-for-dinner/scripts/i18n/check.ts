@@ -91,3 +91,20 @@ export const findSourceProblems = (used: Set<string>, en: LocaleFile): string[] 
     .filter((key) => !used.has(key))
     .map((key) => `en: unused ${quote(key)}`),
 ];
+
+/**
+ * A named key is an identifier, not English text: lowerCamelCase (`countTitle`) or two
+ * words joined by a hyphen to tell identical English apart (`Right-direction`), as in the
+ * playbook guideline. Plain keys, even one word or a component name, are the English.
+ */
+export const isNamedKey = (key: string): boolean =>
+  /^[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*$/.test(key) || /^[A-Za-z]+-[A-Za-z]+$/.test(key);
+
+/**
+ * What is wrong with en.json on its own. An empty value falls back to the key, which is
+ * right for English text but renders a named key's identifier.
+ */
+export const findEnglishProblems = (en: LocaleFile): string[] =>
+  Object.entries(en.translations)
+    .filter(([key, value]) => value === "" && isNamedKey(key))
+    .map(([key]) => `en: named key ${quote(key)} needs its English text`);

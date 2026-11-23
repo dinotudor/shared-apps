@@ -1,6 +1,7 @@
 // The translation provider: the only file that knows about Claude. To switch to another
 // LLM or to DeepL, write another TranslateBatch and pick it in i18n-translate.ts.
 import Anthropic from "@anthropic-ai/sdk";
+import { isNamedKey } from "./check.ts";
 import type { TranslateBatch } from "./translate.ts";
 
 export const DEFAULT_MODEL = "claude-opus-5-5";
@@ -38,14 +39,12 @@ Rules:
 - Keep the tone: friendly and short, never formal. Match the length of the English where you can.
 - Use the glossary's terms. Answer with one translation for every key you were given, and no others.`;
 
-const isNamedKey = (key: string, english: string): boolean => key !== english;
-
 const prompt = (request: Parameters<TranslateBatch>[0]): string => {
   const items = request.entries.map(({ key, english }) => ({
     key,
     english,
     // A named key is an identifier, not text: translate the English, keep the key.
-    ...(isNamedKey(key, english) ? { note: "Named key: translate the English text." } : {}),
+    ...(isNamedKey(key) ? { note: "Named key: translate the English text." } : {}),
   }));
   return [
     `Target locale: ${request.locale}`,
