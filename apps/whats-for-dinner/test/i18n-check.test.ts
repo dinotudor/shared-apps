@@ -36,6 +36,12 @@ describe("findLocaleProblems", () => {
     ]);
   });
 
+  it("reports an unused key even when its name is a built-in object property", () => {
+    expect(findLocaleProblems(en({ Week: "" }), pt({ Week: "Semana", constructor: "x" }))).toEqual([
+      'pt-BR: unused "constructor"',
+    ]);
+  });
+
   it("reports placeholders that differ from the English", () => {
     expect(
       findLocaleProblems(
@@ -96,6 +102,12 @@ describe("findSourceProblems", () => {
   it("reports a key the code uses that en.json lacks, so the build was not run or committed", () => {
     expect(findSourceProblems(new Set(["Week", "Dishes"]), en({ Week: "" }))).toEqual([
       'en: missing "Dishes" (run pnpm build to add it)',
+    ]);
+  });
+
+  it("reports a used key that en.json lacks even when its name is a built-in property", () => {
+    expect(findSourceProblems(new Set(["toString"]), en({}))).toEqual([
+      'en: missing "toString" (run pnpm build to add it)',
     ]);
   });
 

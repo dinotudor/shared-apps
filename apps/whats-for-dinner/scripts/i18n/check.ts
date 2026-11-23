@@ -9,6 +9,9 @@ export type LocaleFile = {
 
 const quote = (key: string): string => JSON.stringify(key);
 
+// Keys are user text, so look them up with Object.hasOwn: `in` also finds inherited
+// properties such as "constructor".
+
 /** The `$1`…`$9` placeholders in a string, sorted and once each. `$$` is a literal `$`. */
 export const placeholders = (text: string): string[] => {
   const found = new Set<string>();
@@ -49,7 +52,7 @@ export const findLocaleProblems = (en: LocaleFile, target: LocaleFile): string[]
     if (typeof translation === "string") {
       actual = placeholders(translation);
     } else {
-      if (!("*" in translation)) report(`plural ${quote(key)} has no "*" fallback`);
+      if (!Object.hasOwn(translation, "*")) report(`plural ${quote(key)} has no "*" fallback`);
       const branches = new Set(
         pluralBranches(translation).map((text) => describe(placeholders(text))),
       );
@@ -71,7 +74,7 @@ export const findLocaleProblems = (en: LocaleFile, target: LocaleFile): string[]
     }
   }
   for (const key of Object.keys(target.translations)) {
-    if (!(key in en.translations)) report(`unused ${quote(key)}`);
+    if (!Object.hasOwn(en.translations, key)) report(`unused ${quote(key)}`);
   }
   return problems;
 };
@@ -82,7 +85,7 @@ export const findLocaleProblems = (en: LocaleFile, target: LocaleFile): string[]
  */
 export const findSourceProblems = (used: Set<string>, en: LocaleFile): string[] => [
   ...[...used]
-    .filter((key) => !(key in en.translations))
+    .filter((key) => !Object.hasOwn(en.translations, key))
     .map((key) => `en: missing ${quote(key)} (run pnpm build to add it)`),
   ...Object.keys(en.translations)
     .filter((key) => !used.has(key))
