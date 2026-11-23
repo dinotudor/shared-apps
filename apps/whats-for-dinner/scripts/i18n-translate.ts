@@ -4,21 +4,16 @@
 //
 // Needs TRANSLATE_API_KEY only when something has to be translated. TRANSLATE_MODEL
 // defaults to the provider's model. Never run it in the deploy pipeline.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { LOCALES } from "../src/i18n/locale.ts";
 import { claudeTranslator, DEFAULT_MODEL } from "./i18n/claude.ts";
-import { APP_DIR, LOCK_FILE, readLocaleFile, writeLocaleFile } from "./i18n/files.ts";
+import { APP_DIR, readLocaleFile, readLock, writeLocaleFile, writeLock } from "./i18n/files.ts";
 import { translateLocale } from "./i18n/translate.ts";
 import type { TranslateBatch } from "./i18n/translate.ts";
 
-type Lock = Record<string, Record<string, string>>;
-
 const SOURCE_LOCALE = "en";
 const GLOSSARY = resolve(APP_DIR, "../../GLOSSARY.md");
-
-const readLock = (): Lock =>
-  existsSync(LOCK_FILE) ? (JSON.parse(readFileSync(LOCK_FILE, "utf8")) as Lock) : {};
 
 // Created on first use, so a run with nothing to translate needs no API key.
 let provider: TranslateBatch | undefined;
@@ -63,6 +58,6 @@ for (const locale of LOCALES) {
   }
 }
 
-writeFileSync(LOCK_FILE, `${JSON.stringify(lock, null, 2)}\n`);
+writeLock(lock);
 if (failed) process.exit(1);
 console.info("Now run pnpm i18n:check and review the diff.");
