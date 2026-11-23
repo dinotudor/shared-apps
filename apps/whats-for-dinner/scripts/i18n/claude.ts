@@ -36,6 +36,7 @@ const ANSWER_SCHEMA = {
 const SYSTEM = `You translate the user interface of a small family web app from English.
 Rules:
 - Keep every $1, $2 … placeholder exactly as written, once each. $$ is a literal dollar sign.
+- Keep the JSON structure: answer each key exactly as given, with one string translation.
 - Keep the tone: friendly and short, never formal. Match the length of the English where you can.
 - Use the glossary's terms. Answer with one translation for every key you were given, and no others.`;
 
