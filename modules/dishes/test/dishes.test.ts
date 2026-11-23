@@ -149,7 +149,7 @@ describe("listing dishes", () => {
       });
     // Created in this order, so "recent" lists them the other way round.
     await add("Pão de queijo", ["Cheese", "Tapioca flour"]);
-    await add("Feijoada", ["Black beans", "Pork sausage"]);
+    await add("Feijoada", ["Feijão preto", "Pork sausage"]);
     await add("Bolo 100% cenoura", ["Carrot", "Sugar"]);
     // Two ingredients match "chee", and the dish is still listed once.
     await add("Arroz de forno", ["Rice", "Cheese", "Grated cheese"]);
@@ -186,6 +186,15 @@ describe("listing dishes", () => {
       "Arroz de forno",
       "Pão de queijo",
     ]);
+  });
+
+  it("finds dishes ignoring accents, in the search or in the dish", async () => {
+    expect(await namesOf({ sort: DishSort.Recent, search: "pao" })).toEqual(["Pão de queijo"]);
+    expect(await namesOf({ sort: DishSort.Recent, search: "Bolo 100% cenôura" })).toEqual([
+      "Bolo 100% cenoura",
+    ]);
+    // Through an ingredient: Feijoada has "Feijão preto".
+    expect(await namesOf({ sort: DishSort.Recent, search: "FEIJAO" })).toEqual(["Feijoada"]);
   });
 
   it("treats % and _ in the search as plain characters", async () => {

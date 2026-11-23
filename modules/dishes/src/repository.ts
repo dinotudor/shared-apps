@@ -1,16 +1,5 @@
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  exists,
-  ilike,
-  inArray,
-  isNull,
-  notInArray,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, exists, inArray, isNull, notInArray, or, sql } from "drizzle-orm";
+import type { AnyColumn } from "drizzle-orm";
 import type { Database } from "@shared-apps/db";
 import { dish, ingredient } from "./schema.ts";
 import { DishSort } from "./model.ts";
@@ -62,17 +51,24 @@ export const markDishDeleted = async (db: Database, id: string): Promise<boolean
 /** `%` and `_` are wildcards in ILIKE, and a backslash escapes them: a search for "100%" means it. */
 const containing = (text: string) => `%${text.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
 
+/**
+ * `text` contains the pattern, ignoring case and accents: "feijao" finds "Feijão". Schema-
+ * qualified, so it doesn't depend on the connection's search_path (migration 0003).
+ */
+const matches = (text: AnyColumn, pattern: string) =>
+  sql`public.unaccent(${text}) ilike public.unaccent(${pattern})`;
+
 /** Dishes that aren't deleted, matching the search on their name or an ingredient's name. */
 export const listDishes = (db: Database, { search, sort }: DishQuery): Promise<DishSummary[]> => {
   const pattern = search ? containing(search) : null;
-  const matches = pattern
+  const found = pattern
     ? or(
-        ilike(dish.name, pattern),
+        matches(dish.name, pattern),
         exists(
           db
             .select({ id: ingredient.id })
             .from(ingredient)
-            .where(and(eq(ingredient.dishId, dish.id), ilike(ingredient.name, pattern))),
+            .where(and(eq(ingredient.dishId, dish.id), matches(ingredient.name, pattern))),
         ),
       )
     : undefined;
@@ -85,7 +81,7 @@ export const listDishes = (db: Database, { search, sort }: DishQuery): Promise<D
       updatedAt: dish.updatedAt,
     })
     .from(dish)
-    .where(and(isNull(dish.deletedAt), matches))
+    .where(and(isNull(dish.deletedAt), found))
     .orderBy(
       ...(sort === DishSort.Recent
         ? [desc(dish.createdAt), asc(dish.id)]
