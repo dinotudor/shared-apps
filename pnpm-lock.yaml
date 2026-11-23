@@ -178,10 +178,10 @@ catalogs:
       version: 2.0.0-rc.5
     '@trpc/client':
       specifier: ^11.26.0
-      version: 11.28.0
+      version: 11.28.3
     '@trpc/server':
       specifier: ^11.26.0
-      version: 11.28.0
+      version: 11.28.3
     '@vitest/ui':
       specifier: ^5.1.0
       version: 5.1.0
@@ -264,7 +264,7 @@ importers:
         version: link:../../modules/membership
       '@trpc/server':
         specifier: 'catalog:'
-        version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+        version: 11.28.3(fastify@5.12.8)(typescript@6.0.3)
       fastify:
         specifier: ^5.12.8
         version: 5.12.8
@@ -292,7 +292,7 @@ importers:
         version: link:../../packages/design-system
       '@trpc/client':
         specifier: 'catalog:'
-        version: 11.28.0(@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)
+        version: 11.28.3(@trpc/server@11.28.3(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)
       compiled-i18n:
         specifier: 1.3.0
         version: 1.3.0(patch_hash=b863d2be0a08288018de2b362d1d840e9fef06b02c388fdec130368d9ffcff89)
@@ -333,7 +333,7 @@ importers:
     devDependencies:
       '@trpc/server':
         specifier: 'catalog:'
-        version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+        version: 11.28.3(fastify@5.12.8)(typescript@6.0.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/ui@5.1.0)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -364,7 +364,7 @@ importers:
         version: link:../auth
       '@trpc/server':
         specifier: 'catalog:'
-        version: 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+        version: 11.28.3(fastify@5.12.8)(typescript@6.0.3)
     devDependencies:
       vitest:
         specifier: 'catalog:'
@@ -1830,14 +1830,14 @@ packages:
   '@testcontainers/postgresql@12.2.1':
     resolution: {integrity: sha512-MIbI5KjZ9M4SY4+xzxg/w4ZLBeV+Jd6ognXoWn7dh/mhIhBbn7ss0MiZHNg2XbCbu03BW9YQ9+H9xW8PFkJWaA==}
 
-  '@trpc/client@11.28.0':
-    resolution: {integrity: sha512-uaj/19rUZKcUkQHAw8mBpjHeR5N/SJyCEy1HPPOC0fpgfV7Zz3cXbz/L9Tqhy+0YMlHwb0PuFGEo2krNjV+Sng==}
+  '@trpc/client@11.28.3':
+    resolution: {integrity: sha512-NnMXBOCVzPMELdQH/X26MhI4u9g83nxWy3apc7UX1beevUk6rEYqfOboqCb/rVoVPu3CBVaPb8PB7AG51oEKvQ==}
     peerDependencies:
-      '@trpc/server': 11.28.0
+      '@trpc/server': 11.28.3
       typescript: '>=5.7.2'
 
-  '@trpc/server@11.28.0':
-    resolution: {integrity: sha512-jj/JplNMKCyNZChmOxYRVnN4vNsS1zvLEnFfPkuvoYmrouKMuFNi4zaIMn1lDx6yyuuru/e5+rjcrBrIGc3p4g==}
+  '@trpc/server@11.28.3':
+    resolution: {integrity: sha512-os9o1enNvbcSSyn9agxsYPkIE8kWK7IJbkD5/ySCCApsdM58cFZ5IF410G9Q0k3RwKfsM2Q/GbGp1rbgCWLp5Q==}
     peerDependencies:
       '@types/aws-lambda': '*'
       '@types/express': '*'
@@ -5671,12 +5671,12 @@ snapshots:
       - react-native-b4a
       - supports-color
 
-  '@trpc/client@11.28.0(@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)':
+  '@trpc/client@11.28.3(@trpc/server@11.28.3(fastify@5.12.8)(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@trpc/server': 11.28.0(fastify@5.12.8)(typescript@6.0.3)
+      '@trpc/server': 11.28.3(fastify@5.12.8)(typescript@6.0.3)
       typescript: 6.0.3
 
-  '@trpc/server@11.28.0(fastify@5.12.8)(typescript@6.0.3)':
+  '@trpc/server@11.28.3(fastify@5.12.8)(typescript@6.0.3)':
     dependencies:
       typescript: 6.0.3
     optionalDependencies:
