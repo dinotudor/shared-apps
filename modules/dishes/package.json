@@ -1,0 +1,21 @@
+{
+  "name": "@shared-apps/dishes",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@shared-apps/api-core": "workspace:*",
+    "@shared-apps/auth": "workspace:*",
+    "@shared-apps/db": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@trpc/server": "catalog:",
+    "vitest": "catalog:"
+  }
+}

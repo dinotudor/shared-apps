@@ -21,7 +21,11 @@ const t = initTRPC.context<Context>().create({
   isDev: false,
   errorFormatter: ({ shape, error }) => {
     const domainCode = error.cause instanceof DomainError ? error.cause.code : null;
-    return { ...shape, data: { ...shape.data, domainCode } };
+    // tRPC copies an unexpected error's own message into the response, which can carry
+    // SQL, names or emails. Callers get a generic one; apps/api logs the original in full.
+    const message =
+      error.code === "INTERNAL_SERVER_ERROR" ? "Internal server error" : shape.message;
+    return { ...shape, message, data: { ...shape.data, domainCode } };
   },
 });
 
@@ -32,6 +36,8 @@ export const createCallerFactory = t.createCallerFactory;
 // DomainErrorCode without a status here doesn't compile.
 const STATUS_BY_DOMAIN_CODE: Record<DomainErrorCode, TRPCError["code"]> = {
   not_a_member: "FORBIDDEN",
+  dish_not_found: "NOT_FOUND",
+  unknown_ingredient: "BAD_REQUEST",
 };
 
 // Every procedure starts here. tRPC wraps anything a procedure or a later middleware throws

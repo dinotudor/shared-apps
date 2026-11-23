@@ -36,6 +36,7 @@ catalog:
   # table objects only work with the drizzle-orm instance that created the database.
   drizzle-orm: ^0.45.4
   vite: ^8.3.0
+  zod: ^4.6.7
   # Keep @vitest/ui on the same version as vitest.
   "@vitest/ui": ^5.1.0
   vitest: ^5.1.0
