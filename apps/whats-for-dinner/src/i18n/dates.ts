@@ -1,3 +1,5 @@
+import type { Locale } from "./locale.ts";
+
 /** The day as screens show it, such as "quinta-feira, 19 de novembro". */
 const DAY: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month: "long" };
 
@@ -8,6 +10,6 @@ const DAY: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month
  */
 export const formatDate = (
   date: Date,
-  { locale, timeZone }: { locale: string; timeZone: string },
+  { locale, timeZone }: { locale: Locale; timeZone: string },
   options: Intl.DateTimeFormatOptions = DAY,
 ): string => new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(date);

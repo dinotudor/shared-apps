@@ -1,11 +1,16 @@
 import { createHash } from "node:crypto";
+import { SOURCE_LOCALE } from "../../src/i18n/locale.ts";
+import type { Locale } from "../../src/i18n/locale.ts";
 import { findLocaleProblems } from "./check.ts";
 import type { LocaleFile } from "./check.ts";
 
+/** One text to translate: its key, and the English the key stands for. */
+export type SourceText = { key: string; english: string };
+
 /** One request to the translation provider: English texts in, translations by key out. */
 export type TranslateBatch = (request: {
-  locale: string;
-  entries: { key: string; english: string }[];
+  locale: Locale;
+  entries: SourceText[];
   glossary: string;
 }) => Promise<Record<string, string>>;
 
@@ -15,14 +20,14 @@ export const englishHash = (text: string): string =>
 
 /** The problems in one answer, by the same rules as i18n:check. */
 const answerProblems = (
-  locale: string,
-  batch: { key: string; english: string }[],
+  locale: Locale,
+  batch: SourceText[],
   answer: Record<string, string>,
 ): string[] =>
   findLocaleProblems(
     // English values are the texts sent, so placeholders are compared with those.
     {
-      locale: "en",
+      locale: SOURCE_LOCALE,
       translations: Object.fromEntries(batch.map(({ key, english }) => [key, english])),
     },
     { locale, translations: answer },
@@ -33,8 +38,8 @@ const answerProblems = (
  * rule, or a call that throws (a refusal, malformed JSON, the network).
  */
 const translateBatch = async (
-  locale: string,
-  entries: { key: string; english: string }[],
+  locale: Locale,
+  entries: SourceText[],
   glossary: string,
   translate: TranslateBatch,
 ): Promise<Record<string, string>> => {
@@ -90,7 +95,7 @@ export const translateLocale = async ({
   batchSize?: number;
 }): Promise<TranslateResult> => {
   const newLock: Record<string, string> = {};
-  const entries: { key: string; english: string }[] = [];
+  const entries: SourceText[] = [];
   const skipped: string[] = [];
   for (const [key, value] of Object.entries(en.translations)) {
     // A plural has several English texts and needs a human: the provider gets plain text.

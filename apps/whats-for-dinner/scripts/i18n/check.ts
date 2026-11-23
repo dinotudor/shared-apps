@@ -1,7 +1,9 @@
+import type { Locale } from "../../src/i18n/locale.ts";
+
 export type Plural = { [tag: string]: string | number | Plural };
 export type Translation = string | Plural;
 export type LocaleFile = {
-  locale: string;
+  locale: Locale;
   name?: string;
   fallback?: string;
   translations: Record<string, Translation>;

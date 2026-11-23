@@ -2,6 +2,9 @@
 export const LOCALES = ["pt-BR", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 
+/** The source language: keys and base copy are English (playbook ADR 0015). */
+export const SOURCE_LOCALE: Locale = "en";
+
 /** The family's language (brief 3.6), for requests that don't ask for one we have. */
 export const DEFAULT_LOCALE: Locale = "pt-BR";
 

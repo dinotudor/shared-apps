@@ -1,5 +1,6 @@
 import { existsSync, globSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import type { Locale } from "../../src/i18n/locale.ts";
 import type { LocaleFile, Plural, Translation } from "./check.ts";
 import { keysInSource } from "./source-keys.ts";
 
@@ -24,7 +25,7 @@ const isTranslation = (value: unknown): value is Translation =>
  * Checks the parsed contents of i18n/<locale>.json: the locale it names, and that every
  * translation is a string or a plural object. `source` names the file in error messages.
  */
-export const parseLocaleFile = (data: unknown, locale: string, source: string): LocaleFile => {
+export const parseLocaleFile = (data: unknown, locale: Locale, source: string): LocaleFile => {
   if (!isRecord(data) || data.locale !== locale || !isRecord(data.translations)) {
     throw new Error(`${source} must have "locale": "${locale}" and a "translations" object`);
   }
@@ -45,7 +46,7 @@ export const parseLocaleFile = (data: unknown, locale: string, source: string): 
 };
 
 /** Reads i18n/<locale>.json, failing with a clear message if it is missing or malformed. */
-export const readLocaleFile = (locale: string): LocaleFile => {
+export const readLocaleFile = (locale: Locale): LocaleFile => {
   const path = resolve(I18N_DIR, `${locale}.json`);
   let data: unknown;
   try {

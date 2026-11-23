@@ -6,13 +6,12 @@
 // defaults to the provider's model. Never run it in the deploy pipeline.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { LOCALES } from "../src/i18n/locale.ts";
+import { LOCALES, SOURCE_LOCALE } from "../src/i18n/locale.ts";
 import { claudeTranslator, DEFAULT_MODEL } from "./i18n/claude.ts";
 import { APP_DIR, readLocaleFile, readLock, writeLocaleFile, writeLock } from "./i18n/files.ts";
 import { translateLocale } from "./i18n/translate.ts";
 import type { TranslateBatch } from "./i18n/translate.ts";
 
-const SOURCE_LOCALE = "en";
 const GLOSSARY = resolve(APP_DIR, "../../GLOSSARY.md");
 
 // Created on first use, so a run with nothing to translate needs no API key.
