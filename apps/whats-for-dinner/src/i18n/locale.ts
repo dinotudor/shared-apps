@@ -5,7 +5,7 @@ export type Locale = (typeof LOCALES)[number];
 /** The source language: keys and base copy are English (playbook ADR 0015). */
 export const SOURCE_LOCALE: Locale = "en";
 
-/** The family's language (brief 3.6), for requests that don't ask for one we have. */
+/** The members' language (brief 3.6), for requests that don't ask for one we have. */
 export const DEFAULT_LOCALE: Locale = "pt-BR";
 
 /**
@@ -45,7 +45,7 @@ type LocaleRequest = {
 
 /**
  * The locale for a request: an explicit `?locale=`, then the remembered one, then the
- * browser's languages, then the family's. `remember` says the choice should be stored.
+ * browser's languages, then DEFAULT_LOCALE. `remember` says the choice should be stored.
  */
 export const chooseLocale = ({
   query,

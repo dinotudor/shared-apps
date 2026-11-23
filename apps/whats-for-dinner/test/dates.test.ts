@@ -5,7 +5,7 @@ import { formatDate } from "../src/i18n/dates.ts";
 const LATE_EVENING = new Date("2026-11-20T01:30:00Z");
 
 describe("formatDate", () => {
-  it("writes the day in Brazilian Portuguese, in the family's time zone", () => {
+  it("writes the day in Brazilian Portuguese, in the given time zone", () => {
     expect(formatDate(LATE_EVENING, { locale: "pt-BR", timeZone: "America/Sao_Paulo" })).toBe(
       "quinta-feira, 19 de novembro",
     );

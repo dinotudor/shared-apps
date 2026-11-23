@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { chooseLocale } from "../src/i18n/locale.ts";
 
 describe("chooseLocale", () => {
-  it("uses the family's language when the request says nothing", () => {
+  it("uses pt-BR, the members' language, when the request says nothing", () => {
     expect(chooseLocale({})).toEqual({ locale: "pt-BR", remember: false });
   });
 });

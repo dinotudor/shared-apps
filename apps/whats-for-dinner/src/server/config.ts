@@ -28,10 +28,10 @@ export const DEV_API_URL = "http://127.0.0.1:3000";
 export const resolveApiUrl = (value: string | undefined, { dev }: { dev: boolean }): string =>
   parseApiUrl(value ?? (dev ? DEV_API_URL : undefined));
 
-/** The family's time zone (brief D1), used when TIME_ZONE is not set. Dates shown use it. */
+/** The members' time zone (brief D1), used when TIME_ZONE is not set. Dates shown use it. */
 export const DEFAULT_TIME_ZONE = "America/Sao_Paulo";
 
-/** TIME_ZONE, or the family's when it is not set. Fails on a name Intl doesn't know. */
+/** TIME_ZONE, or DEFAULT_TIME_ZONE when it is not set. Fails on a name Intl doesn't know. */
 export const resolveTimeZone = (value: string | undefined): string => {
   if (!value) return DEFAULT_TIME_ZONE;
   try {

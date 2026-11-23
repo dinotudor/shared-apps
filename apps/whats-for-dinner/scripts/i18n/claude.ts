@@ -33,7 +33,7 @@ const ANSWER_SCHEMA = {
   additionalProperties: false,
 };
 
-const SYSTEM = `You translate the user interface of a small family web app from English.
+const SYSTEM = `You translate the user interface of a small web app, used at home to plan dinners, from English.
 Rules:
 - Keep every $1, $2 … placeholder exactly as written, once each. $$ is a literal dollar sign.
 - Keep the JSON structure: answer each key exactly as given, with one string translation.

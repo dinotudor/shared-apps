@@ -66,7 +66,7 @@ describe("parseServerConfig", () => {
 });
 
 describe("resolveTimeZone", () => {
-  it("defaults to the family's time zone (brief D1)", () => {
+  it("defaults to America/Sao_Paulo when TIME_ZONE is not set (brief D1)", () => {
     expect(resolveTimeZone(undefined)).toBe(DEFAULT_TIME_ZONE);
     expect(DEFAULT_TIME_ZONE).toBe("America/Sao_Paulo");
   });
