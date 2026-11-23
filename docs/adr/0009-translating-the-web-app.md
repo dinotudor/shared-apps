@@ -31,4 +31,4 @@ Playbook ADR 0015 and its guideline (`guidelines/i18n.md`) choose compiled-i18n,
 
 - A second web app copies the scripts or moves them to a package. They are generic, except for `LOCALES` and the app directory.
 - There is no language switcher in the UI yet. `?locale=en` works, and a switcher needs a design.
-- The patch for backtick-quoted keys (`patches/compiled-i18n@1.3.0.patch`) stays until it's fixed upstream. Upgrading compiled-i18n means checking the patch, the alias for `@builder.io/qwik` that Qwik 2's Vite plugin provides, and our type for `_`.
+- The patch for backtick-quoted keys (`patches/compiled-i18n@1.3.0.patch`) stays until it's fixed upstream. Upgrading compiled-i18n means checking the patch, the alias for `@builder.io/qwik` that Qwik 2's Vite plugin provides, and our type for `_`. If Qwik drops the alias, the fallback (playbook ADR 0015) is our own copy of the two small helpers `compiled-i18n/qwik` provides, `setSsrLocaleGetter` and `extractBase`.
