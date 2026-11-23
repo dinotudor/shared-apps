@@ -1,16 +1,22 @@
 import { component$, Slot, sync$, useSignal, useVisibleTask$ } from "@qwik.dev/core";
 import { Form, Link, routeAction$, routeLoader$, useLocation } from "@qwik.dev/router";
 import type { RequestHandler } from "@qwik.dev/router";
+import { _ } from "compiled-i18n";
 import { Avatar, Button, Logo, OfflineNotice } from "@shared-apps/design-system";
 import { AppNav } from "../components/app-nav.tsx";
 import { useConnectionProvider } from "../connection.ts";
 import { signOut } from "../server/auth.ts";
 import { requireViewer, SIGN_IN_PATH, viewerFrom } from "../server/guard.ts";
+import { applyLocale } from "../server/locale.ts";
 import { getViewer } from "../server/viewer.ts";
 import "../global.css";
 
-// Every page needs a signed-in viewer, except sign-in itself (src/server/guard.ts).
-export const onRequest: RequestHandler = (event) => requireViewer(event, getViewer);
+// Every page renders in the request's locale, and needs a signed-in viewer except sign-in
+// itself (src/server/guard.ts).
+export const onRequest: RequestHandler = (event) => {
+  applyLocale(event);
+  return requireViewer(event, getViewer);
+};
 
 // Only what the header shows goes to the browser.
 export const useViewer = routeLoader$((event) => {
@@ -78,7 +84,7 @@ export default component$(() => {
   return (
     <div class="app">
       <a class="app__skip" href="#main" onClick$={focusMain}>
-        Skip to content
+        {_`Skip to content`}
       </a>
       <header class="app__header">
         <Link href="/" class="app__home">
@@ -89,7 +95,7 @@ export default component$(() => {
           {/* A full-page post, so the cleared cookie and the sign-in page arrive together. */}
           <Form action={signOutAction} reloadDocument>
             <Button type="submit" variant="text">
-              Sign out
+              {_`Sign out`}
             </Button>
           </Form>
         </div>

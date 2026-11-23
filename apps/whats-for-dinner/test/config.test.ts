@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  ConfigError,
   DEV_API_URL,
   parseApiUrl,
+  DEFAULT_TIME_ZONE,
   parseServerConfig,
   resolveApiUrl,
+  resolveTimeZone,
 } from "../src/server/config.ts";
 
 describe("parseApiUrl", () => {
@@ -47,6 +50,7 @@ describe("parseServerConfig", () => {
       port: 3001,
       host: "127.0.0.1",
       apiUrl: "http://api.test",
+      timeZone: "America/Sao_Paulo",
     });
   });
 
@@ -58,5 +62,33 @@ describe("parseServerConfig", () => {
 
   it("requires API_URL, so the server does not start without it", () => {
     expect(() => parseServerConfig({})).toThrow("API_URL is not set");
+  });
+});
+
+describe("resolveTimeZone", () => {
+  it("defaults to America/Sao_Paulo when TIME_ZONE is not set (brief D1)", () => {
+    expect(resolveTimeZone(undefined)).toBe(DEFAULT_TIME_ZONE);
+    expect(DEFAULT_TIME_ZONE).toBe("America/Sao_Paulo");
+  });
+
+  it("accepts any IANA time zone", () => {
+    expect(resolveTimeZone("Europe/Lisbon")).toBe("Europe/Lisbon");
+  });
+
+  it("rejects a name Intl doesn't know", () => {
+    expect(() => resolveTimeZone("Mars/Olympus")).toThrow(
+      "TIME_ZONE is not a valid IANA time zone",
+    );
+  });
+
+  it("keeps Intl's error as the cause of a rejected name", () => {
+    let thrown: unknown;
+    try {
+      resolveTimeZone("Mars/Olympus");
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(ConfigError);
+    expect(thrown instanceof ConfigError && thrown.cause).toBeInstanceOf(RangeError);
   });
 });

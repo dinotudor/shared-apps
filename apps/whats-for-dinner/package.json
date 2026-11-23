@@ -8,16 +8,21 @@
     "preview": "vite build && vite build --ssr src/entry.preview.tsx && vite preview",
     "start": "node server/entry.node-server.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "i18n:check": "node scripts/i18n-check.ts",
+    "i18n:translate": "node scripts/i18n-translate.ts"
   },
   "dependencies": {
     "@qwik.dev/core": "catalog:",
     "@qwik.dev/router": "2.0.0-rc.5",
     "@shared-apps/design-system": "workspace:*",
-    "@trpc/client": "catalog:"
+    "@trpc/client": "catalog:",
+    "compiled-i18n": "1.3.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
     "@shared-apps/api": "workspace:*",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   }

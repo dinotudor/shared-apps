@@ -1,9 +1,14 @@
 import type { BottomNavItem } from "@shared-apps/design-system";
+import { _ } from "compiled-i18n";
 
-/** The bottom navigation tabs (brief section 6). Week is the home screen. */
-export const NAV_ITEMS: BottomNavItem[] = [
-  { href: "/", label: "Week", icon: "week" },
-  { href: "/dishes/", label: "Dishes", icon: "dishes" },
+/**
+ * The bottom navigation tabs (brief section 6). Week is the home screen. A function, not a
+ * constant: the server renders every locale from the same module, so labels are translated
+ * per render.
+ */
+export const navItems = (): BottomNavItem[] => [
+  { href: "/", label: _`Week`, icon: "week" },
+  { href: "/dishes/", label: _`Dishes`, icon: "dishes" },
 ];
 
 // Each tab also owns the pages reached from it: a day and its planning page belong to
