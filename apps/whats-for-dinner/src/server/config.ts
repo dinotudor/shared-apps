@@ -36,8 +36,8 @@ export const resolveTimeZone = (value: string | undefined): string => {
   if (!value) return DEFAULT_TIME_ZONE;
   try {
     return new Intl.DateTimeFormat("en", { timeZone: value }).resolvedOptions().timeZone;
-  } catch {
-    throw new ConfigError("TIME_ZONE is not a valid IANA time zone");
+  } catch (error) {
+    throw new ConfigError("TIME_ZONE is not a valid IANA time zone", { cause: error });
   }
 };
 

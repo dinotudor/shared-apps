@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ConfigError,
   DEV_API_URL,
   parseApiUrl,
   DEFAULT_TIME_ZONE,
@@ -78,5 +79,16 @@ describe("resolveTimeZone", () => {
     expect(() => resolveTimeZone("Mars/Olympus")).toThrow(
       "TIME_ZONE is not a valid IANA time zone",
     );
+  });
+
+  it("keeps Intl's error as the cause of a rejected name", () => {
+    let thrown: unknown;
+    try {
+      resolveTimeZone("Mars/Olympus");
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(ConfigError);
+    expect(thrown instanceof ConfigError && thrown.cause).toBeInstanceOf(RangeError);
   });
 });
