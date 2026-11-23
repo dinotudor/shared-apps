@@ -58,7 +58,7 @@ It is also the first app in `shared-apps`. It must prove the shared stack end to
 ### 3.6 Language
 - UI in Brazilian Portuguese. Code, identifiers, routes, commits and translation keys in English.
 - UI text is written in English with `_`, and the pt-BR copy lives in `apps/whats-for-dinner/i18n/pt-BR.json` (playbook ADR 0015, project ADR 0009). The pt-BR copy in this brief and the design guide is what that file should say.
-- The i18n approach is decided in playbook ADR 0015 (i18n, proposed).
+- The i18n approach is decided in playbook ADR 0015 (i18n, accepted).
 
 ## 4. Out of scope (later phases)
 
@@ -116,7 +116,7 @@ Expected new packages: `modules/dishes`, `modules/meals` (names to confirm), `pa
 - **D6 — Removed ingredients:** removing an ingredient from a dish deletes its `MissingIngredient` rows (cascade). Past meals stop showing it.
 - **D7 — Modules:** `modules/dishes` (dishes, ingredients, ratings) and `modules/meals` (meals, responses, reactions, missing ingredients). `meals` uses `dishes` only through its public interface.
 - **D8 — App access:** sign-in is shared by every app in `shared-apps`, so access is per app. An `app_member` table (appId, userId) lists who may use each app; only the family is a member of What's for dinner. This replaces a `Household` table.
-- **Playbook, decided by Dino separately:** playbook ADR 0015 (i18n, proposed) and hosting (ADR 0014). Issues that depend on them are marked *blocked*.
+- **Playbook, decided by Dino separately:** playbook ADR 0015 (i18n, accepted) and hosting (ADR 0014). Issues that depend on them are marked *blocked*.
 
 ## 9. Ideas for later (not committed)
 
