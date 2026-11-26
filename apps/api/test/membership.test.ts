@@ -9,6 +9,8 @@ import { createDishes } from "@shared-apps/dishes";
 import { createMembership } from "@shared-apps/membership";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
+import { createAppRouter } from "../src/router.ts";
+import { testModules } from "./support/test-modules.ts";
 import { sendTo } from "./support/send.ts";
 
 const WEB = "http://localhost:5173";
@@ -50,11 +52,11 @@ const listDishes = (cookies: Headers) =>
 beforeAll(async () => {
   database = await startTestDatabase();
   app = buildApp(config, {
-    database: { db: database.db, close: () => Promise.resolve() },
+    database: { close: () => Promise.resolve() },
     jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
     auth: createAuth(database.db, config.auth),
     membership: createMembership(database.db),
-    dishes: createDishes(database.db),
+    router: createAppRouter(testModules({ dishes: createDishes(database.db) })),
   });
   await app.ready();
 });

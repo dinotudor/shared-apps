@@ -8,6 +8,7 @@ import { ConfigError, parseConfig } from "./config.ts";
 import type { Config } from "./config.ts";
 import { heartbeat } from "./heartbeat.ts";
 import { runServer } from "./lifecycle.ts";
+import { createAppRouter } from "./router.ts";
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 // Half the shutdown budget for running jobs, leaving the rest for in-flight requests
@@ -55,7 +56,13 @@ const jobs = createJobRunner({
 });
 const membership = createMembership(database.db);
 const dishes = createDishes(database.db);
-const app = buildApp(config, { database, jobs, auth, membership, dishes });
+const app = buildApp(config, {
+  database,
+  jobs,
+  auth,
+  membership,
+  router: createAppRouter({ dishes }),
+});
 
 await runServer(app, {
   port: config.port,

@@ -7,8 +7,9 @@ import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
+import { createAppRouter } from "../src/router.ts";
 import { sendTo } from "./support/send.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
+import { testModules } from "./support/test-modules.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -43,11 +44,12 @@ const me = (cookies?: Headers) =>
 const buildAppWith = async (authConfig: Config["auth"]): Promise<FastifyInstance> => {
   const built = buildApp(config, {
     // The test database closes itself in afterAll.
-    database: { db: database.db, close: () => Promise.resolve() },
+    database: { close: () => Promise.resolve() },
     jobs,
     auth: createAuth(database.db, authConfig),
     membership: { isMember: () => Promise.resolve(false) },
-    dishes: unusedDishes,
+    // Calls viewer.me only, which reaches no module.
+    router: createAppRouter(testModules()),
   });
   await built.ready();
   return built;

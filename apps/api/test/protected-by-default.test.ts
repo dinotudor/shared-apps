@@ -2,14 +2,14 @@ import { TRPCError } from "@trpc/server";
 import { describe, expect, it } from "vitest";
 import { createCallerFactory } from "@shared-apps/api-core";
 import { createAppRouter } from "../src/router.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
+import { testModules } from "./support/test-modules.ts";
 
 // Procedures anyone may call without signing in. Adding one here is a decision, and
 // review should see it: everything else must reject a call without a session.
 const PUBLIC_PROCEDURES = ["health.ping"];
 
 // The session check runs before any module is called, so the modules are never used.
-const appRouter = createAppRouter({ dishes: unusedDishes });
+const appRouter = createAppRouter(testModules());
 
 const procedures = Object.keys(appRouter._def.procedures);
 

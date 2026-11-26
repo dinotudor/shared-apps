@@ -1,10 +1,9 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
-import type { Database } from "@shared-apps/db";
+import { router } from "@shared-apps/api-core";
 import { buildApp } from "../src/app.ts";
 import { runServer } from "../src/lifecycle.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
 
 // The lifecycle never queries the database; it only has to close it.
 const setUp = () => {
@@ -12,14 +11,15 @@ const setUp = () => {
   const app = buildApp(
     { logLevel: "silent" },
     {
-      database: { db: {} as Database, close: closeDatabase },
+      database: { close: closeDatabase },
       jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
       auth: {
         handler: () => Promise.resolve(new Response(null, { status: 404 })),
         getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
       },
       membership: { isMember: () => Promise.resolve(false) },
-      dishes: unusedDishes,
+      // The lifecycle serves no procedures.
+      router: router({}),
     },
   );
   const signals = new EventEmitter();

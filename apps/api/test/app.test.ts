@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { publicProcedure, router } from "@shared-apps/api-core";
-import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
 import type { AppDependencies } from "../src/app.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
+import { createAppRouter } from "../src/router.ts";
+import { testModules } from "./support/test-modules.ts";
 
 let app: FastifyInstance | undefined;
 
 const config = { logLevel: "silent" } as const;
 
 // No procedure here queries the database or sends a job, so these tests need no container.
-const database = { db: {} as Database, close: () => Promise.resolve() };
+const database = { close: () => Promise.resolve() };
 const jobs = { start: () => Promise.resolve(), stop: () => Promise.resolve() };
 // Nobody is signed in, and nothing here goes through /api/auth.
 const auth = {
@@ -20,10 +20,11 @@ const auth = {
 };
 // No procedure here is for members only.
 const membership = { isMember: () => Promise.resolve(false) };
-const dishes = unusedDishes;
+// The real procedures, none of which reaches a module here.
+const appRouter = createAppRouter(testModules());
 
-const startApp = async (appRouter?: AppDependencies["router"]) => {
-  app = buildApp(config, { database, jobs, auth, membership, dishes, router: appRouter });
+const startApp = async (router: AppDependencies["router"] = appRouter) => {
+  app = buildApp(config, { database, jobs, auth, membership, router });
   await app.ready();
   return app;
 };
@@ -107,7 +108,7 @@ describe("request logs", () => {
         jobs,
         auth,
         membership,
-        dishes,
+        router: appRouter,
         logStream: { write: (line) => void lines.push(line) },
       },
     );
@@ -136,7 +137,13 @@ describe("request logs", () => {
 describe("background jobs", () => {
   it("starts the job runner when the app is ready", async () => {
     const start = vi.fn(() => Promise.resolve());
-    app = buildApp(config, { database, auth, membership, dishes, jobs: { ...jobs, start } });
+    app = buildApp(config, {
+      database,
+      auth,
+      membership,
+      router: appRouter,
+      jobs: { ...jobs, start },
+    });
 
     await app.ready();
 
@@ -149,7 +156,7 @@ describe("background jobs", () => {
       database,
       auth,
       membership,
-      dishes,
+      router: appRouter,
       jobs: { ...jobs, start: () => Promise.reject(failure) },
     });
 
@@ -163,7 +170,7 @@ describe("background jobs", () => {
       jobs: { ...jobs, stop: () => Promise.resolve(void calls.push("jobs")) },
       auth,
       membership,
-      dishes,
+      router: appRouter,
     });
     await app.ready();
 
