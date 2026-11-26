@@ -9,7 +9,7 @@ import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
 import { createAppRouter } from "../src/router.ts";
 import { sendTo } from "./support/send.ts";
-import { unusedModules } from "./support/unused-modules.ts";
+import { testModules } from "./support/test-modules.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -49,7 +49,7 @@ const buildAppWith = async (authConfig: Config["auth"]): Promise<FastifyInstance
     auth: createAuth(database.db, authConfig),
     membership: { isMember: () => Promise.resolve(false) },
     // Calls viewer.me only, which reaches no module.
-    router: createAppRouter(unusedModules),
+    router: createAppRouter(testModules()),
   });
   await built.ready();
   return built;

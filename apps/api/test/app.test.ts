@@ -4,7 +4,7 @@ import { publicProcedure, router } from "@shared-apps/api-core";
 import { buildApp } from "../src/app.ts";
 import type { AppDependencies } from "../src/app.ts";
 import { createAppRouter } from "../src/router.ts";
-import { unusedModules } from "./support/unused-modules.ts";
+import { testModules } from "./support/test-modules.ts";
 
 let app: FastifyInstance | undefined;
 
@@ -21,7 +21,7 @@ const auth = {
 // No procedure here is for members only.
 const membership = { isMember: () => Promise.resolve(false) };
 // The real procedures, none of which reaches a module here.
-const appRouter = createAppRouter(unusedModules);
+const appRouter = createAppRouter(testModules());
 
 const startApp = async (router: AppDependencies["router"] = appRouter) => {
   app = buildApp(config, { database, jobs, auth, membership, router });
