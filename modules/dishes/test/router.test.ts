@@ -96,6 +96,25 @@ describe("dishes procedures", () => {
     expect(error.code).toBe("BAD_REQUEST");
   });
 
+  it("reject an edit naming another dish's ingredient as BAD_REQUEST with the domain code unknown_ingredient", async () => {
+    const ana = callerFor(ANA);
+    const other = await ana.dishes.create({ ...feijoada, name: "Moqueca" });
+    const [otherIngredient] = (await ana.dishes.get({ id: other.id })).ingredients;
+    const { id } = await ana.dishes.create(feijoada);
+
+    const error = await errorOf(
+      ana.dishes.update({
+        id,
+        name: "Feijoada",
+        instructions: "",
+        ingredients: [{ id: otherIngredient.id, name: "Black beans", quantity: null }],
+      }),
+    );
+
+    expect(error.code).toBe("BAD_REQUEST");
+    expect(error.cause).toMatchObject({ code: "unknown_ingredient" });
+  });
+
   it("report an unknown dish as NOT_FOUND with the domain code dish_not_found", async () => {
     const error = await errorOf(
       callerFor(ANA).dishes.get({ id: "00000000-0000-4000-8000-000000000000" }),

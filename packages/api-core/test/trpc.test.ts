@@ -4,12 +4,33 @@ import { describe, expect, it } from "vitest";
 import type { Viewer } from "@shared-apps/auth";
 import {
   App,
+  DomainError,
+  DomainErrorKind,
   memberProcedure,
   NotAMemberError,
   protectedProcedure,
   publicProcedure,
   router,
 } from "../src/index.ts";
+
+// Errors a module could declare, with codes api-core has never heard of.
+class ThingNotFoundError extends DomainError {
+  override name = "ThingNotFoundError";
+  readonly code = "thing_not_found";
+  readonly kind = DomainErrorKind.NotFound;
+}
+
+class ThingRuleError extends DomainError {
+  override name = "ThingRuleError";
+  readonly code = "thing_rule_broken";
+  readonly kind = DomainErrorKind.RuleViolated;
+}
+
+class ThingForbiddenError extends DomainError {
+  override name = "ThingForbiddenError";
+  readonly code = "thing_not_yours";
+  readonly kind = DomainErrorKind.Forbidden;
+}
 
 const VIEWER: Viewer = { id: "user-1", name: "Ana Teste", role: "member" };
 
@@ -27,6 +48,15 @@ const testRouter = router({
   }),
   breaksRuleSignedOut: publicProcedure.query(() => {
     throw new NotAMemberError();
+  }),
+  thingNotFound: publicProcedure.query(() => {
+    throw new ThingNotFoundError();
+  }),
+  thingRuleBroken: publicProcedure.query(() => {
+    throw new ThingRuleError();
+  }),
+  thingNotYours: publicProcedure.query(() => {
+    throw new ThingForbiddenError();
   }),
 });
 
@@ -84,5 +114,32 @@ describe("tRPC errors", () => {
     const { status } = await call("breaksRuleSignedOut");
 
     expect(status).toBe(403);
+  });
+
+  it("map a module's not_found error to NOT_FOUND, keeping its own code", async () => {
+    const { status, body } = await call("thingNotFound");
+
+    expect(status).toBe(404);
+    expect(body).toMatchObject({
+      error: { data: { code: "NOT_FOUND", domainCode: "thing_not_found" } },
+    });
+  });
+
+  it("map a module's rule_violated error to BAD_REQUEST, keeping its own code", async () => {
+    const { status, body } = await call("thingRuleBroken");
+
+    expect(status).toBe(400);
+    expect(body).toMatchObject({
+      error: { data: { code: "BAD_REQUEST", domainCode: "thing_rule_broken" } },
+    });
+  });
+
+  it("map a module's forbidden error to FORBIDDEN, keeping its own code", async () => {
+    const { status, body } = await call("thingNotYours");
+
+    expect(status).toBe(403);
+    expect(body).toMatchObject({
+      error: { data: { code: "FORBIDDEN", domainCode: "thing_not_yours" } },
+    });
   });
 });
