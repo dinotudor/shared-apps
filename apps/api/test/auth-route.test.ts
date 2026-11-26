@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
+import { router } from "@shared-apps/api-core";
 import { createAuth } from "@shared-apps/auth";
 import { googleStub, signInWithGoogle } from "@shared-apps/auth/testing";
 import type { Send } from "@shared-apps/auth/testing";
@@ -7,7 +8,6 @@ import { startTestDatabase } from "@shared-apps/db/testing";
 import type { TestDatabase } from "@shared-apps/db/testing";
 import { buildApp } from "../src/app.ts";
 import type { Config } from "../src/config.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
 
 const WEB = "http://localhost:5173";
 
@@ -58,7 +58,8 @@ beforeAll(async () => {
       jobs,
       auth: createAuth(database.db, authConfig),
       membership: { isMember: () => Promise.resolve(false) },
-      dishes: unusedDishes,
+      // Nothing here calls tRPC.
+      router: router({}),
     },
   );
   await app.ready();
@@ -132,7 +133,7 @@ describe("request logs", () => {
         jobs,
         auth: createAuth(database.db, authConfig),
         membership: { isMember: () => Promise.resolve(false) },
-        dishes: unusedDishes,
+        router: router({}),
         logStream: { write: (line: string) => void lines.push(line) },
       },
     );

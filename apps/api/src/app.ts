@@ -7,11 +7,9 @@ import type { Context } from "@shared-apps/api-core";
 import type { Auth } from "@shared-apps/auth";
 import type { DatabaseHandle } from "@shared-apps/db";
 import type { JobRunner } from "@shared-apps/jobs";
-import type { Dishes } from "@shared-apps/dishes";
 import type { Membership } from "@shared-apps/membership";
 import { registerAuthRoute, toHeaders } from "./auth-route.ts";
 import type { Config } from "./config.ts";
-import { createAppRouter } from "./router.ts";
 
 /**
  * The request as it goes into the log, without its query string: tRPC queries carry
@@ -31,16 +29,16 @@ export type AppDependencies = {
   jobs: Pick<JobRunner, "start" | "stop">;
   auth: Pick<Auth, "handler" | "getSession">;
   membership: Pick<Membership, "isMember">;
-  dishes: Dishes;
-  // A parameter so tests can mount procedures that fail.
-  router?: AnyTRPCRouter;
+  // Built in main.ts from the modules, so this file never changes when a module is
+  // added. Tests mount only the procedures they call.
+  router: AnyTRPCRouter;
   // Where log lines go: stdout by default, and an array in tests that read them.
   logStream?: { write: (line: string) => void };
 };
 
 export const buildApp = (
   config: Pick<Config, "logLevel">,
-  { database, jobs, auth, membership, dishes, router, logStream }: AppDependencies,
+  { database, jobs, auth, membership, router, logStream }: AppDependencies,
 ): FastifyInstance => {
   const app = Fastify({
     logger: {
@@ -68,7 +66,7 @@ export const buildApp = (
   registerAuthRoute(app, auth);
 
   const trpcOptions: FastifyTRPCPluginOptions<AnyTRPCRouter>["trpcOptions"] = {
-    router: router ?? createAppRouter({ dishes }),
+    router,
     // Every call verifies its session against PostgreSQL (playbook ADR 0008): the API
     // trusts the cookie, never the frontend's word about who is signed in.
     createContext: async ({ req, res }): Promise<Context> => {

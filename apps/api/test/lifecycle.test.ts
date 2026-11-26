@@ -1,10 +1,10 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
+import { router } from "@shared-apps/api-core";
 import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
 import { runServer } from "../src/lifecycle.ts";
-import { unusedDishes } from "./support/unused-dishes.ts";
 
 // The lifecycle never queries the database; it only has to close it.
 const setUp = () => {
@@ -19,7 +19,8 @@ const setUp = () => {
         getSession: () => Promise.resolve({ viewer: null, headers: new Headers() }),
       },
       membership: { isMember: () => Promise.resolve(false) },
-      dishes: unusedDishes,
+      // The lifecycle serves no procedures.
+      router: router({}),
     },
   );
   const signals = new EventEmitter();
