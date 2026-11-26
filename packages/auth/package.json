@@ -14,7 +14,7 @@
   "dependencies": {
     "@shared-apps/db": "workspace:*",
     "@shared-apps/jobs": "workspace:*",
-    "better-auth": "1.7.25",
+    "better-auth": "1.7.26",
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
