@@ -2,8 +2,9 @@ import { $, component$ } from "@qwik.dev/core";
 import { Link, routeLoader$, useNavigate } from "@qwik.dev/router";
 import type { DocumentHead } from "@qwik.dev/router";
 import { _ } from "compiled-i18n";
-import { DishesView, dishesHref } from "../../components/dishes-view.tsx";
+import { DishesView } from "../../components/dishes-view.tsx";
 import type { DishListQuery } from "../../dishes/model.ts";
+import { dishesHref } from "../../dishes/paths.ts";
 import { apiFor } from "../../server/api.ts";
 import { loadDishes } from "../../server/dishes.ts";
 

@@ -1,20 +1,17 @@
 import { component$ } from "@qwik.dev/core";
-import type { Component, PropsOf, QRL } from "@qwik.dev/core";
+import type { QRL } from "@qwik.dev/core";
 import { _ } from "compiled-i18n";
 import { Alert, Icon, StatusMessage, TextField } from "@shared-apps/design-system";
 import { DISH_SORTS } from "../dishes/model.ts";
 import type { DishesPage, DishListQuery, DishSort } from "../dishes/model.ts";
+import { DISHES_PATH, dishesHref, NEW_DISH_PATH } from "../dishes/paths.ts";
 import { AnyLink } from "./any-link.tsx";
+import type { LinkComponent } from "./any-link.tsx";
 import { DishCard } from "./dish-card.tsx";
-
-export const DISHES_PATH = "/dishes/";
-/** STUB(#26): the New dish screen. The route shows "coming soon" until then. */
-export const NEW_DISH_PATH = "/dishes/new/";
 
 export type DishesViewProps = {
   page: DishesPage;
-  /** Qwik Router's Link in the app. Tests leave it out and get plain links. */
-  link?: Component<PropsOf<"a">>;
+  link?: LinkComponent;
   /**
    * Runs a search without reloading the page. Without it, or before the page's script
    * loads, the form submits as a plain GET and the server renders the results.
@@ -22,19 +19,9 @@ export type DishesViewProps = {
   onSearch$?: QRL<(query: DishListQuery) => void>;
 };
 
-/** The Dishes page's URL for a search and sort: what the form and the sort links go to. */
-export const dishesHref = ({ search, sort }: DishListQuery): string => {
-  const params = new URLSearchParams();
-  if (search) params.set("q", search);
-  params.set("sort", sort);
-  return `${DISHES_PATH}?${params.toString()}`;
-};
-
 // A function, not a constant: labels are translated per render (docs/adr/0009).
 const sortLabel = (sort: DishSort): string =>
   ({ mostCooked: _`Most cooked`, bestScore: _`Best score`, recent: _`Recent` })[sort];
-
-const countLabel = (count: number): string => (count === 1 ? _`1 dish` : _`${count} dishes`);
 
 /**
  * The Dishes page (wireframe 4): search, three sorts, the dish cards and a New dish link,
@@ -137,7 +124,8 @@ export const DishesView = component$<DishesViewProps>(({ page, link, onSearch$ }
 
       {/* Always on the page, so a new search's count is announced when it changes. */}
       <p class="dishes__count visually-hidden" role="status">
-        {result.ok && result.dishes.length > 0 ? countLabel(result.dishes.length) : ""}
+        {/* A Plural key: the locale files hold "1 dish" and "$1 dishes". */}
+        {result.ok && result.dishes.length > 0 ? _`${result.dishes.length} dishes` : ""}
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ const moqueca: DishListItem = { id: "d1", name: "Moqueca", ratings: null, photoU
 
 const rated = (ratings: Partial<DishRatings>): DishListItem => ({
   ...moqueca,
-  ratings: { timesCooked: 3, familyAverage: 6.5, myScore: 7, fedUp: [], ...ratings },
+  ratings: { timesCooked: 3, familyAverage: 6.5, viewerScore: 7, fedUp: [], ...ratings },
 });
 
 const renderCard = async (dish: DishListItem) => {
@@ -52,36 +52,43 @@ describe("DishCard", () => {
     expect(link.querySelector(".dish-card__face")).toBeFalsy();
   });
 
-  it("shows times cooked, the family average and my score", async () => {
-    const link = await renderCard(rated({ timesCooked: 11, familyAverage: 8.9, myScore: 9 }));
+  it("shows times cooked, the family average and the viewer's score", async () => {
+    const link = await renderCard(rated({ timesCooked: 11, familyAverage: 8.9, viewerScore: 9 }));
 
     expect(text(link.querySelector(".dish-card__meta"))).toBe("Cooked 11× · family 8.9 · you 9");
   });
 
-  it("leaves out my score when I haven't rated the dish", async () => {
-    const link = await renderCard(rated({ myScore: null }));
+  it("shows a dash for the viewer's score when they haven't scored the dish", async () => {
+    const link = await renderCard(rated({ viewerScore: null }));
 
-    expect(text(link.querySelector(".dish-card__meta"))).toBe("Cooked 3× · family 6.5");
+    expect(text(link.querySelector(".dish-card__meta"))).toBe("Cooked 3× · family 6.5 · you –");
   });
 
   it("says so when the family hasn't scored a cooked dish", async () => {
-    const link = await renderCard(rated({ familyAverage: null, myScore: null }));
+    const link = await renderCard(rated({ familyAverage: null, viewerScore: null }));
 
-    expect(text(link.querySelector(".dish-card__meta"))).toBe("Cooked 3× · no scores yet");
+    expect(text(link.querySelector(".dish-card__meta"))).toBe("Cooked 3× · no scores yet · you –");
     expect(link.querySelector(".dish-card__face")).toBeFalsy();
   });
 
-  it("calls a dish nobody has cooked new", async () => {
-    const link = await renderCard(rated({ timesCooked: 0, familyAverage: null, myScore: null }));
+  it("calls a dish nobody has cooked new, with the 🆕 face", async () => {
+    const link = await renderCard(
+      rated({ timesCooked: 0, familyAverage: null, viewerScore: null }),
+    );
 
     expect(text(link.querySelector(".dish-card__meta"))).toBe("New · not cooked yet");
+    const face = link.querySelector(".dish-card__face");
+    expect(text(face)).toBe("🆕");
+    expect(face?.getAttribute("aria-hidden")).toBe("true");
   });
 
+  // Brief 3.2's bands are whole scores (0–4, 5–7, 8–10); an average takes the band of the
+  // nearest whole score, as the prototype does.
   it.each([
-    [4.9, "🤢"],
-    [5, "😐"],
-    [7.9, "😐"],
-    [8, "😍"],
+    [4.4, "🤢"],
+    [4.5, "😐"],
+    [7.4, "😐"],
+    [7.5, "😍"],
   ])("shows the emoji for a family average of %d", async (familyAverage, emoji) => {
     const link = await renderCard(rated({ familyAverage }));
 
@@ -91,12 +98,11 @@ describe("DishCard", () => {
     expect(face?.getAttribute("aria-hidden")).toBe("true");
   });
 
-  it("notes who is fed up with the dish", async () => {
-    const one = await renderCard(rated({ fedUp: ["Bia"] }));
-    const two = await renderCard(rated({ fedUp: ["Bia", "Pai"] }));
+  it("notes each member who is fed up with the dish", async () => {
+    const link = await renderCard(rated({ fedUp: ["Alex", "Sam"] }));
 
-    expect(text(one.querySelector(".dish-card__fed-up"))).toBe("🤢 Bia is fed up");
-    expect(text(two.querySelector(".dish-card__fed-up"))).toBe("🤢 Bia and Pai are fed up");
+    const notes = Array.from(link.querySelectorAll(".dish-card__fed-up"));
+    expect(notes.map(text)).toEqual(["🤢 Alex is fed up", "🤢 Sam is fed up"]);
   });
 
   it("shows no fed-up note when nobody is fed up", async () => {

@@ -93,8 +93,10 @@
     "Most cooked": "Mais feitos",
     "Best score": "Melhor nota",
     "Recent": "Recentes",
-    "1 dish": "1 prato",
-    "$1 dishes": "$1 pratos",
+    "$1 dishes": {
+      "1": "$1 prato",
+      "*": "$1 pratos"
+    },
     "Search by dish or ingredient": "Buscar prato ou ingrediente",
     "Sort by": "Ordenar por",
     "Couldn't load the dishes": "Não foi possível carregar os pratos",
@@ -108,7 +110,6 @@
     "no scores yet": "ainda sem notas",
     "family $1": "família $1",
     "you $1": "você $1",
-    "$1 is fed up": "$1 enjoou",
-    "$1 are fed up": "$1 enjoaram"
+    "$1 is fed up": "$1 enjoou"
   }
 }

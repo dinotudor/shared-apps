@@ -1,19 +1,16 @@
 import { component$, getLocale } from "@qwik.dev/core";
-import type { Component, PropsOf } from "@qwik.dev/core";
 import { _ } from "compiled-i18n";
 import { Icon } from "@shared-apps/design-system";
 import type { DishListItem, DishRatings } from "../dishes/model.ts";
+import { dishPath } from "../dishes/paths.ts";
 import { scoreEmoji } from "../dishes/score.ts";
 import { SOURCE_LOCALE } from "../i18n/locale.ts";
 import { AnyLink } from "./any-link.tsx";
-
-/** STUB(#25): the Dish screen. The route shows "coming soon" until then. */
-export const dishPath = (id: string): string => `/dishes/${encodeURIComponent(id)}/`;
+import type { LinkComponent } from "./any-link.tsx";
 
 export type DishCardProps = {
   dish: DishListItem;
-  /** Qwik Router's Link in the app. Tests leave it out and get a plain link. */
-  link?: Component<PropsOf<"a">>;
+  link?: LinkComponent;
 };
 
 /** "8.9" in English, "8,9" in Portuguese. */
@@ -22,22 +19,25 @@ const formatAverage = (value: number, locale: string): string =>
     value,
   );
 
-/** The line under the name, such as "Cooked 11× · family 8.9 · you 9". */
+/**
+ * The line under the name, such as "Cooked 11× · family 8.9 · you 9". The separator is the
+ * same in every language, so the translated parts are joined rather than one long key.
+ */
 const ratingsLine = (ratings: DishRatings, locale: string): string => {
   if (ratings.timesCooked === 0) return _`New · not cooked yet`;
-  const parts = [_`Cooked ${ratings.timesCooked}×`];
-  parts.push(
+  const family =
     ratings.familyAverage === null
       ? _`no scores yet`
-      : _`family ${formatAverage(ratings.familyAverage, locale)}`,
-  );
-  if (ratings.myScore !== null) parts.push(_`you ${ratings.myScore}`);
-  return parts.join(" · ");
+      : _`family ${formatAverage(ratings.familyAverage, locale)}`;
+  // The wireframe shows "you –" until the viewer scores the dish.
+  const viewer = _`you ${ratings.viewerScore ?? "–"}`;
+  return [_`Cooked ${ratings.timesCooked}×`, family, viewer].join(" · ");
 };
 
-const fedUpNote = (names: string[], locale: string): string => {
-  const list = new Intl.ListFormat(locale, { type: "conjunction" }).format(names);
-  return names.length === 1 ? _`${list} is fed up` : _`${list} are fed up`;
+/** The emoji at the card's end: 🆕 for a dish nobody has cooked, else the average's band. */
+const faceFor = (ratings: DishRatings): string | null => {
+  if (ratings.timesCooked === 0) return "🆕";
+  return ratings.familyAverage === null ? null : scoreEmoji(ratings.familyAverage);
 };
 
 /**
@@ -47,8 +47,9 @@ const fedUpNote = (names: string[], locale: string): string => {
 export const DishCard = component$<DishCardProps>(({ dish, link }) => {
   const locale = getLocale(SOURCE_LOCALE);
   const { ratings } = dish;
-  const content = (
-    <>
+  const face = ratings && faceFor(ratings);
+  return (
+    <AnyLink link={link} href={dishPath(dish.id)} class="dish-card">
       {/* Decorative: the name next to it says which dish this is. */}
       <span class="dish-card__photo" aria-hidden="true">
         {dish.photoUrl ? (
@@ -60,24 +61,19 @@ export const DishCard = component$<DishCardProps>(({ dish, link }) => {
       <span class="dish-card__body">
         <span class="dish-card__name">{dish.name}</span>
         {ratings && <span class="dish-card__meta">{ratingsLine(ratings, locale)}</span>}
-        {ratings && ratings.fedUp.length > 0 && (
-          <span class="dish-card__fed-up">
+        {ratings?.fedUp.map((name) => (
+          <span key={name} class="dish-card__fed-up">
             <span aria-hidden="true">🤢 </span>
-            {fedUpNote(ratings.fedUp, locale)}
+            {_`${name} is fed up`}
           </span>
-        )}
+        ))}
       </span>
-      {ratings?.familyAverage != null && (
-        // The average is in the line above; the emoji only repeats it.
+      {face && (
+        // The line above says it in words; the emoji only repeats it.
         <span class="dish-card__face" aria-hidden="true">
-          {scoreEmoji(ratings.familyAverage)}
+          {face}
         </span>
       )}
-    </>
-  );
-  return (
-    <AnyLink link={link} href={dishPath(dish.id)} class="dish-card">
-      {content}
     </AnyLink>
   );
 });

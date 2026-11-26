@@ -15,16 +15,16 @@ export const DEFAULT_DISH_SORT: DishSort = "mostCooked";
 export type DishListQuery = { search: string; sort: DishSort };
 
 /**
- * GLOSSARY: Times cooked, plus the ratings from brief 3.2. The API doesn't return these
- * yet: #22 adds them. Scores are 0 to 10.
+ * GLOSSARY: Times cooked, Score, Family average and Fed up (brief 3.2), as a dish card
+ * shows them. The API doesn't return these yet: #22 adds them.
  */
 export type DishRatings = {
   timesCooked: number;
-  /** Mean of every member's score; null when nobody has rated the dish. */
+  /** GLOSSARY: Family average. Null when no member has scored the dish. */
   familyAverage: number | null;
-  /** The viewer's score; null when they haven't rated the dish. */
-  myScore: number | null;
-  /** Names of the members whose "fed up" is active, for the card's note. */
+  /** The viewer's Score, 0 to 10. Null when they haven't scored the dish. */
+  viewerScore: number | null;
+  /** Names of the members who are Fed up with the dish now. */
   fedUp: string[];
 };
 
