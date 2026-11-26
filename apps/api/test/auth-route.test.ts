@@ -54,7 +54,7 @@ beforeAll(async () => {
     { logLevel: "silent" },
     {
       // The test database closes itself in afterAll.
-      database: { db: database.db, close: () => Promise.resolve() },
+      database: { close: () => Promise.resolve() },
       jobs,
       auth: createAuth(database.db, authConfig),
       membership: { isMember: () => Promise.resolve(false) },
@@ -129,7 +129,7 @@ describe("request logs", () => {
     const built = buildApp(
       { logLevel: "info" },
       {
-        database: { db: database.db, close: () => Promise.resolve() },
+        database: { close: () => Promise.resolve() },
         jobs,
         auth: createAuth(database.db, authConfig),
         membership: { isMember: () => Promise.resolve(false) },

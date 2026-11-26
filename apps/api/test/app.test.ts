@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { publicProcedure, router } from "@shared-apps/api-core";
-import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
 import type { AppDependencies } from "../src/app.ts";
 import { createAppRouter } from "../src/router.ts";
@@ -12,7 +11,7 @@ let app: FastifyInstance | undefined;
 const config = { logLevel: "silent" } as const;
 
 // No procedure here queries the database or sends a job, so these tests need no container.
-const database = { db: {} as Database, close: () => Promise.resolve() };
+const database = { close: () => Promise.resolve() };
 const jobs = { start: () => Promise.resolve(), stop: () => Promise.resolve() };
 // Nobody is signed in, and nothing here goes through /api/auth.
 const auth = {

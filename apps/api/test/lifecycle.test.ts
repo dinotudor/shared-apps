@@ -2,7 +2,6 @@ import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { router } from "@shared-apps/api-core";
-import type { Database } from "@shared-apps/db";
 import { buildApp } from "../src/app.ts";
 import { runServer } from "../src/lifecycle.ts";
 
@@ -12,7 +11,7 @@ const setUp = () => {
   const app = buildApp(
     { logLevel: "silent" },
     {
-      database: { db: {} as Database, close: closeDatabase },
+      database: { close: closeDatabase },
       jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
       auth: {
         handler: () => Promise.resolve(new Response(null, { status: 404 })),

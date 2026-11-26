@@ -25,7 +25,8 @@ export const serializeRequest = (request: FastifyRequest) => ({
 });
 
 export type AppDependencies = {
-  database: DatabaseHandle;
+  // Only closed here: the modules hold the connection, through main.ts.
+  database: Pick<DatabaseHandle, "close">;
   jobs: Pick<JobRunner, "start" | "stop">;
   auth: Pick<Auth, "handler" | "getSession">;
   membership: Pick<Membership, "isMember">;

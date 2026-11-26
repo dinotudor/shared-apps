@@ -1,5 +1,6 @@
-import { createServer, request } from "node:http";
-import type { IncomingMessage, Server, ServerResponse } from "node:http";
+import { IncomingMessage, createServer, request } from "node:http";
+import type { Server, ServerResponse } from "node:http";
+import { Socket } from "node:net";
 import type { AddressInfo } from "node:net";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRequestListener, shutDown } from "../src/server/node-server.ts";
@@ -33,7 +34,8 @@ const handle = async (staticFile: Middleware, router: Middleware) => {
   const log = { error: vi.fn() };
   const res = fakeResponse();
   createRequestListener({ staticFile, router }, log)(
-    {} as IncomingMessage,
+    // A real request on a socket that never connects: the middlewares here ignore it.
+    new IncomingMessage(new Socket()),
     res as unknown as ServerResponse,
   );
   await vi.waitFor(() => {

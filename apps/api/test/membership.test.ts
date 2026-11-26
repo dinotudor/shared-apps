@@ -51,7 +51,7 @@ const listDishes = (cookies: Headers) =>
 beforeAll(async () => {
   database = await startTestDatabase();
   app = buildApp(config, {
-    database: { db: database.db, close: () => Promise.resolve() },
+    database: { close: () => Promise.resolve() },
     jobs: { start: () => Promise.resolve(), stop: () => Promise.resolve() },
     auth: createAuth(database.db, config.auth),
     membership: createMembership(database.db),
