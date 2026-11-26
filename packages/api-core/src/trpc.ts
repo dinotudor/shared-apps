@@ -1,8 +1,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Viewer } from "@shared-apps/auth";
 import type { App } from "./apps.ts";
-import { DomainError, NotAMemberError } from "./errors.ts";
-import type { DomainErrorCode } from "./errors.ts";
+import { DomainError, DomainErrorKind, NotAMemberError } from "./errors.ts";
 
 export type Context = {
   /** Who is signed in, from a session apps/api verified for this call. Null when nobody is. */
@@ -32,12 +31,12 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const createCallerFactory = t.createCallerFactory;
 
-// The one place domain errors become tRPC errors (playbook ADR 0012). A Record, so a new
-// DomainErrorCode without a status here doesn't compile.
-const STATUS_BY_DOMAIN_CODE: Record<DomainErrorCode, TRPCError["code"]> = {
-  not_a_member: "FORBIDDEN",
-  dish_not_found: "NOT_FOUND",
-  unknown_ingredient: "BAD_REQUEST",
+// The one place domain errors become tRPC errors (playbook ADR 0012), by kind, not by code
+// (docs/adr/0010). A Record, so a new DomainErrorKind without a status here doesn't compile.
+const STATUS_BY_KIND: Record<DomainErrorKind, TRPCError["code"]> = {
+  [DomainErrorKind.NotFound]: "NOT_FOUND",
+  [DomainErrorKind.RuleViolated]: "BAD_REQUEST",
+  [DomainErrorKind.Forbidden]: "FORBIDDEN",
 };
 
 // Every procedure starts here. tRPC wraps anything a procedure or a later middleware throws
@@ -47,7 +46,7 @@ const baseProcedure = t.procedure.use(async ({ next }) => {
   const result = await next();
   if (!result.ok && result.error.cause instanceof DomainError) {
     const cause = result.error.cause;
-    throw new TRPCError({ code: STATUS_BY_DOMAIN_CODE[cause.code], cause });
+    throw new TRPCError({ code: STATUS_BY_KIND[cause.kind], cause });
   }
   return result;
 });

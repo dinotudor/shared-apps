@@ -1,6 +1,5 @@
 export { App } from "./apps.ts";
-export { DomainError, NotAMemberError } from "./errors.ts";
-export type { DomainErrorCode } from "./errors.ts";
+export { DomainError, DomainErrorKind, NotAMemberError } from "./errors.ts";
 export {
   adminProcedure,
   createCallerFactory,
