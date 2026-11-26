@@ -1,6 +1,6 @@
 # 0006. Per-app membership lives in modules/membership and reaches tRPC through the context
 
-- Status: accepted
+- Status: accepted. Decision 5 amended by ADR 0010: domain errors map to tRPC codes by kind, not by code.
 - Date: 2026-11-19
 - Issue: #16
 
