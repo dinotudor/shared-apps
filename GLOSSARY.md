@@ -45,3 +45,15 @@ _Avoid_: Archived dish, removed dish
 **Times cooked**:
 How many days before today had the dish planned for dinner.
 _Avoid_: Times made, popularity
+
+**Score**:
+A member's rating of a dish, a whole number from 0 to 10, shown with 🤢 (0–4), 😐 (5–7) or 😍 (8–10). Each member has at most one score per dish and can change it.
+_Avoid_: Grade, stars
+
+**Family average**:
+The mean of the scores members gave a dish. Members who haven't scored it are left out. "Family" here is the brief's wording for the screen, not a data concept.
+_Avoid_: Average rating, household score
+
+**Fed up**:
+A member's mark that they've had enough of a dish for now. It lasts 21 days unless they undo it. The pt-BR copy calls it "Enjoei".
+_Avoid_: Banned, blocked

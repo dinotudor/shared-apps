@@ -156,10 +156,14 @@ body {
   background: var(--wfd-surface);
   color: var(--wfd-text);
   font: 600 var(--sl-text-sm) / var(--sl-leading-sm) var(--wfd-font-ui);
+  text-decoration: none;
   cursor: pointer;
 }
 
-.wfd-chip[aria-pressed="true"] {
+/* A toggle chip is a button with aria-pressed; a chip that navigates (such as a sort that
+   changes the URL) is a link with aria-current. Both show the same selected state. */
+.wfd-chip[aria-pressed="true"],
+.wfd-chip[aria-current="true"] {
   border-color: var(--wfd-text);
   background: var(--wfd-text);
   color: var(--wfd-bg);
